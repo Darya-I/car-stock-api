@@ -4,8 +4,10 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public ICollection<Car> Cars { get; set; } = new List<Car>();
+        public ICollection<CarModel> CarsModel { get; set; } = new List<CarModel>();
 
-        public int CarId { get; set; } //required FK
-        public Car Car { get; set; }
     }
 }
+
+// все коллекции инициализируются чтоб не было NullReferenceException

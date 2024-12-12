@@ -22,21 +22,23 @@ namespace CarStockDAL.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+           modelBuilder.Entity<Car>()
+                .HasOne(c => c.Brand)
+                .WithMany(c => c.Cars)
+                .HasForeignKey(c => c.BrandId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Car>()
-                .HasOne(m => m.Model)
-                .WithOne(m => m.Car)
-                .HasForeignKey<Car>(m => m.ModelId);
+            modelBuilder.Entity<CarModel>()
+                .HasOne(m => m.Brand)
+                .WithMany(b => b.CarsModel)
+                .HasForeignKey(m => m.BrandId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Car>()
-                .HasOne(b => b.Brand)
-                .WithOne(b => b.Car)
-                .HasForeignKey<Car>(b => b.BrandId);
-
-            modelBuilder.Entity<Car>()
-                .HasOne(c => c.Color)
-                .WithOne(c => c.Car)
-                .HasForeignKey<Car>(m => m.ColorId);
+            modelBuilder.Entity<Color>()
+                .HasOne(m => m.CarModel)
+                .WithMany(c => c.Colors)
+                .HasForeignKey(m => m.CarModelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
 
@@ -50,38 +52,46 @@ namespace CarStockDAL.Data
 
             modelBuilder.Entity<CarModel>().HasData(
                 // Toyota Models
-                new CarModel { Id = 1, Name = "Corolla"},
-                new CarModel { Id = 2, Name = "Camry"},
-                new CarModel { Id = 3, Name = "RAV4" },
+                new CarModel { Id = 1, Name = "Corolla", BrandId = 1},
+                new CarModel { Id = 2, Name = "Camry", BrandId = 1 },
+                new CarModel { Id = 3, Name = "RAV4", BrandId = 1 },
                 // BMW Models
-                new CarModel { Id = 4, Name = "X5" },
-                new CarModel { Id = 5, Name = "3 Series"}, 
-                new CarModel { Id = 6, Name = "5 Series"},
+                new CarModel { Id = 4, Name = "X5" , BrandId = 2},
+                new CarModel { Id = 5, Name = "3 Series", BrandId = 2 }, 
+                new CarModel { Id = 6, Name = "5 Series", BrandId = 2 },
                 // Porsche Models
-                new CarModel { Id = 7, Name = "911 Carrera"},
-                new CarModel { Id = 8, Name = "Cayenne"},
-                new CarModel { Id = 9, Name = "Macan"},
+                new CarModel { Id = 7, Name = "911 Carrera", BrandId = 3 },
+                new CarModel { Id = 8, Name = "Cayenne", BrandId = 3 },
+                new CarModel { Id = 9, Name = "Macan", BrandId = 3 },
                 // Mercedes Models
-                new CarModel { Id = 10, Name = "C-Class"},
-                new CarModel { Id = 11, Name = "E-Class"},
-                new CarModel { Id = 12, Name = "GLE"},
+                new CarModel { Id = 10, Name = "C-Class", BrandId = 4 },
+                new CarModel { Id = 11, Name = "E-Class", BrandId = 4 },
+                new CarModel { Id = 12, Name = "GLE", BrandId = 4 },
                 // Audi Models
-                new CarModel { Id = 13, Name = "A4"},
-                new CarModel { Id = 14, Name = "Q5"},
-                new CarModel { Id = 15, Name = "A6"}
+                new CarModel { Id = 13, Name = "A4", BrandId = 4 },
+                new CarModel { Id = 14, Name = "Q5", BrandId = 4 },
+                new CarModel { Id = 15, Name = "A6", BrandId = 4 }
             );
 
             modelBuilder.Entity<Color>().HasData(
-                new Color { Id = 1, Name = "Red" },
-                new Color { Id = 2, Name = "Blue" },
-                new Color { Id = 3, Name = "Black" },
-                new Color { Id = 4, Name = "White" },
-                new Color { Id = 5, Name = "Silver" },
-                new Color { Id = 6, Name = "Green" },
-                new Color { Id = 7, Name = "Yellow" },
-                new Color { Id = 8, Name = "Gray" }
-            );
+                new Color { Id = 1, Name = "Black", CarModelId = 4 },
+                new Color { Id = 2, Name = "White", CarModelId = 4 },
 
+                new Color { Id = 3, Name = "Grey", CarModelId = 5 },
+                new Color { Id = 4, Name = "Blue", CarModelId = 5 },
+
+                new Color { Id = 5, Name = "Silver", CarModelId = 6 },
+                new Color { Id = 6, Name = "Black", CarModelId = 6 },
+
+                new Color { Id = 7, Name = "Red", CarModelId = 7 },
+                new Color { Id = 8, Name = "Yellow", CarModelId = 7 },
+
+                new Color { Id = 9, Name = "White", CarModelId = 8 },
+                new Color { Id = 10, Name = "Red", CarModelId = 8 },
+
+                new Color { Id = 11, Name = "Green", CarModelId = 9 },
+                new Color { Id = 12, Name = "Blue", CarModelId = 9 }
+            );
 
         }
     }
@@ -90,3 +100,4 @@ namespace CarStockDAL.Data
 
 //dotnet ef migrations add SeedData
 //dotnet ef database update
+// https://learn.microsoft.com/ru-ru/ef/core/modeling/relationships/one-to-many

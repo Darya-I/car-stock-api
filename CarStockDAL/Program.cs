@@ -14,7 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     );
 
 //      проверочка
-builder.Services.AddScoped<PostgreCarRepository>();
+//builder.Services.AddScoped<PostgreCarRepository>();
 
 var app = builder.Build();
 
@@ -24,33 +24,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
-//      проверочка
-
-app.MapGet("test", (PostgreCarRepository repo) =>
-{
-    var newCar = new Car
-    {
-        BrandId = 2,
-        ModelId = 2, 
-        ColorId = 2  
-    };
-
-    repo.Create(newCar);
-    repo.Save();
-
-    var cars = repo.GetAllCars();
-
-    return cars.Select(car => new
-    {
-        car.Id,
-        car.BrandId,
-        car.ModelId,
-        car.ColorId
-    });
-});
-
 
 app.UseHttpsRedirection();
 
