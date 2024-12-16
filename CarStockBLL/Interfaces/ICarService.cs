@@ -1,25 +1,19 @@
-﻿using CarStockBLL.DTO;
-using CarStockDAL.Models;
+﻿using CarStockDAL.Models;
 
 namespace CarStockBLL.Interfaces
 {
     public interface ICarService
     {
-
-        // не знаю делать их асинхронными или нет
-        void CreateCar(Car car);
-
         // read
-        Car GetCar(int? id);
-        //read
-        IEnumerable<Car> GetCars();
+        // в этих методах хз Т или сам класс
+        Task<Car> GetCarByIdAsync(int? id);
+        Task<IEnumerable<Car>> GetAllCarsAsync();
 
-        void UpdateCar(Car car);
+        Task CreateCarAsync(Car car);
 
-        void DeleteCar(int? id);
+        Task UpdateCarAsync(Car car);
 
-        void Dispose();
-
+        Task DeleteCarAsync(int? id);
 
     }
 }

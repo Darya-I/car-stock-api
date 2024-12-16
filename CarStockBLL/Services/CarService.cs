@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using CarStockBLL.DTO;
 using CarStockBLL.Interfaces;
-using CarStockDAL.Data;
+using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 
 namespace CarStockBLL.Services
@@ -17,87 +16,97 @@ namespace CarStockBLL.Services
         }
 
 
-        public Car GetCar(int? id) 
+        public async Task<Car> GetCarByIdAsync(int? id) 
         {
             if (id == null)
             {
-                throw new ValidationException("");
+                throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
             }
 
-            var car = _carRepository.GetCar(id.Value);
+            var car = await _carRepository.GetCarByIdAsync(id.Value);
 
-            return new Car { Brand = car.Brand, CarModel = car.CarModel, Color = car.Color, Amount = car.Amount, IsAvaible = car.IsAvaible };
+            if (car == null)
+            {
+                throw new KeyNotFoundException($"Car with ID {id} not found.");
+            }
+
+            return new Car
+            {
+                Id = car.Id,
+                Brand = car.Brand,
+                CarModel = car.CarModel,
+                Color = car.Color,
+                Amount = car.Amount,
+                IsAvaible = car.IsAvaible,
+            };
         }
 
-        public void UpdateCar(Car car) 
+        public async Task UpdateCarAsync(Car car) 
         {
-            var mod_car = _carRepository.GetCar(car.Id);
-            
-            if (mod_car == null)
+            var existingCar = await _carRepository.GetCarByIdAsync(car.Id);
+
+            if (existingCar == null)
             {
                 throw new ValidationException("Car not found.");
             }
 
-            car.Brand.Id = mod_car.BrandId;
-            car.CarModel.Id = mod_car.CarModelId;
-            car.Color = mod_car.Color;
-            car.Amount = mod_car.Amount;
-            car.IsAvaible = mod_car.IsAvaible;
+            existingCar.Brand.Id = car.BrandId;
+            existingCar.CarModel.Id = car.CarModelId;
+            existingCar.Color = car.Color;
+            existingCar.Amount = car.Amount;
+            existingCar.IsAvaible = car.IsAvaible;
 
-            _carRepository.Update(mod_car);
-            _carRepository.Save();
+            await _carRepository.UpdateCarAsync(car);
+            await _carRepository.SaveAsync();
         }
 
-        public void DeleteCar(int? id) 
+        public async Task DeleteCarAsync(int? id) 
         {
             if (id == null) 
             {
                 throw new ValidationException(" "); //дописать тут
             }
-            var car = _carRepository.GetCar(id.Value);
+            var car = _carRepository.GetCarByIdAsync(id.Value);
 
             if (car == null)
             {
                 throw new ValidationException(" ");
             }
 
-            _carRepository.Delete(id.Value);
-            _carRepository.Save();
+            await _carRepository.DeleteCarAsync(id.Value);
+            await _carRepository.SaveAsync();
 
         }
 
-        public IEnumerable<Car> GetCars() 
+        public async Task<IEnumerable<Car>> GetAllCarsAsync() 
         {
-            var cars = _carRepository.GetAllCars();
-
-            if (cars == null || !cars.Any())
+            try
             {
-                throw new ValidationException("Автомобили не найдены."); // Или используйте свое исключение
+                var cars = await _carRepository.GetAllCarsAsync();
+                if (cars.Any())
+                {
+                    return cars;
+                }
+                else
+                {
+                    return Enumerable.Empty<Car>();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new ValidationException("Car not found.");
             }
 
-            return cars.Select(car => new Car
-            {
-                Brand = car.Brand,
-                CarModel = car.CarModel,
-                Color = car.Color,
-                Amount = car.Amount,
-                IsAvaible= car.IsAvaible
-            });
-
-            
         }
 
-        public void Dispose()
+        public async Task CreateCarAsync(Car car)
         {
-            _carRepository.Dispose();
+            _carRepository.CreateCarAsync(car);
+            _carRepository.SaveAsync();
 
         }
-
-        public void CreateCar(Car car)
-        {
-            _carRepository.Create(car);
-            _carRepository.Save();
-
-        }
+        
     }
 }

@@ -1,69 +1,65 @@
-﻿using CarStockDAL.Models;
+﻿using System.Reflection.Metadata.Ecma335;
+using CarStockDAL.Data.Repos;
+using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CarStockDAL.Data
 {
-    public class PostgreCarRepository : ICarRepository<Car>
+    public class PostgreCarRepository<T> : ICarRepository<Car> where T : class
     {
-        private AppDbContext db;
+        private readonly AppDbContext _dbContext;
+        private readonly DbSet<Car> _cars;
 
-        public PostgreCarRepository(AppDbContext db) 
+        public PostgreCarRepository(AppDbContext context) 
         {
-            this.db = db;
+            _dbContext = context;
+            _cars = context.Cars;
+
         }
 
-        public void Create(Car car)
+
+        public async Task CreateCarAsync(Car car)
         {
-            db.Cars.Add(car);
+            _cars.Add(car);
+            await SaveAsync();
         }
 
-        public void Delete(int id)
+        public async Task UpdateCarAsync(Car car)
         {
-            Car car = db.Cars.Find(id);
-            if (car != null) 
+            _cars.Update(car);
+            await SaveAsync();
+        }
+
+        public async Task DeleteCarAsync(int id)
+        {
+
+            var carToDelete = await _cars.FindAsync(id);
+
+            if (carToDelete != null)
             {
-                db.Cars.Remove(car);
+                _cars.Remove(carToDelete);
+                await SaveAsync();
             }
         }
 
-        public IEnumerable<Car> GetAllCars()
+        public async Task<Car> GetCarByIdAsync(int id)
         {
-            return db.Cars;
+            return await _cars.FindAsync(id);
         }
 
-        public Car GetCar(int id)
+        public async Task<List<Car>> GetAllCarsAsync(bool tracked = true)
         {
-            return db.Cars.Find(id);
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
-        }
-
-        public void Update(Car car)
-        {
-            db.Entry(car).State = EntityState.Modified;
-        }
-
-        private bool disposed = false;
-
-        public virtual void Dispose(bool disposing) 
-        {
-            if (!this.disposed)
+            IQueryable<Car> query = _cars;
+            if (!tracked)
             {
-                if (disposing) 
-                {
-                    db.Dispose();
-                }
+                query = query.AsNoTracking();
             }
-            this.disposed = true;                           //Флаг, предотвращающий повторное освобождение ресурсов.
+
+            return await query.ToListAsync();
         }
 
-        public void Dispose()
+        public async Task SaveAsync()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);                      //Указывает сборщику мусора, что финализатор для данного объекта можно пропустить,
-                                                            //так как ресурсы уже освобождены вручную.
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
