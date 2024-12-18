@@ -3,7 +3,7 @@
 
 namespace CarStockDAL.Data.Repos
 {
-    interface IColorRepository<T> : IDisposable
+    public interface IColorRepository<T>
         where T : class
     {
 
@@ -14,6 +14,6 @@ namespace CarStockDAL.Data.Repos
         Task<List<Color>> GetAllColorsAsync(bool tracked = true);
         Task SaveAsync();
 
-
+        Task<T> GetColorByNameAsync(string name);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace CarStockDAL.Data.Repos
 {
-    interface ICarModelRepository<T> : IDisposable
+    public interface ICarModelRepository<T>
         where T : class
     {
 
@@ -13,5 +13,6 @@ namespace CarStockDAL.Data.Repos
         Task<List<CarModel>> GetCarModelsAsync(bool tracked = true);
         Task SaveAsync();
 
+        Task<T> GetCarModelByNameAsync(string name);
     }
 }

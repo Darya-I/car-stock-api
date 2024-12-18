@@ -12,9 +12,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 
-
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

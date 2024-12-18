@@ -31,24 +31,41 @@ namespace CarStockDAL.Data
 
         public async Task DeleteCarAsync(int id)
         {
-
-            var carToDelete = await _cars.FindAsync(id);
-
-            if (carToDelete != null)
+            // Поиск автомобиля по идентификатору
+            var exists = await _cars.Where(c => c.Id == id).AnyAsync();
+            if (!exists)
             {
-                _cars.Remove(carToDelete);
-                await SaveAsync();
+                throw new InvalidOperationException("Car not found.");
             }
+
+            var carToDelete = await _cars.SingleOrDefaultAsync(c => c.Id == id);
+
+            // Удаление автомобиля
+            _cars.Remove(carToDelete);
+
+            // Сохранение изменений в базе данных
+            await _dbContext.SaveChangesAsync();
         }
 
+
+        // тут мейби надо править под линкью
         public async Task<Car> GetCarByIdAsync(int id)
         {
-            return await _cars.FindAsync(id);
+            var car = await _cars
+                .Include(c => c.Brand)     // Загрузить связанный объект Brand
+                .Include(c => c.CarModel)  // Загрузить связанный объект CarModel
+                .Include(c => c.Color)     // Загрузить связанный объект Color
+                .FirstOrDefaultAsync(c => c.Id == id);  // Фильтруем по ID
+            return car;
         }
 
         public async Task<List<Car>> GetAllCarsAsync(bool tracked = true)
         {
-            IQueryable<Car> query = _cars;
+            IQueryable<Car> query = _cars
+                .Include(c => c.Brand)
+                .Include(c => c.CarModel)
+                .Include(c => c.Color);
+
             if (!tracked)
             {
                 query = query.AsNoTracking();
@@ -56,6 +73,7 @@ namespace CarStockDAL.Data
 
             return await query.ToListAsync();
         }
+
 
         public async Task SaveAsync()
         {

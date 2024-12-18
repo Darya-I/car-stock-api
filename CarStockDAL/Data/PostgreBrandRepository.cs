@@ -10,10 +10,10 @@ namespace CarStockDAL.Data
         private readonly AppDbContext _dbContext;
         private readonly DbSet<Brand> _brands;
 
-        public PostgreBrandRepository(AppDbContext dbContext, DbSet<Brand> brands)
+        public PostgreBrandRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-            _brands = brands;
+            _brands = dbContext.Brands;
         }
 
         public async Task CreareBrandAsync(Brand brand)
@@ -60,24 +60,14 @@ namespace CarStockDAL.Data
             await SaveAsync();
         }
 
-        private bool disposed = false;
+        
 
-        public virtual void Dispose(bool disposing)
+        // новый метод для поиска по имени
+        public async Task<Brand?> GetBrandByNameAsync(string name)
         {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    _dbContext.Dispose();
-                }
-            }
-            this.disposed = true;                           //Флаг, предотвращающий повторное освобождение ресурсов.
+            return await _brands.FirstOrDefaultAsync(b => b.Name == name);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+       
     }
 }

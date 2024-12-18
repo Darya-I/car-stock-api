@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CarStockBLL\CarStockBLL.csproj" />
     <ProjectReference Include="..\CarStockDAL\CarStockDAL.csproj" />
+    <ProjectReference Include="..\CarStockMAP\CarStockMAP.csproj" />
   </ItemGroup>
 
 </Project>

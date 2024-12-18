@@ -10,6 +10,12 @@ namespace CarStockDAL.Data
         private readonly AppDbContext _dbContext;
         private readonly DbSet<CarModel> _carModels;
 
+        public PostgreCarModelRepository(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+            _carModels = dbContext.Models;
+        }
+
         public async Task CreateCarModelAsync(CarModel carModel)
         {
             _carModels.Add(carModel);
@@ -55,24 +61,12 @@ namespace CarStockDAL.Data
         }
 
 
-        private bool disposed = false;
 
-        public virtual void Dispose(bool disposing)
+        public async Task<CarModel?> GetCarModelByNameAsync(string name)
         {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    _dbContext.Dispose();
-                }
-            }
-            this.disposed = true;                           //Флаг, предотвращающий повторное освобождение ресурсов.
+            return await _carModels.FirstOrDefaultAsync(b => b.Name == name);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        
     }
 }

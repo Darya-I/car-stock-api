@@ -9,10 +9,10 @@ namespace CarStockDAL.Data
         private readonly AppDbContext _dbContext;
         private readonly DbSet<Color> _colors;
 
-        public PostgreColorRepository(AppDbContext dbContext, DbSet<Color> colors)
+        public PostgreColorRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-            _colors = colors;
+            _colors = dbContext.Colors;
         }
 
         public async Task CreateColorAsync(Color color)
@@ -60,24 +60,11 @@ namespace CarStockDAL.Data
             await SaveAsync();
         }
 
-        private bool disposed = false;
-
-        public virtual void Dispose(bool disposing)
+        public async Task<Color?> GetColorByNameAsync(string name)
         {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    _dbContext.Dispose();
-                }
-            }
-            this.disposed = true;                           //Флаг, предотвращающий повторное освобождение ресурсов.
+            return await _colors.FirstOrDefaultAsync(b => b.Name == name);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+
     }
 }

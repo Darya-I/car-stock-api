@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Models;
 using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 
@@ -8,15 +9,22 @@ namespace CarStockBLL.Services
     public class CarService : ICarService
     {
         private readonly ICarRepository<Car> _carRepository;
-        //private readonly IColorRepository<Color> _colorRepository;
 
-        public CarService(ICarRepository<Car> carRepository)
+        private readonly IBrandService _brandService;
+        private readonly ICarModelService _carModelService;
+        private readonly IColorService _colorService;
+
+
+        public CarService(ICarRepository<Car> carRepository, IBrandService brandService, ICarModelService carModelService, IColorService colorService)
         {
             _carRepository = carRepository;
+            _brandService = brandService;
+            _carModelService = carModelService;
+            _colorService = colorService;
         }
 
 
-        public async Task<Car> GetCarByIdAsync(int? id) 
+        public async Task<Car> GetCarByIdAsync(int? id)
         {
             if (id == null)
             {
@@ -30,6 +38,7 @@ namespace CarStockBLL.Services
                 throw new KeyNotFoundException($"Car with ID {id} not found.");
             }
 
+            // Возвращаем результат
             return new Car
             {
                 Id = car.Id,
@@ -41,24 +50,25 @@ namespace CarStockBLL.Services
             };
         }
 
-        public async Task UpdateCarAsync(Car car) 
+
+        public async Task UpdateCarAsync(CarUpdateDto carUpdateDto)
         {
-            var existingCar = await _carRepository.GetCarByIdAsync(car.Id);
+            var existingCar = await _carRepository.GetCarByIdAsync(carUpdateDto.Id);
 
             if (existingCar == null)
             {
                 throw new ValidationException("Car not found.");
             }
 
-            existingCar.Brand.Id = car.BrandId;
-            existingCar.CarModel.Id = car.CarModelId;
-            existingCar.Color = car.Color;
-            existingCar.Amount = car.Amount;
-            existingCar.IsAvaible = car.IsAvaible;
+            existingCar.BrandId = carUpdateDto.BrandId;
+            existingCar.CarModelId = carUpdateDto.CarModelId;
+            existingCar.ColorId = carUpdateDto.ColorId;
+            existingCar.Amount = carUpdateDto.Amount;
+            existingCar.IsAvaible = carUpdateDto.IsAvaible;
 
-            await _carRepository.UpdateCarAsync(car);
-            await _carRepository.SaveAsync();
+            await _carRepository.UpdateCarAsync(existingCar);
         }
+
 
         public async Task DeleteCarAsync(int? id) 
         {
@@ -66,15 +76,14 @@ namespace CarStockBLL.Services
             {
                 throw new ValidationException(" "); //дописать тут
             }
-            var car = _carRepository.GetCarByIdAsync(id.Value);
+            var car = await _carRepository.GetCarByIdAsync(id.Value);
 
             if (car == null)
             {
-                throw new ValidationException(" ");
+                throw new ValidationException(" че ");
             }
 
             await _carRepository.DeleteCarAsync(id.Value);
-            await _carRepository.SaveAsync();
 
         }
 
@@ -101,12 +110,53 @@ namespace CarStockBLL.Services
 
         }
 
-        public async Task CreateCarAsync(Car car)
+        public async Task<OperationResult<string>> CreateCarAsync(string brandName, string carModelName, string colorName, int amount, bool isAvailable)
         {
-            _carRepository.CreateCarAsync(car);
-            _carRepository.SaveAsync();
+            var brandResult = await _brandService.GetBrandByNameAsync(brandName);
+            if (!brandResult.Success) 
+            {
+                return OperationResult<string>.Failure(brandResult.ErrorMessage);
+            }
+            var brand = brandResult.Data;
 
+            var colorResult = await _colorService.GetColorByNameAsync(colorName);
+            if (!colorResult.Success)
+            {
+                return OperationResult<string>.Failure(colorResult.ErrorMessage);
+            }
+            var color = colorResult.Data;
+
+            var carModelResult = await _carModelService.GetCarModelByNameAsync(carModelName);
+            if (!carModelResult.Success)
+            {
+                return OperationResult<string>.Failure(carModelResult.ErrorMessage);
+            }
+            var carModel = carModelResult.Data;
+
+            // Дальше работаем с успешными результатами.
+            var car = new Car
+            {
+                BrandId = brand.Id,
+                CarModelId = carModel.Id,
+                ColorId = color.Id,
+                Amount = amount,
+                IsAvaible = isAvailable
+            };
+
+            await _carRepository.CreateCarAsync(car);
+
+            return OperationResult<string>.SuccessResult($"Car '{carModelName}' of brand '{brandName}' and color '{colorName}' successfully created.");
         }
-        
+
+
+
+
+        // тут должен быть вызов кар модел, вернуть тру,
+        // в кармодел вызов колор, вернуть тру, ЗАТЕМ
+        // этот метод вернет тру
+        // иначе НЕТУ, на всех проверках говорить чего нет
+        //bool brandExist = _brandService.GetBrandByNameAsync(BrandName) == BrandName;
+
+
     }
 }

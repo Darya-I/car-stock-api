@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
+using System.Text.Json.Serialization;
 
 namespace CarStockDAL.Models
 {
@@ -10,6 +11,7 @@ namespace CarStockDAL.Models
 
         public int BrandId { get; set; } //required FK
         public Brand Brand { get; set; }
+        [JsonIgnore]
         public ICollection<Color> Colors { get; set; } = new List<Color>();
 
     }

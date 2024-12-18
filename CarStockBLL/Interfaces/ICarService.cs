@@ -1,4 +1,5 @@
-﻿using CarStockDAL.Models;
+﻿using CarStockBLL.Models;
+using CarStockDAL.Models;
 
 namespace CarStockBLL.Interfaces
 {
@@ -9,11 +10,13 @@ namespace CarStockBLL.Interfaces
         Task<Car> GetCarByIdAsync(int? id);
         Task<IEnumerable<Car>> GetAllCarsAsync();
 
-        Task CreateCarAsync(Car car);
+        Task<OperationResult<string>> CreateCarAsync(string brandName, string carModelName, string colorName, int amount, bool isAvaible);
 
-        Task UpdateCarAsync(Car car);
+        Task UpdateCarAsync(CarUpdateDto carUpdateDto);
 
         Task DeleteCarAsync(int? id);
+
+        //Task<bool> IsCarExists(string BrandName, string CarModelName, string ColorName);
 
     }
 }
