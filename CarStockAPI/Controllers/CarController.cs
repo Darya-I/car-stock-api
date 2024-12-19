@@ -2,11 +2,10 @@
 using CarStockBLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using CarStockMAP;
-using Riok.Mapperly.Abstractions;
-using CarStockBLL.Services;
-using CarStockBLL.Models;
 using CarStockBLL.Infrastructure;
-//using CarStockDAL.Models;
+using CarStockBLL.Models;
+using CarStockAPI.Models;
+
 
 
 namespace CarStockAPI.Controllers
@@ -32,11 +31,11 @@ namespace CarStockAPI.Controllers
         }
 
         [HttpPost("CreateCar")]
-        public async Task<ActionResult> CreateCarAsync(CarViewModel car)
+        public async Task<ActionResult> CreateCarAsync(CarDTO car)
         {
             try
             {
-                var result = await _carService.CreateCarAsync(car.BrandName, car.CarModelName, car.ColorName, car.Amount, car.IsAvaible);
+                var result = await _mapService.CreateMappedCarAsync(car);
 
                 if (!result.Success)
                 {
@@ -89,7 +88,7 @@ namespace CarStockAPI.Controllers
             {
                 return NotFound(new { Message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "An internal server error occurred.");
             }
@@ -105,11 +104,10 @@ namespace CarStockAPI.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { Message = ex.Message }); // Ошибка валидации (например, id не указан или объект не найден)
-            }
-            catch (Exception ex)
+                return BadRequest(new { Message = ex.Message });  }
+            catch (Exception)
             {
-                return StatusCode(500, "An internal server error occurred."); // В случае других ошибок
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
 

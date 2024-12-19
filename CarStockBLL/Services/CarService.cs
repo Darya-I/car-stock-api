@@ -110,23 +110,24 @@ namespace CarStockBLL.Services
 
         }
 
-        public async Task<OperationResult<string>> CreateCarAsync(string brandName, string carModelName, string colorName, int amount, bool isAvailable)
+        public async Task<OperationResult<string>> CreateCarAsync(Car car)
         {
-            var brandResult = await _brandService.GetBrandByNameAsync(brandName);
+
+            var brandResult = await _brandService.GetBrandByNameAsync(car.Brand.Name);
             if (!brandResult.Success) 
             {
                 return OperationResult<string>.Failure(brandResult.ErrorMessage);
             }
             var brand = brandResult.Data;
 
-            var colorResult = await _colorService.GetColorByNameAsync(colorName);
+            var colorResult = await _colorService.GetColorByNameAsync(car.Color.Name);
             if (!colorResult.Success)
             {
                 return OperationResult<string>.Failure(colorResult.ErrorMessage);
             }
             var color = colorResult.Data;
 
-            var carModelResult = await _carModelService.GetCarModelByNameAsync(carModelName);
+            var carModelResult = await _carModelService.GetCarModelByNameAsync(car.CarModel.Name);
             if (!carModelResult.Success)
             {
                 return OperationResult<string>.Failure(carModelResult.ErrorMessage);
@@ -134,18 +135,18 @@ namespace CarStockBLL.Services
             var carModel = carModelResult.Data;
 
             // Дальше работаем с успешными результатами.
-            var car = new Car
+            var newCar = new Car
             {
                 BrandId = brand.Id,
                 CarModelId = carModel.Id,
                 ColorId = color.Id,
-                Amount = amount,
-                IsAvaible = isAvailable
+                Amount = car.Amount,
+                IsAvaible = car.IsAvaible,
             };
 
-            await _carRepository.CreateCarAsync(car);
+            await _carRepository.CreateCarAsync(newCar);
 
-            return OperationResult<string>.SuccessResult($"Car '{carModelName}' of brand '{brandName}' and color '{colorName}' successfully created.");
+            return OperationResult<string>.SuccessResult($"Car '{car.CarModel.Name}' of brand '{car.Brand.Name}' and color '{car.Color.Name}' successfully created.");
         }
 
 

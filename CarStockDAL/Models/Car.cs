@@ -7,13 +7,13 @@
         public bool IsAvaible { get; set; }
 
         public int BrandId { get; set; } //required FK
-        public Brand Brand { get; set; }
+        public Brand? Brand { get; set; }
 
         public int CarModelId { get; set; }
-        public CarModel CarModel { get; set; }
+        public CarModel? CarModel { get; set; }
 
         public int ColorId { get; set; }
-        public Color Color { get; set; }
+        public Color? Color { get; set; }
                                         
     }
 }

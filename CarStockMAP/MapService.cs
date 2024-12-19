@@ -1,4 +1,6 @@
 ﻿using CarStockBLL.Interfaces;
+using CarStockBLL.Models;
+using CarStockDAL.Models;
 using CarStockMAP.DTO;
 using CarStockMAP.Mapping;
 using CarStockMAP.ViewModels;
@@ -9,12 +11,10 @@ namespace CarStockMAP
     public class MapService
     {
         public readonly ICarService _carService;
-        //public readonly IBrandService _brandService;
 
         public MapService(ICarService carService)
         {
             _carService = carService;
-           // _brandService = brandService;
         }
 
         public async Task<IEnumerable<CarDTO>> GetMappedCarsAsync()
@@ -29,23 +29,27 @@ namespace CarStockMAP
 
         }
 
-        //принимаем CarDto от клиента
-        public async Task CreateCarAsync(CarViewModel car)
+
+        public async Task<OperationResult<string>> CreateMappedCarAsync(CarDTO carDto)
         {
             try
             {
-                return;
                 var mapper = new CarMapper();
-                //var car = mapper.MapToCar(carDTO);
-                //await _carService.CreateCarAsync(car);
 
+                // преобразуем DTO в модель уровня BLL
+                var car = mapper.MapToCar(carDto);
+
+                // передаем преобразованную модель в _carService для создания
+                var result = await _carService.CreateCarAsync(car);
+
+                return result;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                return;
+                return OperationResult<string>.Failure($"An error occurred while creating the mapped car: {ex.Message}");
             }
-
         }
+
 
     }
 }

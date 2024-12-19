@@ -9,8 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Регистрация сервисов
 builder.Services.AddScoped<ICarService, CarService>();
-builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<ICarModelService, CarModelService>();
+builder.Services.AddScoped<IColorService, ColorService>();
 
 var app = builder.Build();
 

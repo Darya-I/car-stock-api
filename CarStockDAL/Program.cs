@@ -1,4 +1,6 @@
 using CarStockDAL.Data;
+using CarStockDAL.Data.Repos;
+using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,11 +11,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .EnableSensitiveDataLogging()  // Включает логирование параметров запросов
-           .LogTo(Console.WriteLine)      // Логирует SQL-запросы в консоль
-);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Регистрация репозиториев
+builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
+builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
+builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
+builder.Services.AddScoped<IColorRepository<Color>, PostgreColorRepository<Color>>();
 
 var app = builder.Build();
 

@@ -4,6 +4,7 @@ using CarStockDAL.Data;
 using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 using CarStockMAP;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,13 +19,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     );
 
 
-// Регистрация репозиториев
+
+
+//                          DEV ONLY !!! NEED TO REFACTOR
+
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
 builder.Services.AddScoped<IColorRepository<Color>, PostgreColorRepository<Color>>();
 
-// Регистрация сервисов
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICarModelService, CarModelService>();
@@ -32,6 +35,7 @@ builder.Services.AddScoped<IColorService, ColorService>();
 
 // Регистрация MapService
 builder.Services.AddScoped<MapService>();
+
 
 var app = builder.Build();
 

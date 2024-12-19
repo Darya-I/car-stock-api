@@ -1,4 +1,4 @@
-﻿namespace CarStockAPI
+﻿namespace CarStockAPI.Models
 {
     public class CarViewModel
     {

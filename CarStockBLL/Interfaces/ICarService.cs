@@ -1,6 +1,7 @@
 ﻿using CarStockBLL.Models;
 using CarStockDAL.Models;
 
+
 namespace CarStockBLL.Interfaces
 {
     public interface ICarService
@@ -10,7 +11,7 @@ namespace CarStockBLL.Interfaces
         Task<Car> GetCarByIdAsync(int? id);
         Task<IEnumerable<Car>> GetAllCarsAsync();
 
-        Task<OperationResult<string>> CreateCarAsync(string brandName, string carModelName, string colorName, int amount, bool isAvaible);
+        Task<OperationResult<string>> CreateCarAsync(Car car);
 
         Task UpdateCarAsync(CarUpdateDto carUpdateDto);
 
