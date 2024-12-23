@@ -1,6 +1,7 @@
 using CarStockDAL.Data;
 using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,12 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+
 
 // Регистрация репозиториев
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();

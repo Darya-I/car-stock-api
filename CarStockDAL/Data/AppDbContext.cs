@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CarStockDAL.Data
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -35,7 +35,7 @@ namespace CarStockDAL.Data
                 .WithMany(c => c.Colors)
                 .HasForeignKey(m => m.CarModelId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+           
             base.OnModelCreating(modelBuilder);
  
         }

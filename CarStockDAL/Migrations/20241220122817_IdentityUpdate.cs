@@ -6,10 +6,35 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CarStockDAL.Migrations
 {
-    public partial class IdentityData : Migration
+    public partial class IdentityUpdate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DeleteData(
+                table: "Brands",
+                keyColumn: "Id",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Brands",
+                keyColumn: "Id",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Brands",
+                keyColumn: "Id",
+                keyValue: 3);
+
+            migrationBuilder.DeleteData(
+                table: "Brands",
+                keyColumn: "Id",
+                keyValue: 4);
+
+            migrationBuilder.DeleteData(
+                table: "Brands",
+                keyColumn: "Id",
+                keyValue: 5);
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -29,6 +54,8 @@ namespace CarStockDAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    RefreshToken = table.Column<string>(type: "text", nullable: true),
+                    RefreshTokenExpireTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -215,6 +242,18 @@ namespace CarStockDAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.InsertData(
+                table: "Brands",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Toyota" },
+                    { 2, "BMW" },
+                    { 3, "Porsche" },
+                    { 4, "Mercedes" },
+                    { 5, "Audi" }
+                });
         }
     }
 }

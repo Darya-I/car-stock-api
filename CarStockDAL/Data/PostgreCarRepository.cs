@@ -28,6 +28,16 @@ namespace CarStockDAL.Data
             await SaveAsync();
         }
 
+        //availability
+        public async Task UpdateCarAvailabilityAsync(int id, bool isAvaible)
+        {
+            var existingCar = await _cars.FirstOrDefaultAsync(car => car.Id == id);
+
+            existingCar.IsAvaible = isAvaible;
+            _cars.Update(existingCar);
+            await SaveAsync();
+        }
+
         public async Task DeleteCarAsync(int id)
         {
             // Поиск автомобиля по идентификатору

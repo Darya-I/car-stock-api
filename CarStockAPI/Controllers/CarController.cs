@@ -5,6 +5,8 @@ using CarStockMAP;
 using CarStockBLL.Infrastructure;
 using CarStockBLL.Models;
 using CarStockAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 
 
@@ -23,6 +25,8 @@ namespace CarStockAPI.Controllers
             _mapService = mapService;
         }
 
+        //[Authorize(JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
+        [Authorize(Roles = "Admin,User")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
         {
@@ -94,6 +98,37 @@ namespace CarStockAPI.Controllers
             }
         }
 
+        //availability
+        [HttpPut("UpdateCarAvailability/{id}")]
+        public async Task<IActionResult> UpdateCarAvailability(int id, [FromBody] CarUpdateDto carUpdateDto)
+        {
+            if (carUpdateDto == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            if (id != carUpdateDto.Id)
+            {
+                return BadRequest("Car ID in the URL does not match the ID in the body.");
+            }
+
+            try
+            {
+                // DEV
+                await _carService.UpdateCarAsync(carUpdateDto);
+
+                return Ok(carUpdateDto);
+            }
+            catch (ValidationException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An internal server error occurred.");
+            }
+        }
+
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
         {
@@ -110,11 +145,6 @@ namespace CarStockAPI.Controllers
                 return StatusCode(500, "An internal server error occurred.");
             }
         }
-
-
-
-
-
 
 
     }

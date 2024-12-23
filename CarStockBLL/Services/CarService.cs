@@ -69,6 +69,19 @@ namespace CarStockBLL.Services
             await _carRepository.UpdateCarAsync(existingCar);
         }
 
+        public async Task UpdateAvailabilityCar(CarUpdateDto carUpdateDto)
+        {
+            var existingCar = await _carRepository.GetCarByIdAsync(carUpdateDto.Id);
+
+            if (existingCar == null) { throw new ValidationException("Car not found"); }
+
+            existingCar.IsAvaible = carUpdateDto.IsAvaible;
+
+            //      DEV ONLY
+            await _carRepository.UpdateCarAvailabilityAsync(existingCar.Id, existingCar.IsAvaible);
+        }
+
+
 
         public async Task DeleteCarAsync(int? id) 
         {
