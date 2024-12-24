@@ -25,8 +25,7 @@ namespace CarStockAPI.Controllers
             _mapService = mapService;
         }
 
-        //[Authorize(JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
         {
@@ -114,8 +113,7 @@ namespace CarStockAPI.Controllers
 
             try
             {
-                // DEV
-                await _carService.UpdateCarAsync(carUpdateDto);
+                await _carService.UpdateCarAvailabilityAsync(id, carUpdateDto.IsAvaible);
 
                 return Ok(carUpdateDto);
             }
@@ -140,6 +138,35 @@ namespace CarStockAPI.Controllers
             catch (ValidationException ex)
             {
                 return BadRequest(new { Message = ex.Message });  }
+            catch (Exception)
+            {
+                return StatusCode(500, "An internal server error occurred.");
+            }
+        }
+
+        [HttpPut("UpdateCarAmoubt/{id}")]
+        public async Task<IActionResult> UpdateCarAmount(int id, [FromBody] CarUpdateDto carUpdateDto)
+        {
+            if (carUpdateDto == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            if (id != carUpdateDto.Id)
+            {
+                return BadRequest("Car ID in the URL does not match the ID in the body.");
+            }
+
+            try
+            {
+                await _carService.UpdateCarAmountAsync(id, carUpdateDto.Amount);
+
+                return Ok(carUpdateDto);
+            }
+            catch (ValidationException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
             catch (Exception)
             {
                 return StatusCode(500, "An internal server error occurred.");

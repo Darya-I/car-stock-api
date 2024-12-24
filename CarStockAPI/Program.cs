@@ -24,17 +24,12 @@ builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-
-
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
 
-//                          DEV ONLY !!! NEED TO REFACTOR !!! SERVICES REGISTER
+//                          !!! NEED TO REFACTOR !!! SERVICES REGISTER
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
@@ -49,9 +44,11 @@ builder.Services.AddScoped<IColorService, ColorService>();
 // еще регистрация
 builder.Services.AddScoped<MapService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddTransient<ITokenService, TokenService>();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 
-// Configure JWT Authentication
+// JWT
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var secretKey = jwtConfig.GetValue<string>("Secret");
 
@@ -81,7 +78,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure Authorization
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
@@ -91,7 +87,6 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

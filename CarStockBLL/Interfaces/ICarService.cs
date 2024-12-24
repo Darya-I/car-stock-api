@@ -17,7 +17,8 @@ namespace CarStockBLL.Interfaces
 
         Task DeleteCarAsync(int? id);
 
-        //Task<bool> IsCarExists(string BrandName, string CarModelName, string ColorName);
+        Task UpdateCarAvailabilityAsync(int id, bool isAvaible);
+        Task UpdateCarAmountAsync(int id, int amount);
 
     }
 }

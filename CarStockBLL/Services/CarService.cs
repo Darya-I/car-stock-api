@@ -69,19 +69,6 @@ namespace CarStockBLL.Services
             await _carRepository.UpdateCarAsync(existingCar);
         }
 
-        public async Task UpdateAvailabilityCar(CarUpdateDto carUpdateDto)
-        {
-            var existingCar = await _carRepository.GetCarByIdAsync(carUpdateDto.Id);
-
-            if (existingCar == null) { throw new ValidationException("Car not found"); }
-
-            existingCar.IsAvaible = carUpdateDto.IsAvaible;
-
-            //      DEV ONLY
-            await _carRepository.UpdateCarAvailabilityAsync(existingCar.Id, existingCar.IsAvaible);
-        }
-
-
 
         public async Task DeleteCarAsync(int? id) 
         {
@@ -147,7 +134,6 @@ namespace CarStockBLL.Services
             }
             var carModel = carModelResult.Data;
 
-            // Дальше работаем с успешными результатами.
             var newCar = new Car
             {
                 BrandId = brand.Id,
@@ -162,14 +148,40 @@ namespace CarStockBLL.Services
             return OperationResult<string>.SuccessResult($"Car '{car.CarModel.Name}' of brand '{car.Brand.Name}' and color '{car.Color.Name}' successfully created.");
         }
 
+        public async Task UpdateCarAvailabilityAsync(int id, bool isAvaible)
+        {
+            var existingCar = await _carRepository.GetCarByIdAsync(id);
 
+            if (existingCar == null)
+            {
+                throw new ValidationException("Car not found.");
+            }
 
+            existingCar.IsAvaible = isAvaible;
 
-        // тут должен быть вызов кар модел, вернуть тру,
-        // в кармодел вызов колор, вернуть тру, ЗАТЕМ
-        // этот метод вернет тру
-        // иначе НЕТУ, на всех проверках говорить чего нет
-        //bool brandExist = _brandService.GetBrandByNameAsync(BrandName) == BrandName;
+            await _carRepository.UpdateCarAsync(existingCar);
+        }
+
+        public async Task UpdateCarAmountAsync(int id, int amount)
+        {
+            var existingCar = await _carRepository.GetCarByIdAsync(id);
+
+            if (existingCar == null) 
+            {
+                throw new ValidationException("Car not found");
+            }
+
+            if (amount < 0)
+            {
+                throw new ValidationException("Amount cannot be negative.");
+            }
+
+            existingCar.Amount = amount;
+
+            existingCar.IsAvaible = amount > 0;
+
+            await _carRepository.UpdateCarAsync(existingCar);       
+        }
 
 
     }

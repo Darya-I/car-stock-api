@@ -28,15 +28,6 @@ namespace CarStockDAL.Data
             await SaveAsync();
         }
 
-        //availability
-        public async Task UpdateCarAvailabilityAsync(int id, bool isAvaible)
-        {
-            var existingCar = await _cars.FirstOrDefaultAsync(car => car.Id == id);
-
-            existingCar.IsAvaible = isAvaible;
-            _cars.Update(existingCar);
-            await SaveAsync();
-        }
 
         public async Task DeleteCarAsync(int id)
         {
@@ -56,8 +47,6 @@ namespace CarStockDAL.Data
             await _dbContext.SaveChangesAsync();
         }
 
-
-        // тут мейби надо править под линкью
         public async Task<Car> GetCarByIdAsync(int id)
         {
             var car = await _cars

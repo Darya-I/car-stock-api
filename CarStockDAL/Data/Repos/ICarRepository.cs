@@ -14,8 +14,6 @@ namespace CarStockDAL.Data.Repos
         Task DeleteCarAsync(int id);
         Task<T> GetCarByIdAsync(int id);
         Task<List<Car>> GetAllCarsAsync(bool tracked = true);
-        Task UpdateCarAvailabilityAsync(int id, bool isAvaible);
-
         Task SaveAsync();
 
     }
