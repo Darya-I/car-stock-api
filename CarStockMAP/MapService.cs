@@ -2,6 +2,7 @@
 using CarStockBLL.Models;
 using CarStockMAP.DTO;
 using CarStockMAP.Mapping;
+using CarStockMAP.Models;
 
 
 namespace CarStockMAP
@@ -15,6 +16,20 @@ namespace CarStockMAP
         {
             _carService = carService;
             _userService = userService;
+        }
+
+
+        public async Task<LoginTokenDto> MapUserLogin(LoginRequest loginRequest)
+        {
+            var mapper = new UserMapper();
+            var user = mapper.MapLoginRequestToUser(loginRequest);
+
+            // Аутентификация возвращает пользователя и access token
+            var (authenticatedUser, accessToken) = await _userService.Authenticate(user);
+            // Передаем пользователя и accessToken в метод маппинга
+            var loginResult = mapper.MapUserToLoginTokenDto(authenticatedUser);
+            loginResult.Token = accessToken;
+            return loginResult;
         }
 
         public async Task<IEnumerable<CarDTO>> GetMappedCarsAsync()
@@ -33,13 +48,39 @@ namespace CarStockMAP
         {
             var mapper = new UserMapper();
             
-            var user = mapper.MapToUser(createUserDTO);
+            var user = mapper.MapCreateUserDtoToUser(createUserDTO);
 
             var result = await _userService.CreateUserAsync(user);
 
-            return mapper.MapToCreateUserDto(result);
+            return mapper.MapUserToCreateUserDto(result);
 
         }
+
+        public async Task<GetUsersDTO> GetMappedUserAsync(string email)
+        {
+            var mapper = new UserMapper();
+
+            // Получаем пользователя и его роли
+            var userWithRoles = await _userService.GetUserAsync(email);
+
+            if (userWithRoles == null)
+            {
+                throw new InvalidOperationException($"User with email '{email}' was not found.");
+            }
+
+            // Извлекаем пользователя и роли
+            var user = userWithRoles.Value.user;
+            var roles = userWithRoles.Value.roles;
+
+            // Маппим пользователя на DTO
+            var userDto = mapper.MapUserToGetUsersDto(user);
+
+            // Добавляем роли в DTO
+            userDto.Roles = roles;
+
+            return userDto;
+        }
+
 
         public async Task<IEnumerable<GetUsersDTO>> GetMappedUsersAsync()
         {
@@ -53,7 +94,7 @@ namespace CarStockMAP
             foreach (var (user, roles) in usersWithRoles)
             {
                 // маппим пользователя на DTO
-                var userDto = mapper.MapToUsersDto(user);
+                var userDto = mapper.MapUserToGetUsersDto(user);
 
                 // добавляем роли внутри списка DTO
                 userDto.Roles = roles;
@@ -69,7 +110,7 @@ namespace CarStockMAP
         {
             var mapper = new UserMapper();
 
-            var user = mapper.MapToUser(updateUserDTO);
+            var user = mapper.MapUpdateUserDtoToUser(updateUserDTO);
 
             var result = await _userService.UpdateUserAsync(user);
 

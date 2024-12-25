@@ -1,4 +1,4 @@
-﻿namespace CarStockAPI.Models
+﻿namespace CarStockMAP.Models
 {
     public class LoginRequest
     {

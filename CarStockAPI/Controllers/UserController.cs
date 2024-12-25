@@ -1,10 +1,7 @@
-﻿using CarStockAPI.Models;
-using CarStockBLL.Interfaces;
-using CarStockDAL.Models;
+﻿using CarStockBLL.Interfaces;
 using CarStockMAP;
 using CarStockMAP.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarStockAPI.Controllers
@@ -54,6 +51,14 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var users = await _mapService.GetMappedUsersAsync();
+            return Ok(users);
+        }
+
+        [Authorize(Roles = "Admin, User")]
+        [HttpGet("GetUser/{email}")]
+        public async Task<IActionResult> GetUser([FromRoute] string email)
+        {
+            var users = await _mapService.GetMappedUserAsync(email);
             return Ok(users);
         }
 

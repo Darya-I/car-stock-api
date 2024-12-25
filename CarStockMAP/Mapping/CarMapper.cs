@@ -22,5 +22,7 @@ namespace CarStockMAP.Mapping
         [MapProperty(nameof(CarDTO.ColorName), nameof(Car.Color.Name))]
         public partial Car MapToCar(CarDTO car);
 
+
+
     }
 }

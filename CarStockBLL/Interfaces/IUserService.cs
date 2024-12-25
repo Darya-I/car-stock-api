@@ -4,7 +4,7 @@ namespace CarStockBLL.Interfaces
 {
     public interface IUserService
     {
-        public Task<User?> GetUserAsync(string login, string password);
+        public Task<(User user, List<string> roles)?> GetUserAsync(string email);
 
         public Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
 
@@ -21,5 +21,7 @@ namespace CarStockBLL.Interfaces
         public Task UpdateUserRoleAsync(string userEmail, string newRole);
 
         public Task<List<(User user, List<string> roles)>> GetAllUsersAsync();
+
+        public Task<(User, string AccessToken)> Authenticate(User user);
     }
 }

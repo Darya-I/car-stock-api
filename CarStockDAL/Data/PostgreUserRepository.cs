@@ -32,6 +32,11 @@ namespace CarStockDAL.Data
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task UpdateUserAsync(User user)
+        {
+            _dbContext?.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+        }
 
     }
 }

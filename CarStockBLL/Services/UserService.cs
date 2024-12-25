@@ -2,6 +2,7 @@
 using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace CarStockBLL.Services
 {
@@ -20,15 +21,53 @@ namespace CarStockBLL.Services
             _tokenService = tokenService;
         }
 
-        public async Task<User?> GetUserAsync(string login, string password)
+        public async Task<(User, string AccessToken)> Authenticate(User user)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(login);
-            if (user != null && await _userManager.CheckPasswordAsync(user, password))
+            var userFromDb = await _userRepository.GetUserByUsernameAsync(user.Email);
+            if (userFromDb == null)
+                throw new UnauthorizedAccessException("Invalid email.");
+
+            if (!await _userManager.CheckPasswordAsync(userFromDb, user.PasswordHash))
+                throw new UnauthorizedAccessException("Invalid password.");
+
+            // берем роль
+            var roles = await _userManager.GetRolesAsync(userFromDb);
+
+            var claims = new List<Claim>
             {
-                return user;
+                new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
+                new Claim(ClaimTypes.Email, userFromDb.Email),
+            };
+
+            if (roles.Any())
+            {
+                claims.Add(new Claim(ClaimTypes.Role, roles.First()));
             }
-            
-            return null; // обработка в будущем
+
+            var accessToken = _tokenService.GetAccessToken(claims, out var expires);
+
+            var refreshToken = _tokenService.GetRefreshToken();
+
+            // присваиваем refresh-токен пользователю
+            userFromDb.RefreshToken = refreshToken;
+
+            await _userRepository.UpdateUserAsync(userFromDb);
+
+            return (userFromDb, accessToken);
+        }
+
+        public async Task<(User user, List<string> roles)?> GetUserAsync(string email)
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(email);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"User with email '{email}' was not found.");
+            }
+
+            // получаем роли для пользователя
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return (user, roles.ToList());
         }
 
         public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
@@ -44,7 +83,7 @@ namespace CarStockBLL.Services
         public async Task UpdateRefreshTokenAsync(User user)
         {
             var newRefreshToken = _tokenService.GetRefreshToken();
-            var refreshTokenExpireTime = DateTime.UtcNow.AddDays(1); // например, через 7 дней
+            var refreshTokenExpireTime = DateTime.UtcNow.AddDays(1);
             await _userRepository.UpdateRefreshTokenAsync(user, newRefreshToken, refreshTokenExpireTime);
 
         }
@@ -98,7 +137,7 @@ namespace CarStockBLL.Services
                 user.Email = existingUser.Email; 
             }
 
-            // Если указан новый пароль, обновляем его
+            // если указан новый пароль, обновляем его
             if (!string.IsNullOrEmpty(user.PasswordHash))
             {
                 var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
@@ -109,7 +148,6 @@ namespace CarStockBLL.Services
                 }
             }
 
-            // Сохраняем изменения
             var result = await _userManager.UpdateAsync(existingUser);
             if (!result.Succeeded)
             {
@@ -129,20 +167,18 @@ namespace CarStockBLL.Services
 
             var currentRoles = await _userManager.GetRolesAsync(user);
 
-            // Удаляем текущие роли
+            // удаляем текущие роли
             var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
             if (!removeResult.Succeeded)
             {
                 throw new Exception($"Error removing roles: {string.Join("; ", removeResult.Errors.Select(e => e.Description))}");
             }
 
-            // Проверяем, существует ли новая роль
             if (!await _roleManager.RoleExistsAsync(newRole))
             {
                 throw new InvalidOperationException($"Role {newRole} does not exist.");
             }
 
-            // Добавляем новую роль
             var addRoleResult = await _userManager.AddToRoleAsync(user, newRole);
             if (!addRoleResult.Succeeded)
             {
@@ -159,9 +195,9 @@ namespace CarStockBLL.Services
 
             foreach (var user in users)
             {
-                // Получаем роли для каждого пользователя
+                // получаем роли для каждого пользователя
                 var roles = await _userManager.GetRolesAsync(user);
-                result.Add((user, roles.ToList())); // Добавляем пользователя и его роли в результат
+                result.Add((user, roles.ToList())); // добавляем пользователя и его роли в результат
             }
 
             return result;

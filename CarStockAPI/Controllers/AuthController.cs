@@ -1,6 +1,8 @@
 ﻿using CarStockAPI.Models;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Models;
+using CarStockMAP;
+using CarStockMAP.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,40 +16,23 @@ namespace CarStockAPI.Controllers
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
         private readonly UserManager<User> _userManager;
+        public readonly MapService _mapService;
 
-        public AuthController(IUserService userService, ITokenService tokenService, UserManager<User> userManager)
+
+        public AuthController(IUserService userService, ITokenService tokenService, UserManager<User> userManager, MapService mapService)
         {
             _userService = userService;
             _tokenService = tokenService;
             _userManager = userManager;
+            _mapService = mapService;
         }
 
-
-        //                                                  пользователю надо в бд сохранять его токен и времяжизни
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
-            {
-                return Unauthorized("Invalid credentials");
-            }
-
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName)
-            };
-            var roles = await _userService.GetUserRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            //мб тут надо await
-            var token = _tokenService.GetAccessToken(claims, out DateTime expires);
-
-            return Ok(new { Token = token, Expiration = expires });
-
+            var response = await _mapService.MapUserLogin(loginRequest);
+            setTokenCookie(response.RefreshToken);
+            return Ok(response);
         }
 
         [HttpPost("refresh")]
@@ -72,6 +57,17 @@ namespace CarStockAPI.Controllers
             var token = _tokenService.GetAccessToken(claims, out DateTime expires);
             await _userService.UpdateRefreshTokenAsync(user);
             return Ok(new { Token = token, Expiration = expires });
+        }
+
+        // хелп метод
+        private void setTokenCookie(string token)
+        {
+            var cookieOpt = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refresh-token", token, cookieOpt);
         }
     }
 }

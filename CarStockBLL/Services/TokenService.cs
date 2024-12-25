@@ -3,6 +3,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Models;
+using CarStockDAL.Data.Repos;
+using CarStockDAL.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CarStockBLL.Services
@@ -22,11 +26,12 @@ namespace CarStockBLL.Services
             _audience = configuration.GetValue<string>("JwtConfig:Audience");            
         }
 
+        
         public string GetAccessToken(IEnumerable<Claim> claims, out DateTime expires)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
 
-            expires = DateTime.UtcNow.AddMinutes(30);
+            expires = DateTime.UtcNow.AddMinutes(15);
 
             JwtSecurityToken token = new(
                 issuer: _issuer,
