@@ -1,20 +1,20 @@
 ﻿using CarStockBLL.Interfaces;
 using CarStockBLL.Models;
-using CarStockDAL.Models;
 using CarStockMAP.DTO;
 using CarStockMAP.Mapping;
-using CarStockMAP.ViewModels;
 
 
 namespace CarStockMAP
 {
     public class MapService
     {
-        public readonly ICarService _carService;
+        private readonly ICarService _carService;
+        private readonly IUserService _userService;
 
-        public MapService(ICarService carService)
+        public MapService(ICarService carService, IUserService userService)
         {
             _carService = carService;
+            _userService = userService;
         }
 
         public async Task<IEnumerable<CarDTO>> GetMappedCarsAsync()
@@ -29,6 +29,52 @@ namespace CarStockMAP
 
         }
 
+        public async Task<CreateUserDTO> CreateMappedUserAsync(CreateUserDTO createUserDTO)
+        {
+            var mapper = new UserMapper();
+            
+            var user = mapper.MapToUser(createUserDTO);
+
+            var result = await _userService.CreateUserAsync(user);
+
+            return mapper.MapToCreateUserDto(result);
+
+        }
+
+        public async Task<IEnumerable<GetUsersDTO>> GetMappedUsersAsync()
+        {
+            var mapper = new UserMapper();
+
+            var userDtos = new List<GetUsersDTO>();
+
+            // получаем пользователей с ролями
+            var usersWithRoles = await _userService.GetAllUsersAsync();
+
+            foreach (var (user, roles) in usersWithRoles)
+            {
+                // маппим пользователя на DTO
+                var userDto = mapper.MapToUsersDto(user);
+
+                // добавляем роли внутри списка DTO
+                userDto.Roles = roles;
+
+                userDtos.Add(userDto);
+            }
+
+            return userDtos;
+        }
+
+
+        public async Task<UpdateUserDTO> UpdateMappedUserAsync(UpdateUserDTO updateUserDTO)
+        {
+            var mapper = new UserMapper();
+
+            var user = mapper.MapToUser(updateUserDTO);
+
+            var result = await _userService.UpdateUserAsync(user);
+
+            return updateUserDTO;
+        }
 
         public async Task<OperationResult<string>> CreateMappedCarAsync(CarDTO carDto)
         {

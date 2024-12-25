@@ -26,7 +26,7 @@ namespace CarStockBLL.Services
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
 
-            expires = DateTime.Now.AddMinutes(30);
+            expires = DateTime.UtcNow.AddMinutes(30);
 
             JwtSecurityToken token = new(
                 issuer: _issuer,
@@ -38,28 +38,6 @@ namespace CarStockBLL.Services
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             return handler.WriteToken(token);
-        }
-
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-            var tokenValidationParametres = new TokenValidationParameters
-            {
-                ValidateIssuer = false,             //FOR DEV ONLY !!!
-                ValidateAudience = false,           //FOR DEV ONLY !!!
-                ValidateLifetime = false,           //FOR DEV ONLY !!!
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = key,
-                ClockSkew = TimeSpan.Zero, // без задержки времени для истечения срока действия токена
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            //передаем настройки валидации и строковое представление JWT-токена
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParametres, out SecurityToken securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
-            return principal;
         }
 
         public string GetRefreshToken()

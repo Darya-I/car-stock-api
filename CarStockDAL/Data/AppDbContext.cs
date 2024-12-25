@@ -6,7 +6,6 @@ namespace CarStockDAL.Data
 {
     public class AppDbContext : IdentityDbContext<User>
     {
-
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -41,8 +40,3 @@ namespace CarStockDAL.Data
         }
     }
 }
-
-
-//dotnet ef migrations add SeedData
-//dotnet ef database update
-// https://learn.microsoft.com/ru-ru/ef/core/modeling/relationships/one-to-many

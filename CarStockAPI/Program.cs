@@ -2,6 +2,7 @@
 using System.Text;
 using CarStockBLL;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Middlewares;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
 using CarStockDAL.Data.Repos;
@@ -86,6 +87,8 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandling>();
 
 if (app.Environment.IsDevelopment())
 {

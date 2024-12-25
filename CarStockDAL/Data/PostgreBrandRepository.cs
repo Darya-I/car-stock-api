@@ -53,21 +53,15 @@ namespace CarStockDAL.Data
         {
             await _dbContext.SaveChangesAsync(); // DRY нарушен потому что мы не юзаем юнит оф ворк
         }
-
         public async Task UpdateBrandAsync(Brand brand)
         {
             _brands.Update(brand);
             await SaveAsync();
         }
 
-        
-
-        // новый метод для поиска по имени
         public async Task<Brand?> GetBrandByNameAsync(string name)
         {
             return await _brands.FirstOrDefaultAsync(b => b.Name == name);
         }
-
-       
     }
 }

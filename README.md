@@ -46,3 +46,13 @@ ToList() принудительно выполняет всю операцию �
 
 ### `11.12.2024` в CarStockDAL теперь паттерн репозиторий, работающий только на Car 
 
+
+ <details>
+	<summary> notes </summary>
+
+`dotnet ef migrations add SeedData`
+
+`dotnet ef database update`
+
+https://learn.microsoft.com/ru-ru/ef/core/modeling/relationships/one-to-many
+ </details>

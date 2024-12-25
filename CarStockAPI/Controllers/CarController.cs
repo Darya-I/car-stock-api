@@ -25,7 +25,7 @@ namespace CarStockAPI.Controllers
             _mapService = mapService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager, User")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
         {
@@ -33,27 +33,21 @@ namespace CarStockAPI.Controllers
             return Ok(carDtos);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("CreateCar")]
         public async Task<ActionResult> CreateCarAsync(CarDTO car)
         {
-            try
+            var result = await _mapService.CreateMappedCarAsync(car);
+
+            if (!result.Success)
             {
-                var result = await _mapService.CreateMappedCarAsync(car);
-
-                if (!result.Success)
-                {
-                    return BadRequest(new { message = result.ErrorMessage });
-                }
-
-                return Ok(new { message = result.Data });
-
+                return BadRequest(new { message = result.ErrorMessage });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
-            }
+
+            return Ok(new { message = result.Data });
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("GetCar{id:int}")]
         public async Task<ActionResult<CarViewModel>> GetCarByIdAsync(int id)
         {
@@ -63,10 +57,9 @@ namespace CarStockAPI.Controllers
             }
 
             return Ok(await _carService.GetCarByIdAsync(id));
-
-
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCar/{id}")]
         public async Task<IActionResult> UpdateCar(int id, [FromBody] CarUpdateDto carUpdateDto)
         {
@@ -80,24 +73,12 @@ namespace CarStockAPI.Controllers
                 return BadRequest("Car ID in the URL does not match the ID in the body.");
             }
 
-            try
-            {
-                
-                await _carService.UpdateCarAsync(carUpdateDto);
-
-                return Ok(carUpdateDto);
-            }
-            catch (ValidationException ex)
-            {
-                return NotFound(new { Message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            await _carService.UpdateCarAsync(carUpdateDto);
+            return Ok(carUpdateDto);
         }
 
         //availability
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability(int id, [FromBody] CarUpdateDto carUpdateDto)
         {
@@ -110,41 +91,20 @@ namespace CarStockAPI.Controllers
             {
                 return BadRequest("Car ID in the URL does not match the ID in the body.");
             }
-
-            try
-            {
-                await _carService.UpdateCarAvailabilityAsync(id, carUpdateDto.IsAvaible);
-
-                return Ok(carUpdateDto);
-            }
-            catch (ValidationException ex)
-            {
-                return NotFound(new { Message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            await _carService.UpdateCarAvailabilityAsync(id, carUpdateDto.IsAvaible);
+            return Ok(carUpdateDto);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
         {
-            try
-            {
-                await _carService.DeleteCarAsync(id);
-                return Ok($"Car with Id: {id} was deleted" );
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { Message = ex.Message });  }
-            catch (Exception)
-            {
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            await _carService.DeleteCarAsync(id);
+            return Ok($"Car with Id: {id} was deleted");
         }
 
-        [HttpPut("UpdateCarAmoubt/{id}")]
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPut("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount(int id, [FromBody] CarUpdateDto carUpdateDto)
         {
             if (carUpdateDto == null)
@@ -157,22 +117,8 @@ namespace CarStockAPI.Controllers
                 return BadRequest("Car ID in the URL does not match the ID in the body.");
             }
 
-            try
-            {
-                await _carService.UpdateCarAmountAsync(id, carUpdateDto.Amount);
-
-                return Ok(carUpdateDto);
-            }
-            catch (ValidationException ex)
-            {
-                return NotFound(new { Message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            await _carService.UpdateCarAmountAsync(id, carUpdateDto.Amount);
+            return Ok(carUpdateDto);
         }
-
-
     }
 }

@@ -14,7 +14,6 @@ namespace CarStockBLL.Services
             _carModelRepository = carModelRepository;
         }
 
-
         public async Task<OperationResult<CarModel>> GetCarModelByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -30,6 +29,5 @@ namespace CarStockBLL.Services
 
             return OperationResult<CarModel>.SuccessResult(new CarModel { Name = carModel.Name, Id = carModel.Id });
         }
-
     }
 }

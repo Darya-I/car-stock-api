@@ -8,6 +8,6 @@ namespace CarStockBLL.Interfaces
 
         public string GetRefreshToken();
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+        //public ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     }
 }

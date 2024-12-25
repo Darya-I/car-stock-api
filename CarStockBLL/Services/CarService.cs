@@ -14,7 +14,6 @@ namespace CarStockBLL.Services
         private readonly ICarModelService _carModelService;
         private readonly IColorService _colorService;
 
-
         public CarService(ICarRepository<Car> carRepository, IBrandService brandService, ICarModelService carModelService, IColorService colorService)
         {
             _carRepository = carRepository;
@@ -22,7 +21,6 @@ namespace CarStockBLL.Services
             _carModelService = carModelService;
             _colorService = colorService;
         }
-
 
         public async Task<Car> GetCarByIdAsync(int? id)
         {
@@ -50,7 +48,6 @@ namespace CarStockBLL.Services
             };
         }
 
-
         public async Task UpdateCarAsync(CarUpdateDto carUpdateDto)
         {
             var existingCar = await _carRepository.GetCarByIdAsync(carUpdateDto.Id);
@@ -69,50 +66,30 @@ namespace CarStockBLL.Services
             await _carRepository.UpdateCarAsync(existingCar);
         }
 
-
         public async Task DeleteCarAsync(int? id) 
         {
             if (id == null) 
             {
-                throw new ValidationException(" "); //дописать тут
+                throw new ValidationException("Car ID cannot be null");
             }
             var car = await _carRepository.GetCarByIdAsync(id.Value);
 
             if (car == null)
             {
-                throw new ValidationException(" че ");
+                throw new ValidationException("Сar not found");
             }
 
             await _carRepository.DeleteCarAsync(id.Value);
-
         }
 
         public async Task<IEnumerable<Car>> GetAllCarsAsync() 
         {
-            try
-            {
-                var cars = await _carRepository.GetAllCarsAsync();
-                if (cars.Any())
-                {
-                    return cars;
-                }
-                else
-                {
-                    return Enumerable.Empty<Car>();
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                throw new ValidationException("Car not found.");
-            }
-
+            var cars = await _carRepository.GetAllCarsAsync();
+            return cars.Any() ? cars : Enumerable.Empty<Car>();
         }
-
+        //                                                      REFACTOR ????????
         public async Task<OperationResult<string>> CreateCarAsync(Car car)
         {
-
             var brandResult = await _brandService.GetBrandByNameAsync(car.Brand.Name);
             if (!brandResult.Success) 
             {
@@ -182,7 +159,5 @@ namespace CarStockBLL.Services
 
             await _carRepository.UpdateCarAsync(existingCar);       
         }
-
-
     }
 }

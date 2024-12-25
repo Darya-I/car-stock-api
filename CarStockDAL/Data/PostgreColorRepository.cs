@@ -32,7 +32,6 @@ namespace CarStockDAL.Data
             }
         }
 
-
         public async Task<List<Color>> GetAllColorsAsync(bool tracked = true)
         {
             IQueryable<Color> query = _colors;
@@ -64,7 +63,5 @@ namespace CarStockDAL.Data
         {
             return await _colors.FirstOrDefaultAsync(b => b.Name == name);
         }
-
-
     }
 }

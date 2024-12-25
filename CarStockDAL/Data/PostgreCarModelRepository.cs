@@ -60,13 +60,9 @@ namespace CarStockDAL.Data
             await SaveAsync();
         }
 
-
-
         public async Task<CarModel?> GetCarModelByNameAsync(string name)
         {
             return await _carModels.FirstOrDefaultAsync(b => b.Name == name);
         }
-
-        
     }
 }

@@ -22,28 +22,8 @@ namespace CarStockAPI.Controllers
             _userManager = userManager;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
-        {
-            var user = await _userManager.FindByEmailAsync(registerRequest.Email);
-            if (user != null)
-            {
-                return BadRequest();
-            }
-            user = new User
-            {
-                UserName = registerRequest.Email,
-                Email = registerRequest.Email
-            };
-            var result = await _userManager.CreateAsync(user, registerRequest.Password);
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "User");
-                return Ok();
-            }
-            return BadRequest();
-        }
 
+        //                                                  пользователю надо в бд сохранять его токен и времяжизни
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
@@ -92,9 +72,6 @@ namespace CarStockAPI.Controllers
             var token = _tokenService.GetAccessToken(claims, out DateTime expires);
             await _userService.UpdateRefreshTokenAsync(user);
             return Ok(new { Token = token, Expiration = expires });
-
         }
-
-
     }
 }

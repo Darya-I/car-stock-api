@@ -13,7 +13,6 @@ namespace CarStockBLL.Services
         {
             _brandRepository = brandRepository;
         }
-
         public async Task<OperationResult<Brand>> GetBrandByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -30,7 +29,5 @@ namespace CarStockBLL.Services
 
             return OperationResult<Brand>.SuccessResult(new Brand { Name = brand.Name, Id = brand.Id });
         }
-
-
     }
 }
