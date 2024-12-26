@@ -15,15 +15,13 @@ namespace CarStockAPI.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
-        private readonly UserManager<User> _userManager;
         public readonly MapService _mapService;
 
 
-        public AuthController(IUserService userService, ITokenService tokenService, UserManager<User> userManager, MapService mapService)
+        public AuthController(IUserService userService, ITokenService tokenService, MapService mapService)
         {
             _userService = userService;
             _tokenService = tokenService;
-            _userManager = userManager;
             _mapService = mapService;
         }
 

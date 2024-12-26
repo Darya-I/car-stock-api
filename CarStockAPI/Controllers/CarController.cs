@@ -14,7 +14,6 @@ namespace CarStockAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CarController : ControllerBase
     {
         public readonly ICarService _carService;
