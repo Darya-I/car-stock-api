@@ -24,9 +24,9 @@ namespace CarStockMAP
             var mapper = new UserMapper();
             var user = mapper.MapLoginRequestToUser(loginRequest);
 
-            // Аутентификация возвращает пользователя и access token
+            // метод возвращает пользователя и access token
             var (authenticatedUser, accessToken) = await _userService.Authenticate(user);
-            // Передаем пользователя и accessToken в метод маппинга
+            // пользователя и accessToken в метод маппинга
             var loginResult = mapper.MapUserToLoginTokenDto(authenticatedUser);
             loginResult.Token = accessToken;
             return loginResult;
@@ -60,7 +60,7 @@ namespace CarStockMAP
         {
             var mapper = new UserMapper();
 
-            // Получаем пользователя и его роли
+            // берем пользователя и его роли
             var userWithRoles = await _userService.GetUserAsync(email);
 
             if (userWithRoles == null)
@@ -68,14 +68,12 @@ namespace CarStockMAP
                 throw new InvalidOperationException($"User with email '{email}' was not found.");
             }
 
-            // Извлекаем пользователя и роли
+            // извлекаем пользователя и роли
             var user = userWithRoles.Value.user;
             var roles = userWithRoles.Value.roles;
 
-            // Маппим пользователя на DTO
             var userDto = mapper.MapUserToGetUsersDto(user);
 
-            // Добавляем роли в DTO
             userDto.Roles = roles;
 
             return userDto;
@@ -104,7 +102,6 @@ namespace CarStockMAP
 
             return userDtos;
         }
-
 
         public async Task<UpdateUserDTO> UpdateMappedUserAsync(UpdateUserDTO updateUserDTO)
         {
@@ -136,7 +133,5 @@ namespace CarStockMAP
                 return OperationResult<string>.Failure($"An error occurred while creating the mapped car: {ex.Message}");
             }
         }
-
-
     }
 }

@@ -1,17 +1,16 @@
-﻿using System;
-using System.Text;
-using CarStockBLL;
+﻿using System.Text;
 using CarStockBLL.Interfaces;
 using CarStockBLL.Middlewares;
+using CarStockBLL.Models;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
 using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 using CarStockMAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +29,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     );
 
 
-//                          !!! NEED TO REFACTOR !!! SERVICES REGISTER
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
@@ -42,43 +40,34 @@ builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICarModelService, CarModelService>();
 builder.Services.AddScoped<IColorService, ColorService>();
 
-// еще регистрация
+
 builder.Services.AddScoped<MapService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+//builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 
 // JWT
-var jwtConfig = builder.Configuration.GetSection("JwtConfig");
-var secretKey = jwtConfig.GetValue<string>("Secret");
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
-if (string.IsNullOrEmpty(secretKey))
-{
-    throw new InvalidOperationException("JWT Secret Key is not configured.");
-}
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+//аутентификация с JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtConfig.GetValue<string>("Issuer"),
-        ValidAudience = jwtConfig.GetValue<string>("Audience"),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        var jwtConfig = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtConfig>>().Value;
 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtConfig.Issuer,
+            ValidAudience = jwtConfig.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
@@ -96,8 +85,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -4,9 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CarStockBLL.Interfaces;
 using CarStockBLL.Models;
-using CarStockDAL.Data.Repos;
-using CarStockDAL.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CarStockBLL.Services
@@ -16,16 +14,14 @@ namespace CarStockBLL.Services
         public readonly string _secretKey;
         public readonly string _issuer;
         public readonly string _audience;
-        private readonly IConfiguration _configuration;
 
-
-        public TokenService(IConfiguration configuration)
+        public TokenService(IOptions<JwtConfig> jwtConfig)
         {
-            _secretKey = configuration.GetValue<string>("JwtConfig:Secret");
-            _issuer = configuration.GetValue<string>("JwtConfig:Issuer");
-            _audience = configuration.GetValue<string>("JwtConfig:Audience");            
+            var config = jwtConfig.Value;
+            _secretKey = config.Secret;
+            _issuer = config.Issuer;
+            _audience = config.Audience;            
         }
-
         
         public string GetAccessToken(IEnumerable<Claim> claims, out DateTime expires)
         {

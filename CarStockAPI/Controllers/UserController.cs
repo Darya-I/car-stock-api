@@ -1,11 +1,15 @@
 ﻿using CarStockBLL.Interfaces;
 using CarStockMAP;
 using CarStockMAP.DTO;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarStockAPI.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -61,6 +65,5 @@ namespace CarStockAPI.Controllers
             var users = await _mapService.GetMappedUserAsync(email);
             return Ok(users);
         }
-
     }
 }
