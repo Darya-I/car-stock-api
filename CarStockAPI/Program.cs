@@ -12,9 +12,36 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NpgsqlTypes;
+using Serilog;
+using Serilog.Sinks.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//                                                  настройки serilog
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true);
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration) 
+        .ReadFrom.Services(services)
+        .WriteTo.PostgreSQL(
+            connectionString: context.Configuration.GetConnectionString("DefaultConnection"),
+            tableName: "Logs",
+            needAutoCreateTable: true,
+            columnOptions: new Dictionary<string, ColumnWriterBase>
+            {
+                { "message", new RenderedMessageColumnWriter() },
+                { "message_template", new MessageTemplateColumnWriter() },
+                { "level", new LevelColumnWriter(true, NpgsqlDbType.Varchar) },
+                { "raise_date", new TimestampColumnWriter() },
+                { "exception", new ExceptionColumnWriter() },
+                { "properties", new LogEventSerializedColumnWriter() }
+            }); ;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,8 +71,6 @@ builder.Services.AddScoped<IColorService, ColorService>();
 builder.Services.AddScoped<MapService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
-//builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-
 
 // JWT
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
