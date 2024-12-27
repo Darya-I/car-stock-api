@@ -5,14 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarStockDAL.Data
 {
-    public class PostgreCarModelRepository<T> : ICarModelRepository<CarModel> where T : class
+    public class PostgreCarModelRepository<T> : PostgreBaseRepository, ICarModelRepository<CarModel> where T : class
     {
-        private readonly AppDbContext _dbContext;
         private readonly DbSet<CarModel> _carModels;
 
-        public PostgreCarModelRepository(AppDbContext dbContext)
+        public PostgreCarModelRepository(AppDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
             _carModels = dbContext.Models;
         }
 
@@ -47,11 +45,6 @@ namespace CarStockDAL.Data
             }
 
             return await query.ToListAsync();
-        }
-
-        public async Task SaveAsync()
-        {
-            await _dbContext.SaveChangesAsync(); // DRY нарушен потому что мы не юзаем юнит оф ворк
         }
 
         public async Task UpdateCarModelAsync(CarModel carModel)

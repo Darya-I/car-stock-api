@@ -11,8 +11,6 @@ namespace CarStockDAL.Data.Repos
         Task DeleteCarModelAsync(int id);
         Task<T> GetCarModelByIdAsync(int id);
         Task<List<CarModel>> GetCarModelsAsync(bool tracked = true);
-        Task SaveAsync();
-
         Task<T> GetCarModelByNameAsync(string name);
     }
 }

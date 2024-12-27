@@ -4,14 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarStockDAL.Data
 {
-    public class PostgreColorRepository<T> : IColorRepository<Color> where T : class
+    public class PostgreColorRepository<T> : PostgreBaseRepository, IColorRepository<Color> where T : class
     {
-        private readonly AppDbContext _dbContext;
         private readonly DbSet<Color> _colors;
 
-        public PostgreColorRepository(AppDbContext dbContext)
+        public PostgreColorRepository(AppDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
             _colors = dbContext.Colors;
         }
 
@@ -46,11 +44,6 @@ namespace CarStockDAL.Data
         public async Task<Color> GetColorByIdAsync(int id)
         {
             return await _colors.FindAsync(id);
-        }
-
-        public async Task SaveAsync()
-        {
-            await _dbContext.SaveChangesAsync(); // DRY нарушен потому что мы не юзаем юнит оф ворк
         }
 
         public async Task UpdateColorAsync(Color color)

@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using CarStockAPI.Middlewares;
 using CarStockBLL.Interfaces;
-using CarStockBLL.Middlewares;
 using CarStockBLL.Models;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
@@ -55,7 +55,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
-
+//                                              регистрация сервисов
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
@@ -96,6 +96,7 @@ builder.Services.AddAuthentication((options => {
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>

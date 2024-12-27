@@ -57,7 +57,7 @@ namespace CarStockAPI.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetUser/{email}")]
         public async Task<IActionResult> GetUser([FromRoute] string email)
         {

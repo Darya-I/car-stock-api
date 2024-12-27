@@ -3,18 +3,14 @@ using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CarStockDAL.Data
 {
-    public class PostgreCarRepository<T> : ICarRepository<Car> where T : class
+    public class PostgreCarRepository<T> : PostgreBaseRepository, ICarRepository<Car> where T : class
     {
-        private readonly AppDbContext _dbContext;
         private readonly DbSet<Car> _cars;
 
-        public PostgreCarRepository(AppDbContext context) 
+        public PostgreCarRepository(AppDbContext dbContext) : base(dbContext)
         {
-            _dbContext = context;
-            _cars = context.Cars;
-
+            _cars = dbContext.Cars;
         }
-
 
         public async Task CreateCarAsync(Car car)
         {
@@ -27,7 +23,6 @@ namespace CarStockDAL.Data
             _cars.Update(car);
             await SaveAsync();
         }
-
 
         public async Task DeleteCarAsync(int id)
         {
@@ -70,12 +65,6 @@ namespace CarStockDAL.Data
             }
 
             return await query.ToListAsync();
-        }
-
-
-        public async Task SaveAsync()
-        {
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

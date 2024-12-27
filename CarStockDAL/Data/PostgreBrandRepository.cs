@@ -5,14 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarStockDAL.Data
 {
-    public class PostgreBrandRepository<T> : IBrandRepository<Brand> where T : class
+    public class PostgreBrandRepository<T> : PostgreBaseRepository, IBrandRepository<Brand> where T : class
     {
         private readonly AppDbContext _dbContext;
         private readonly DbSet<Brand> _brands;
 
-        public PostgreBrandRepository(AppDbContext dbContext)
+        public PostgreBrandRepository(AppDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
             _brands = dbContext.Brands;
         }
 
@@ -49,10 +48,6 @@ namespace CarStockDAL.Data
             return await _brands.FindAsync(id);
         }
 
-        public async Task SaveAsync()
-        {
-            await _dbContext.SaveChangesAsync(); // DRY нарушен потому что мы не юзаем юнит оф ворк
-        }
         public async Task UpdateBrandAsync(Brand brand)
         {
             _brands.Update(brand);

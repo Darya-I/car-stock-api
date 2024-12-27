@@ -2,7 +2,7 @@
 
 namespace CarStockDAL.Data.Repos
 {
-    public interface IBrandRepository<T> 
+    public interface IBrandRepository<T>
         where T : class
     {
         Task CreareBrandAsync(T brand);
@@ -10,8 +10,6 @@ namespace CarStockDAL.Data.Repos
         Task DeleteBrandAsync(int id);
         Task<T> GetBrandByIdAsync(int id);
         Task<List<Brand>> GetAllBrandsAsync(bool tracked = true);
-        Task SaveAsync();
-
         Task<T> GetBrandByNameAsync(string name);
 
     }
