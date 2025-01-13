@@ -21,6 +21,58 @@ namespace CarStockBLL.Services
             _tokenService = tokenService;
         }
 
+        public async Task<(User, string)> HandleGoogleUser(User user)
+        {
+            var userFromDb = await _userRepository.GetUserByEmailAsync(user.Email);
+            if (userFromDb == null)
+            {
+               var creationResult = await _userManager.CreateAsync(user);
+                if (!creationResult.Succeeded)
+                {
+                    var info = string.Join("; ", creationResult.Errors.Select(e => e.Description));
+                    throw new InvalidOperationException($"Failed to create a new user. Details: {info}");
+                }
+
+                userFromDb = user;
+                await _userManager.AddToRoleAsync(user, "User");
+
+            }
+
+            return await GoogleAuthenticate(userFromDb);
+        }
+
+        public async Task<(User, string AccessToken)> GoogleAuthenticate(User user)
+        {
+            var userFromDb = await _userRepository.GetUserByEmailAsync(user.Email);
+            if (userFromDb == null)
+                throw new UnauthorizedAccessException("Invalid email.");
+
+            // берем роль
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
+                new Claim(ClaimTypes.Email, userFromDb.Email),
+            };
+
+            if (roles.Any())
+            {
+                claims.Add(new Claim(ClaimTypes.Role, roles.First()));
+            }
+
+            var accessToken = _tokenService.GetAccessToken(claims, out var expires);
+
+            var refreshToken = _tokenService.GetRefreshToken();
+
+            // присваиваем refresh-токен пользователю
+            user.RefreshToken = refreshToken;
+
+            await _userRepository.UpdateUserAsync(userFromDb);
+
+            return (userFromDb, accessToken);
+        }
+
         public async Task<(User, string AccessToken)> Authenticate(User user)
         {
             var userFromDb = await _userRepository.GetUserByUsernameAsync(user.Email);

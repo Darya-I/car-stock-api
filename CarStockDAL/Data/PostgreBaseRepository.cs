@@ -1,6 +1,4 @@
-﻿using CarStockDAL.Data.Repos;
-
-namespace CarStockDAL.Data
+﻿namespace CarStockDAL.Data
 {
     public abstract class PostgreBaseRepository 
     {

@@ -24,6 +24,11 @@ namespace CarStockDAL.Data
             return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task UpdateRefreshTokenAsync(User user, string refrehToken, DateTime refreshTokenExpireTime)
         {
             user.RefreshToken = refrehToken;

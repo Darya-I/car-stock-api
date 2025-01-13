@@ -2,8 +2,11 @@
 using CarStockBLL.Interfaces;
 using CarStockDAL.Models;
 using CarStockMAP;
+using CarStockMAP.DTO;
 using CarStockMAP.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,6 +26,45 @@ namespace CarStockAPI.Controllers
             _userService = userService;
             _tokenService = tokenService;
             _mapService = mapService;
+        }
+
+
+        [HttpGet("signin-google")]
+        public IActionResult SignInWithGoogle() 
+        {
+            var redirectUrl = Url.Action("GoogleResponse", "Auth");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+
+        }
+
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!result.Succeeded)
+            {
+                return BadRequest();    
+            }
+
+            var claims = result.Principal.Claims;
+
+            GoogleLoginRequest googleUser = new GoogleLoginRequest
+            {
+                Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value.ToString(),
+                Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value.ToString(),
+            };
+
+            await _mapService.MapGoogleUser(googleUser);
+
+            var response = await _mapService.MapGoogleUserLogin(googleUser);
+
+            return Ok(new
+            {
+                Claims = claims.Select(c => new { Type = c.Type, Value = c.Value }),
+                AccessToken = response.Token
+            });
+
         }
 
         [HttpPost("login")]

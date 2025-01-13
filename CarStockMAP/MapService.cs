@@ -18,6 +18,26 @@ namespace CarStockMAP
             _userService = userService;
         }
 
+        public async Task<GoogleUserDTO> MapGoogleUser(GoogleLoginRequest googleLoginRequest)
+        {
+            var mapper = new UserMapper();
+            var user = mapper.MapGoogleLoginRequestToUser(googleLoginRequest);
+            
+            var (normalUser, accessToken) = await _userService.HandleGoogleUser(user);
+            var googleUser = mapper.MapGoogleToUser(normalUser);
+            return googleUser;
+        }
+
+        public async Task<LoginTokenDto> MapGoogleUserLogin(GoogleLoginRequest googleLoginRequest)
+        {
+            var mapper = new UserMapper();
+            var user = mapper.MapGoogleLoginRequestToUser(googleLoginRequest);
+
+            var (authenticatedUser, accessToken) = await _userService.GoogleAuthenticate(user);
+            var googleLoginResult = mapper.MapUserToLoginTokenDto(authenticatedUser);
+            googleLoginResult.Token = accessToken;
+            return googleLoginResult;
+        }
 
         public async Task<LoginTokenDto> MapUserLogin(LoginRequest loginRequest)
         {

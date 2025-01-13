@@ -4,24 +4,28 @@ namespace CarStockBLL.Interfaces
 {
     public interface IUserService
     {
-        public Task<(User user, List<string> roles)?> GetUserAsync(string email);
+        Task<(User user, List<string> roles)?> GetUserAsync(string email);
 
-        public Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
+        Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
 
-        public Task<List<string>> GetUserRolesAsync(User user);
+       Task<List<string>> GetUserRolesAsync(User user);
 
-        public Task UpdateRefreshTokenAsync(User user);
+        Task UpdateRefreshTokenAsync(User user);
 
-        public Task<User> CreateUserAsync(User user);
+        Task<User> CreateUserAsync(User user);
 
-        public Task DeleteUserAsync(string email);
+        Task DeleteUserAsync(string email);
 
-        public Task<User> UpdateUserAsync(User user);
+        Task<User> UpdateUserAsync(User user);
 
-        public Task UpdateUserRoleAsync(string userEmail, string newRole);
+        Task UpdateUserRoleAsync(string userEmail, string newRole);
 
-        public Task<List<(User user, List<string> roles)>> GetAllUsersAsync();
+        Task<List<(User user, List<string> roles)>> GetAllUsersAsync();
 
-        public Task<(User, string AccessToken)> Authenticate(User user);
+        Task<(User, string AccessToken)> Authenticate(User user);
+
+        Task<(User, string AccessToken)> GoogleAuthenticate(User user);
+
+        Task<(User, string)> HandleGoogleUser(User user);
     }
 }

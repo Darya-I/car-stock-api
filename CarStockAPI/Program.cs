@@ -15,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using NpgsqlTypes;
 using Serilog;
 using Serilog.Sinks.PostgreSQL;
+using CarStockAPI.Models.Configs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,10 +72,14 @@ builder.Services.AddScoped<IColorService, ColorService>();
 
 builder.Services.AddScoped<MapService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddTransient<ITokenService, TokenService>();
+// ???
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // JWT
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+
+// Google
+builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Authentication:Google"));
 
 //аутентификация с JWT
 builder.Services.AddAuthentication((options => {
@@ -82,7 +88,8 @@ builder.Services.AddAuthentication((options => {
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })).AddJwtBearer(options =>
             {
-                var jwtConfig = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtConfig>>().Value;
+                var serviceProvider = builder.Services.BuildServiceProvider();
+                var jwtConfig = serviceProvider.GetRequiredService<IOptions<JwtConfig>>().Value;
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -95,7 +102,15 @@ builder.Services.AddAuthentication((options => {
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
                     ClockSkew = TimeSpan.Zero
                 };
-            });
+            })
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme) // Добавление схемы Cookie
+        .AddGoogle(options =>
+        {
+            var googleConfig = builder.Configuration.GetSection("Authentication:Google").Get<GoogleConfig>();
+            options.ClientId = googleConfig.ClientId;
+            options.ClientSecret = googleConfig.ClientSecret;
+            options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Использование Cookie для Google
+        });
 
 builder.Services.AddAuthorization(options =>
 {
@@ -104,7 +119,7 @@ builder.Services.AddAuthorization(options =>
               .RequireAuthenticatedUser());
 });
 
-
+// для откладки пока не используется чтоб потрогать гугл
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
 builder.Services.AddCors(options =>
@@ -112,7 +127,8 @@ options.AddPolicy("CorsPolicy", policy =>
 {
     policy.AllowAnyMethod()
     .AllowAnyHeader()
-    .WithOrigins(allowedOrigins);
+    .AllowAnyOrigin();
+    //WithOrigins(allowedOrigins);
 })
     );
 

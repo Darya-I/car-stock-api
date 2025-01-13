@@ -38,5 +38,14 @@ namespace CarStockMAP.Mapping
         [MapProperty(nameof(User.RefreshToken), nameof(LoginTokenDto.RefreshToken))]
         public partial LoginTokenDto MapUserToLoginTokenDto(User user);
 
+
+        [MapProperty(nameof(GoogleLoginRequest.Email), nameof(User.Email))]
+        [MapProperty(nameof(GoogleLoginRequest.Email), nameof(User.UserName))]
+        public partial User MapGoogleLoginRequestToUser(GoogleLoginRequest googleLoginRequest);
+
+        [MapProperty(nameof(User.Email), nameof(GoogleUserDTO.Email))]
+        [MapProperty(nameof(User.UserName), nameof(GoogleUserDTO.Email))]
+        public partial GoogleUserDTO MapGoogleToUser(User user);
+
     }
 }
