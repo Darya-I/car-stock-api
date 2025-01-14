@@ -2,6 +2,9 @@
 
 namespace CarStockMAP.DTO.Car
 {
+    /// <summary>
+    /// DTO автомобиля
+    /// </summary>
     public class CarDTO
     {
         public int Id { get; set; }

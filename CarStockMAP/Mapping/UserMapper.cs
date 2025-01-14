@@ -48,9 +48,9 @@ namespace CarStockMAP.Mapping
         /// <summary>
         /// Маппинг User в DTO токена входа
         /// </summary>
-        [MapProperty(nameof(User.Email), nameof(LoginTokenDto.Email))]
-        [MapProperty(nameof(User.RefreshToken), nameof(LoginTokenDto.RefreshToken))]
-        public partial LoginTokenDto MapUserToLoginTokenDto(User user);
+        [MapProperty(nameof(User.Email), nameof(LoginTokenDTO.Email))]
+        [MapProperty(nameof(User.RefreshToken), nameof(LoginTokenDTO.RefreshToken))]
+        public partial LoginTokenDTO MapUserToLoginTokenDto(User user);
 
         /// <summary>
         /// Маппинг данных входа через Google в User

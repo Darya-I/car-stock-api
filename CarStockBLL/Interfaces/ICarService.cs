@@ -4,10 +4,11 @@ using CarStockDAL.Models;
 
 namespace CarStockBLL.Interfaces
 {
+    /// <summary>
+    /// Интерфейс для сервиса операций над автомобилями
+    /// </summary>
     public interface ICarService
     {
-        // read
-        // в этих методах хз Т или сам класс
         Task<Car> GetCarByIdAsync(int? id);
         Task<IEnumerable<Car>> GetAllCarsAsync();
 

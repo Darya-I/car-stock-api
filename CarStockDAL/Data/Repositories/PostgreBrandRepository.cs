@@ -5,11 +5,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarStockDAL.Data.Repositories
 {
+    /// <summary>
+    /// Репозиторий для операций с марками автомобилей, реализующий интерфейс <see cref="IBrandRepository{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">Тип сущности, с которой работает репозиторий.</typeparam>
     public class PostgreBrandRepository<T> : PostgreBaseRepository, IBrandRepository<Brand> where T : class
     {
-        private readonly AppDbContext _dbContext;
+        /// <summary>
+        /// Коллекция сущностей брендов, представляющая таблицу в базе данных
+        /// </summary>
         private readonly DbSet<Brand> _brands;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="PostgreBrandRepository{T}"/>.
+        /// </summary>
+        /// <param name="dbContext">Контекст базы данных</param>
         public PostgreBrandRepository(AppDbContext dbContext) : base(dbContext)
         {
             _brands = dbContext.Brands;

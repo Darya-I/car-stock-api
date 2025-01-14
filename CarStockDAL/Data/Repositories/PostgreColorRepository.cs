@@ -4,10 +4,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarStockDAL.Data.Repositories
 {
+    /// <summary>
+    /// Репозиторий для операций с марками автомобилей, реализующий интерфейс <see cref="IColorRepository{T}"/>
+    /// </summary>
+    /// <typeparam name="T">Тип сущности, с которой работает репозиторий</typeparam>
     public class PostgreColorRepository<T> : PostgreBaseRepository, IColorRepository<Color> where T : class
     {
+        /// <summary>
+        /// Коллекция сущностей цветов
+        /// </summary>
         private readonly DbSet<Color> _colors;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="PostgreColorRepository{T}"/>.
+        /// </summary>
+        /// <param name="dbContext">Контекст базы данных</param>
         public PostgreColorRepository(AppDbContext dbContext) : base(dbContext)
         {
             _colors = dbContext.Colors;

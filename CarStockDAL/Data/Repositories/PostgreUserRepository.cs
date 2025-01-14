@@ -4,10 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarStockDAL.Data.Repositories
 {
+    /// <summary>
+    /// Репозиторий для операций с пользователями, реализующий интерфейс <see cref="IUserRepository">
+    /// </summary>
     public class PostgreUserRepository : IUserRepository
     {
+        /// <summary>
+        /// Контекст базы данных
+        /// </summary>
         private readonly AppDbContext _dbContext;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр репозитория пользователей
+        /// </summary>
+        /// <param name="dbContext">Контекст базы данных</param>
         public PostgreUserRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;

@@ -2,6 +2,9 @@
 
 namespace CarStockBLL.Interfaces
 {
+    /// <summary>
+    /// Интерфейс для сервиса операций над пользователями
+    /// </summary>
     public interface IUserService
     {
         Task<(User user, List<string> roles)?> GetUserAsync(string email);

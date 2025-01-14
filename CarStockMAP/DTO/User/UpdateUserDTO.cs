@@ -1,5 +1,8 @@
 ﻿namespace CarStockMAP.DTO.User
 {
+    /// <summary>
+    /// DTO обновленного пользователя
+    /// </summary>
     public class UpdateUserDTO
     {
         public string? Email { get; set; }

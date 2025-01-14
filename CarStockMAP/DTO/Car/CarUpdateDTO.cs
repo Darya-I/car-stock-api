@@ -1,5 +1,8 @@
 ﻿namespace CarStockMAP.DTO.Car
 {
+    /// <summary>
+    /// DTO обновленного автомобиля
+    /// </summary>
     public class CarUpdateDTO
     {
         public int Id { get; set; }

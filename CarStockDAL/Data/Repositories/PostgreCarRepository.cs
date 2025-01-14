@@ -3,10 +3,21 @@ using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CarStockDAL.Data.Repositories
 {
+    /// <summary>
+    /// Репозиторий для операций с автомобилями, реализующий интерфейс <see cref="ICarRepository{T}"/>
+    /// </summary>
+    /// <typeparam name="T">Тип сущности, с которой работает репозиторий</typeparam>
     public class PostgreCarRepository<T> : PostgreBaseRepository, ICarRepository<Car> where T : class
     {
+        /// <summary>
+        /// Коллекция сущностей автомобилей
+        /// </summary>
         private readonly DbSet<Car> _cars;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="PostgreCarRepository{T}"/>.
+        /// </summary>
+        /// <param name="dbContext">Контекст базы данных</param>
         public PostgreCarRepository(AppDbContext dbContext) : base(dbContext)
         {
             _cars = dbContext.Cars;
