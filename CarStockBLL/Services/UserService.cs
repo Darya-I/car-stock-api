@@ -1,5 +1,5 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockDAL.Data.Repos;
+using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;

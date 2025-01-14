@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using CarStockBLL.Interfaces;
 using CarStockBLL.Models;
-using CarStockDAL.Data.Repos;
+using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
 namespace CarStockBLL.Services

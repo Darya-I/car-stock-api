@@ -1,7 +1,7 @@
 ﻿using CarStockBLL.Interfaces;
 using CarStockBLL.Models;
 using CarStockDAL.Data;
-using CarStockDAL.Data.Repos;
+using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
 namespace CarStockBLL.Services

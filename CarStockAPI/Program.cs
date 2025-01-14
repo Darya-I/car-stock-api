@@ -4,7 +4,6 @@ using CarStockBLL.Interfaces;
 using CarStockBLL.Models;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
-using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 using CarStockMAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,6 +16,8 @@ using Serilog;
 using Serilog.Sinks.PostgreSQL;
 using CarStockAPI.Models.Configs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using CarStockDAL.Data.Interfaces;
+using CarStockDAL.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

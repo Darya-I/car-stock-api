@@ -1,6 +1,6 @@
 ﻿using CarStockDAL.Models;
 
-namespace CarStockDAL.Data.Repos
+namespace CarStockDAL.Data.Interfaces
 {
     public interface ICarModelRepository<T>
         where T : class

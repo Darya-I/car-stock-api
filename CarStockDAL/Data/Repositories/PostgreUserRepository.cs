@@ -1,8 +1,8 @@
-﻿using CarStockDAL.Data.Repos;
+﻿using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarStockDAL.Data
+namespace CarStockDAL.Data.Repositories
 {
     public class PostgreUserRepository : IUserRepository
     {
