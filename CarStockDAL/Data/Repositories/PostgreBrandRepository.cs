@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
-using CarStockDAL.Data.Repos;
+using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarStockDAL.Data
+namespace CarStockDAL.Data.Repositories
 {
     public class PostgreBrandRepository<T> : PostgreBaseRepository, IBrandRepository<Brand> where T : class
     {

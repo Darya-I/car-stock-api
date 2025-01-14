@@ -1,8 +1,8 @@
-﻿using CarStockDAL.Data.Repos;
+﻿using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarStockDAL.Data
+namespace CarStockDAL.Data.Repositories
 {
     public class PostgreColorRepository<T> : PostgreBaseRepository, IColorRepository<Color> where T : class
     {
@@ -23,7 +23,7 @@ namespace CarStockDAL.Data
         {
             var colorToDelete = await _colors.FindAsync(id);
 
-            if (colorToDelete != null) 
+            if (colorToDelete != null)
             {
                 _colors.Remove(colorToDelete);
                 await SaveAsync();
