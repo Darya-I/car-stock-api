@@ -14,7 +14,11 @@ namespace CarStockBLL.Services
         private readonly ICarModelService _carModelService;
         private readonly IColorService _colorService;
 
-        public CarService(ICarRepository<Car> carRepository, IBrandService brandService, ICarModelService carModelService, IColorService colorService)
+        public CarService(
+            ICarRepository<Car> carRepository, 
+            IBrandService brandService, 
+            ICarModelService carModelService, 
+            IColorService colorService)
         {
             _carRepository = carRepository;
             _brandService = brandService;
@@ -48,22 +52,24 @@ namespace CarStockBLL.Services
             };
         }
 
-        public async Task UpdateCarAsync(CarUpdateDto carUpdateDto)
+        public async Task<bool> UpdateCarAsync(Car car)
         {
-            var existingCar = await _carRepository.GetCarByIdAsync(carUpdateDto.Id);
+            var existingCar = await _carRepository.GetCarByIdAsync(car.Id);
 
             if (existingCar == null)
             {
                 throw new ValidationException("Car not found.");
             }
 
-            existingCar.BrandId = carUpdateDto.BrandId;
-            existingCar.CarModelId = carUpdateDto.CarModelId;
-            existingCar.ColorId = carUpdateDto.ColorId;
-            existingCar.Amount = carUpdateDto.Amount;
-            existingCar.IsAvaible = carUpdateDto.IsAvaible;
+            existingCar.BrandId = car.BrandId;
+            existingCar.CarModelId = car.CarModelId;
+            existingCar.ColorId = car.ColorId;
+            existingCar.Amount = car.Amount;
+            existingCar.IsAvaible = car.IsAvaible;
 
             await _carRepository.UpdateCarAsync(existingCar);
+
+            return true;
         }
 
         public async Task DeleteCarAsync(int? id) 
@@ -159,5 +165,6 @@ namespace CarStockBLL.Services
 
             await _carRepository.UpdateCarAsync(existingCar);       
         }
+
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace CarStockBLL.Models
+﻿namespace CarStockMAP.DTO.Car
 {
-    public class CarUpdateDto
+    public class CarUpdateDTO
     {
         public int Id { get; set; }
         public int BrandId { get; set; }

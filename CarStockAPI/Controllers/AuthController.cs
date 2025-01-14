@@ -2,8 +2,7 @@
 using CarStockBLL.Interfaces;
 using CarStockDAL.Models;
 using CarStockMAP;
-using CarStockMAP.DTO;
-using CarStockMAP.Models;
+using CarStockMAP.DTO.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -18,14 +17,21 @@ namespace CarStockAPI.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
-        public readonly MapService _mapService;
+        public readonly UserMapService _mapService;
+        //public readonly ILogger _logger;
 
-
-        public AuthController(IUserService userService, ITokenService tokenService, MapService mapService)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="tokenService"></param>
+        /// <param name="mapService"></param>
+        public AuthController(IUserService userService, ITokenService tokenService, UserMapService mapService)
         {
             _userService = userService;
             _tokenService = tokenService;
             _mapService = mapService;
+            //_logger = logger;
         }
 
 
@@ -38,6 +44,10 @@ namespace CarStockAPI.Controllers
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse()
         {
@@ -49,7 +59,7 @@ namespace CarStockAPI.Controllers
 
             var claims = result.Principal.Claims;
 
-            GoogleLoginRequest googleUser = new GoogleLoginRequest
+            GoogleLoginRequestDTO googleUser = new GoogleLoginRequestDTO
             {
                 Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value.ToString(),
                 Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value.ToString(),
@@ -58,6 +68,8 @@ namespace CarStockAPI.Controllers
             await _mapService.MapGoogleUser(googleUser);
 
             var response = await _mapService.MapGoogleUserLogin(googleUser);
+
+            //_logger.LogInformation("balagdakfliadshpf");
 
             return Ok(new
             {
@@ -68,7 +80,7 @@ namespace CarStockAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
             var response = await _mapService.MapUserLogin(loginRequest);
             setTokenCookie(response.RefreshToken);

@@ -1,4 +1,4 @@
-﻿namespace CarStockMAP.DTO
+﻿namespace CarStockMAP.DTO.Auth
 {
     public class LoginTokenDto
     {

@@ -1,6 +1,6 @@
-﻿namespace CarStockMAP.DTO
+﻿namespace CarStockMAP.DTO.Auth
 {
-    public class GoogleLoginRequest
+    public class GoogleUserDTO
     {
         public string Email { get; set; }
         public string Name { get; set; }

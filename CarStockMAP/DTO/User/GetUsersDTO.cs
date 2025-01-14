@@ -1,4 +1,4 @@
-﻿namespace CarStockMAP.DTO
+﻿namespace CarStockMAP.DTO.User
 {
     public class GetUsersDTO
     {

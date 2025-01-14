@@ -1,24 +1,22 @@
 ﻿using CarStockBLL.Interfaces;
 using CarStockBLL.Models;
-using CarStockMAP.DTO;
+using CarStockMAP.DTO.Auth;
+using CarStockMAP.DTO.User;
 using CarStockMAP.Mapping;
-using CarStockMAP.Models;
 
 
 namespace CarStockMAP
 {
-    public class MapService
+    public class UserMapService
     {
-        private readonly ICarService _carService;
         private readonly IUserService _userService;
 
-        public MapService(ICarService carService, IUserService userService)
+        public UserMapService(IUserService userService)
         {
-            _carService = carService;
             _userService = userService;
         }
 
-        public async Task<GoogleUserDTO> MapGoogleUser(GoogleLoginRequest googleLoginRequest)
+        public async Task<GoogleUserDTO> MapGoogleUser(GoogleLoginRequestDTO googleLoginRequest)
         {
             var mapper = new UserMapper();
             var user = mapper.MapGoogleLoginRequestToUser(googleLoginRequest);
@@ -28,7 +26,7 @@ namespace CarStockMAP
             return googleUser;
         }
 
-        public async Task<LoginTokenDto> MapGoogleUserLogin(GoogleLoginRequest googleLoginRequest)
+        public async Task<LoginTokenDto> MapGoogleUserLogin(GoogleLoginRequestDTO googleLoginRequest)
         {
             var mapper = new UserMapper();
             var user = mapper.MapGoogleLoginRequestToUser(googleLoginRequest);
@@ -39,7 +37,7 @@ namespace CarStockMAP
             return googleLoginResult;
         }
 
-        public async Task<LoginTokenDto> MapUserLogin(LoginRequest loginRequest)
+        public async Task<LoginTokenDto> MapUserLogin(LoginRequestDTO loginRequest)
         {
             var mapper = new UserMapper();
             var user = mapper.MapLoginRequestToUser(loginRequest);
@@ -52,17 +50,7 @@ namespace CarStockMAP
             return loginResult;
         }
 
-        public async Task<IEnumerable<CarDTO>> GetMappedCarsAsync()
-        {
-            var cars = await _carService.GetAllCarsAsync();
-
-            var mapper = new CarMapper();
-            //преобразуем каждый объект Car из коллекции cars в объекты CarDto и создаем список
-            var carDtos = cars.Select(car => mapper.MapToCarDto(car)).ToList();  
-
-            return carDtos;
-
-        }
+       
 
         public async Task<CreateUserDTO> CreateMappedUserAsync(CreateUserDTO createUserDTO)
         {
@@ -134,24 +122,6 @@ namespace CarStockMAP
             return updateUserDTO;
         }
 
-        public async Task<OperationResult<string>> CreateMappedCarAsync(CarDTO carDto)
-        {
-            try
-            {
-                var mapper = new CarMapper();
-
-                // преобразуем DTO в модель уровня BLL
-                var car = mapper.MapToCar(carDto);
-
-                // передаем преобразованную модель в _carService для создания
-                var result = await _carService.CreateCarAsync(car);
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return OperationResult<string>.Failure($"An error occurred while creating the mapped car: {ex.Message}");
-            }
-        }
+       
     }
 }

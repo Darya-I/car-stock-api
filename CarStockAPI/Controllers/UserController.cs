@@ -1,6 +1,6 @@
 ﻿using CarStockBLL.Interfaces;
 using CarStockMAP;
-using CarStockMAP.DTO;
+using CarStockMAP.DTO.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +12,11 @@ namespace CarStockAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public readonly MapService _mapService;
+        public readonly UserMapService _userMapService;
 
-        public UserController(MapService mapService, IUserService userService)
+        public UserController(UserMapService userMapService, IUserService userService)
         {
-            _mapService = mapService;
+            _userMapService = userMapService;
             _userService = userService;
         }
 
@@ -24,7 +24,7 @@ namespace CarStockAPI.Controllers
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser(CreateUserDTO createUserDto)
         {
-            var result = await _mapService.CreateMappedUserAsync(createUserDto);
+            var result = await _userMapService.CreateMappedUserAsync(createUserDto);
             return Ok(result);
         }
 
@@ -40,7 +40,7 @@ namespace CarStockAPI.Controllers
         [HttpPut("UpdateUser/{email}")]
         public async Task<IActionResult> UpdateUser([FromRoute] string email, [FromBody] UpdateUserDTO updateUserDto)
         {
-            var user = await _mapService.UpdateMappedUserAsync(updateUserDto);
+            var user = await _userMapService.UpdateMappedUserAsync(updateUserDto);
             
             if (!string.IsNullOrWhiteSpace(updateUserDto.Role))
             {
@@ -53,7 +53,7 @@ namespace CarStockAPI.Controllers
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _mapService.GetMappedUsersAsync();
+            var users = await _userMapService.GetMappedUsersAsync();
             return Ok(users);
         }
 
@@ -61,7 +61,7 @@ namespace CarStockAPI.Controllers
         [HttpGet("GetUser/{email}")]
         public async Task<IActionResult> GetUser([FromRoute] string email)
         {
-            var users = await _mapService.GetMappedUserAsync(email);
+            var users = await _userMapService.GetMappedUserAsync(email);
             return Ok(users);
         }
     }

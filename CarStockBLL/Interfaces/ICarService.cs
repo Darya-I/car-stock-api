@@ -13,13 +13,12 @@ namespace CarStockBLL.Interfaces
 
         Task<OperationResult<string>> CreateCarAsync(Car car);
 
-        Task UpdateCarAsync(CarUpdateDto carUpdateDto);
+        Task<bool> UpdateCarAsync(Car car);
 
         Task DeleteCarAsync(int? id);
 
         Task UpdateCarAvailabilityAsync(int id, bool isAvaible);
 
         Task UpdateCarAmountAsync(int id, int amount);
-
     }
 }

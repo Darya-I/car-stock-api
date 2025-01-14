@@ -71,7 +71,9 @@ builder.Services.AddScoped<ICarModelService, CarModelService>();
 builder.Services.AddScoped<IColorService, ColorService>();
 
 
-builder.Services.AddScoped<MapService>();
+builder.Services.AddScoped<UserMapService>();
+builder.Services.AddScoped<CarMapService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 // ???
 builder.Services.AddScoped<ITokenService, TokenService>();

@@ -1,12 +1,11 @@
-﻿using CarStockMAP.DTO;
-using CarStockBLL.Interfaces;
+﻿using CarStockBLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using CarStockMAP;
 using CarStockBLL.Infrastructure;
-using CarStockBLL.Models;
 using CarStockAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using CarStockMAP.DTO.Car;
 
 
 
@@ -17,19 +16,19 @@ namespace CarStockAPI.Controllers
     public class CarController : ControllerBase
     {
         public readonly ICarService _carService;
-        public readonly MapService _mapService;
+        public readonly CarMapService _carMapService;
 
-        public CarController(ICarService carService, MapService mapService)
+        public CarController(ICarService carService, CarMapService carMapService)
         {
             _carService = carService;
-            _mapService = mapService;
+            _carMapService = carMapService;
         }
 
         [Authorize(Roles = "Admin, Manager, User")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
         {
-            var carDtos = await _mapService.GetMappedCarsAsync();
+            var carDtos = await _carMapService.GetMappedCarsAsync();
             return Ok(carDtos);
         }
 
@@ -37,7 +36,7 @@ namespace CarStockAPI.Controllers
         [HttpPost("CreateCar")]
         public async Task<ActionResult> CreateCarAsync(CarDTO car)
         {
-            var result = await _mapService.CreateMappedCarAsync(car);
+            var result = await _carMapService.CreateMappedCarAsync(car);
 
             if (!result.Success)
             {
@@ -61,7 +60,7 @@ namespace CarStockAPI.Controllers
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCar/{id}")]
-        public async Task<IActionResult> UpdateCar(int id, [FromBody] CarUpdateDto carUpdateDto)
+        public async Task<IActionResult> UpdateCar(int id, [FromBody] CarUpdateDTO carUpdateDto)
         {
             if (carUpdateDto == null)
             {
@@ -73,14 +72,15 @@ namespace CarStockAPI.Controllers
                 return BadRequest("Car ID in the URL does not match the ID in the body.");
             }
 
-            await _carService.UpdateCarAsync(carUpdateDto);
+            // 
+            await _carMapService.GetUpdatedMappedCarAsync(carUpdateDto);
             return Ok(carUpdateDto);
         }
 
         //availability
         [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCarAvailability/{id}")]
-        public async Task<IActionResult> UpdateCarAvailability(int id, [FromBody] CarUpdateDto carUpdateDto)
+        public async Task<IActionResult> UpdateCarAvailability(int id, [FromBody] CarUpdateDTO carUpdateDto)
         {
             if (carUpdateDto == null)
             {
@@ -105,7 +105,7 @@ namespace CarStockAPI.Controllers
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCarAmount/{id}")]
-        public async Task<IActionResult> UpdateCarAmount(int id, [FromBody] CarUpdateDto carUpdateDto)
+        public async Task<IActionResult> UpdateCarAmount(int id, [FromBody] CarUpdateDTO carUpdateDto)
         {
             if (carUpdateDto == null)
             {
