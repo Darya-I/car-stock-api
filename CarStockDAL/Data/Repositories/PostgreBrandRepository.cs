@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace CarStockDAL.Data.Repositories
 {
     /// <summary>
-    /// Репозиторий для операций с марками автомобилей, реализующий интерфейс <see cref="IBrandRepository{T}"/>.
+    /// Репозиторий для операций с марками автомобилей, реализующий интерфейс <see cref="IBrandRepository{T}"/>
     /// </summary>
-    /// <typeparam name="T">Тип сущности, с которой работает репозиторий.</typeparam>
+    /// <typeparam name="T">Тип сущности, с которой работает репозиторий</typeparam>
     public class PostgreBrandRepository<T> : PostgreBaseRepository, IBrandRepository<Brand> where T : class
     {
         /// <summary>
-        /// Коллекция сущностей брендов, представляющая таблицу в базе данных
+        /// Коллекция сущностей брендов
         /// </summary>
         private readonly DbSet<Brand> _brands;
 

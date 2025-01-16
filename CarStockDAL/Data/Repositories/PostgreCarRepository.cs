@@ -37,30 +37,21 @@ namespace CarStockDAL.Data.Repositories
 
         public async Task DeleteCarAsync(int id)
         {
-            // Поиск автомобиля по идентификатору
-            var exists = await _cars.Where(c => c.Id == id).AnyAsync();
-            if (!exists)
-            {
-                throw new InvalidOperationException("Car not found.");
-            }
-
             var carToDelete = await _cars.SingleOrDefaultAsync(c => c.Id == id);
-
-            // Удаление автомобиля
             _cars.Remove(carToDelete);
-
-            // Сохранение изменений в базе данных
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task<Car> GetCarByIdAsync(int id)
         {
+            
             var car = await _cars
                 .Include(c => c.Brand)     // Загрузить связанный объект Brand
                 .Include(c => c.CarModel)  // Загрузить связанный объект CarModel
                 .Include(c => c.Color)     // Загрузить связанный объект Color
                 .FirstOrDefaultAsync(c => c.Id == id);  // Фильтруем по ID
-            return car;
+            
+            return car == null ? throw new KeyNotFoundException("Car not found") : car;
         }
 
         public async Task<List<Car>> GetAllCarsAsync(bool tracked = true)

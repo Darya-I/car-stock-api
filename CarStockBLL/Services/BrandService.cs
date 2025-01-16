@@ -13,21 +13,21 @@ namespace CarStockBLL.Services
         {
             _brandRepository = brandRepository;
         }
-        public async Task<OperationResult<Brand>> GetBrandByNameAsync(string name)
+        public async Task<Brand> GetBrandByNameAsync(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return OperationResult<Brand>.Failure("Brand name cannot be null or empty.");
+                throw new ArgumentNullException("Brand name cannot be null or empty.");
             }
 
             var brand = await _brandRepository.GetBrandByNameAsync(name);
 
             if (brand == null)
             {
-                return OperationResult<Brand>.Failure($"Brand with name '{name}' not found.");
+                throw new KeyNotFoundException($"Brand with name '{name}' not found.");
             }
 
-            return OperationResult<Brand>.SuccessResult(new Brand { Name = brand.Name, Id = brand.Id });
+            return (new Brand { Name = brand.Name, Id = brand.Id });
         }
     }
 }

@@ -32,10 +32,16 @@ namespace CarStockMAP
         /// <param name="carUpdateDTO">Обновленный автомобиль</param>
         public async Task GetUpdatedMappedCarAsync(CarUpdateDTO carUpdateDTO)
         {
-            var mapper = new CarMapper();
-            var updatedCar = mapper.MapUpdateCarDtoToCar(carUpdateDTO);
-
-            await _carService.UpdateCarAsync(updatedCar);
+            try
+            {
+                var mapper = new CarMapper();
+                var updatedCar = mapper.MapUpdateCarDtoToCar(carUpdateDTO);
+                await _carService.UpdateCarAsync(updatedCar);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -44,40 +50,39 @@ namespace CarStockMAP
         /// <returns>DTO списка автомобилей</returns>
         public async Task<IEnumerable<CarDTO>> GetMappedCarsAsync()
         {
-            var cars = await _carService.GetAllCarsAsync();
-
-            var mapper = new CarMapper();
-            
-            //преобразуем каждый объект Car из коллекции cars в объекты CarDto и создаем список
-            var carDtos = cars.Select(car => mapper.MapCarToCarDto(car)).ToList();
-
-            return carDtos;
-
+            try
+            {
+                var cars = await _carService.GetAllCarsAsync();
+                var mapper = new CarMapper();
+                //Преобразуем каждый объект Car из коллекции cars в объекты CarDto и создаем список
+                var carDtos = cars.Select(car => mapper.MapCarToCarDto(car)).ToList();
+                return carDtos;
+            }
+            catch (Exception) 
+            {
+                throw;
+            }
         }
 
         /// <summary>
         /// Маппит DTO автомобиля на Car, передает CarService
         /// </summary>
         /// <param name="carDto">DTO автомобиля</param>
-        /// <returns></returns>
-        /// <exception cref="OperationResult"></exception>
-        public async Task<OperationResult<string>> CreateMappedCarAsync(CarDTO carDto)
+        /// <returns>Строка с результатом</returns>
+        public async Task<string> CreateMappedCarAsync(CarDTO carDto)
         {
             try
             {
                 var mapper = new CarMapper();
-
-                // преобразуем DTO в модель уровня BLL
+                // Преобразуем DTO в модель уровня BLL
                 var car = mapper.MapCarDTOToCar(carDto);
-
-                // передаем преобразованную модель в _carService для создания
+                // Передаем преобразованную модель в _carService для создания
                 var result = await _carService.CreateCarAsync(car);
-
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return OperationResult<string>.Failure($"An error occurred while creating the mapped car: {ex.Message}");
+                throw;
             }
         }
     }

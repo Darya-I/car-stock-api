@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -23,6 +24,19 @@ namespace CarStockAPI.Middlewares
             try
             {
                 await _next(httpContext);
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogWarning("Validation error: {Message}", ex.Message);
+                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await httpContext.Response.WriteAsJsonAsync(new { error = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning("Key not found error: {Message}", ex.Message);
+                httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+                await httpContext.Response.WriteAsJsonAsync(new { error = ex.Message });
+
             }
             catch (Exception ex)
             {

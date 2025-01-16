@@ -1,9 +1,9 @@
-﻿namespace CarStockBLL.Models
-{
-    public class JwtConfig
+﻿    namespace CarStockBLL.Models
     {
-        public string Secret { get; set; }
-        public string Issuer { get; set; }
-        public string Audience { get; set; }
+        public class JwtConfig
+        {
+            public string Secret { get; set; }
+            public string Issuer { get; set; }
+            public string Audience { get; set; }
+        }
     }
-}

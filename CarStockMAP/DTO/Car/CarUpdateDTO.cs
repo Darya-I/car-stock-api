@@ -10,6 +10,6 @@
         public int CarModelId { get; set; }
         public int ColorId { get; set; }
         public int Amount { get; set; }
-        public bool IsAvaible { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

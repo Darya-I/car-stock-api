@@ -1,4 +1,4 @@
-﻿namespace CarStockAPI.Models.Configs
+﻿namespace CarStockAPI.Configs
 {
     public class GoogleConfig
     {

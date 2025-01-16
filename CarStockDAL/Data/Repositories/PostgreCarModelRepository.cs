@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CarStockDAL.Data.Repositories
 {
     /// <summary>
-    /// Репозиторий для операций с моделями автомобилей, реализующий интерфейс <see cref="ICarModelRepository{T}"/>.
+    /// Репозиторий для операций с моделями автомобилей, реализующий интерфейс <see cref="ICarModelRepository{T}"/>
     /// </summary>
     /// <typeparam name="T">Тип сущности, с которой работает репозиторий</typeparam>
     public class PostgreCarModelRepository<T> : PostgreBaseRepository, ICarModelRepository<CarModel> where T : class

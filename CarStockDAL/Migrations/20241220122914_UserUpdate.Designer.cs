@@ -61,7 +61,7 @@ namespace CarStockDAL.Migrations
                     b.Property<int>("ColorId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsAvaible")
+                    b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");

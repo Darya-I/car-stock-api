@@ -14,7 +14,7 @@ namespace CarStockMAP.Mapping
         [MapProperty(nameof(Car.Brand.Name), nameof(CarDTO.BrandName))]
         [MapProperty(nameof(Car.CarModel.Name), nameof(CarDTO.CarModelName))]
         [MapProperty(nameof(Car.Color.Name), nameof(CarDTO.ColorName))]
-        [MapProperty(nameof(Car.Id), nameof(CarDTO.Id))]
+        //[MapProperty(nameof(Car.Id), nameof(CarDTO.Id))]
         public partial CarDTO MapCarToCarDto(Car car);
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace CarStockMAP.Mapping
         [MapProperty(nameof(CarUpdateDTO.CarModelId), nameof(Car.CarModelId))]
         [MapProperty(nameof(CarUpdateDTO.ColorId), nameof(Car.ColorId))]
         [MapProperty(nameof(CarUpdateDTO.Amount), nameof(Car.Amount))]
-        [MapProperty(nameof(CarUpdateDTO.IsAvaible), nameof(Car.IsAvaible))]
+        [MapProperty(nameof(CarUpdateDTO.IsAvailable), nameof(Car.IsAvailable))]
         public partial Car MapUpdateCarDtoToCar(CarUpdateDTO carUpdateDTO);
     }
 }

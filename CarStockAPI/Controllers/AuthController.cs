@@ -1,6 +1,5 @@
 ﻿using CarStockAPI.Models;
 using CarStockBLL.Interfaces;
-using CarStockDAL.Models;
 using CarStockMAP;
 using CarStockMAP.DTO.Auth;
 using Microsoft.AspNetCore.Authentication;
@@ -18,26 +17,30 @@ namespace CarStockAPI.Controllers
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
         public readonly UserMapService _mapService;
-        //public readonly ILogger _logger;
+        private readonly IAuthorizeUserService _authorizationService;
+        private readonly ILogger<AuthController> _logger;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userService"></param>
-        /// <param name="tokenService"></param>
-        /// <param name="mapService"></param>
-        public AuthController(IUserService userService, ITokenService tokenService, UserMapService mapService)
+        public AuthController(IUserService userService,
+                              ITokenService tokenService,
+                              UserMapService mapService,
+                              IAuthorizeUserService authorizeUserService,
+                              ILogger<AuthController> logger)
         {
             _userService = userService;
             _tokenService = tokenService;
             _mapService = mapService;
-            //_logger = logger;
+            _authorizationService = authorizeUserService;
+            _logger = logger;
         }
 
-
+        /// <summary>
+        /// Инициирует процесс входа через Google
+        /// </summary>
+        /// <returns>Перенаправление на страницу аутентификации Google</returns>
         [HttpGet("signin-google")]
         public IActionResult SignInWithGoogle() 
         {
+            _logger.LogInformation("Initiating Google sign-in process.");
             var redirectUrl = Url.Action("GoogleResponse", "Auth");
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
@@ -45,57 +48,73 @@ namespace CarStockAPI.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Обрабатывает ответ от Google после аутентификации
         /// </summary>
-        /// <returns></returns>
+        /// <returns>AccessToken или сообщение об ошибке</returns>
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse()
         {
+            _logger.LogInformation("Receiving Google authentication response");
+            // сначала логин в самом гугле, оттуда берем инфу
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+           
             if (!result.Succeeded)
             {
+                _logger.LogWarning("Google authentication failed");
                 return BadRequest();    
             }
-
+            //вот тут взяли
             var claims = result.Principal.Claims;
 
+            //вот тут раскидали гугловского пользака
             GoogleLoginRequestDTO googleUser = new GoogleLoginRequestDTO
             {
-                Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value.ToString(),
-                Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value.ToString(),
+                Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value.ToString(),
+                Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value.ToString(),
             };
 
-            await _mapService.MapGoogleUser(googleUser);
+            _logger.LogInformation("Mapping Google user: {Email}", googleUser.Email);
+            var mapResult = await _mapService.MapGoogle(googleUser);
 
-            var response = await _mapService.MapGoogleUserLogin(googleUser);
-
-            //_logger.LogInformation("balagdakfliadshpf");
-
+            _logger.LogInformation("Google user mapping successful. Access token generated");
             return Ok(new
             {
-                Claims = claims.Select(c => new { Type = c.Type, Value = c.Value }),
-                AccessToken = response.Token
+                AccessToken = mapResult
             });
-
         }
 
+        /// <summary>
+        /// Вход пользователя
+        /// </summary>
+        /// <param name="loginRequest">Данные пользователя для входа</param>
+        /// <returns>Токены пользователя</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
+            _logger.LogInformation("Mapping user: {Email}", loginRequest.Email);
             var response = await _mapService.MapUserLogin(loginRequest);
-            setTokenCookie(response.RefreshToken);
+            _logger.LogInformation("Authentication successful for user: {Email}. Setting refresh token cookie.", loginRequest.Email);
+            SetTokenCookie(response.RefreshToken);
             return Ok(response);
         }
 
-        [HttpPost("refresh")]
+        /// <summary>
+        /// Обновляет refresh токен пользователя
+        /// </summary>
+        /// <param name="refreshTokenRequest">Refresh токен</param>
+        /// <returns>Новый access токен</returns>
+        [HttpPost("refresh")] 
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
-            var user = await _userService.GetUserByRefreshTokenAsync(refreshTokenRequest.RefreshToken);
+            _logger.LogInformation("Attempting to refresh token for user with refresh token: {RefreshToken}", refreshTokenRequest.RefreshToken);
+            var user = await _authorizationService.GetUserByRefreshTokenAsync(refreshTokenRequest.RefreshToken);
             if (user == null)
             {
+                _logger.LogWarning("No user found for refresh token: {RefreshToken}", refreshTokenRequest.RefreshToken);
                 return Unauthorized();
             }
 
+            _logger.LogInformation("User found. Retrieving roles for user: {UserName}", user.UserName);
             var roles = await _userService.GetUserRolesAsync(user);
             var claims = new List<Claim>()
             {
@@ -106,13 +125,19 @@ namespace CarStockAPI.Controllers
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
+
+            _logger.LogInformation("Generating access token for user: {UserName}", user.UserName);
             var token = _tokenService.GetAccessToken(claims, out DateTime expires);
-            await _userService.UpdateRefreshTokenAsync(user);
+            _logger.LogInformation("Access token generated successfully for user: {UserName}. Updating refresh token.", user.UserName);
+            await _authorizationService.UpdateRefreshTokenAsync(user);
             return Ok(new { Token = token, Expiration = expires });
         }
 
-        // хелп метод
-        private void setTokenCookie(string token)
+        /// <summary>
+        /// Устанавливает куки, содержащие refresh токен
+        /// </summary>
+        /// <param name="token">Refresh токен для хранения в куки</param>
+        private void SetTokenCookie(string token)
         {
             var cookieOpt = new CookieOptions
             {
@@ -120,6 +145,7 @@ namespace CarStockAPI.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refresh-token", token, cookieOpt);
+            _logger.LogInformation("Refresh token cookie set successfully with expiration date: {ExpirationDate}", cookieOpt.Expires);
         }
     }
 }

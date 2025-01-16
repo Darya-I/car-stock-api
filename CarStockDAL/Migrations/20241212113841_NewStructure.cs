@@ -51,7 +51,7 @@ namespace CarStockDAL.Migrations
                 defaultValue: 0);
 
             migrationBuilder.AddColumn<bool>(
-                name: "IsAvaible",
+                name: "IsAvailable",
                 table: "Cars",
                 type: "boolean",
                 nullable: false,
@@ -338,7 +338,7 @@ namespace CarStockDAL.Migrations
                 table: "Cars");
 
             migrationBuilder.DropColumn(
-                name: "IsAvaible",
+                name: "IsAvailable",
                 table: "Cars");
 
             migrationBuilder.RenameColumn(
