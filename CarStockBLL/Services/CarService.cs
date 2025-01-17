@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
@@ -65,11 +66,12 @@ namespace CarStockBLL.Services
         public async Task<Car> GetCarByIdAsync(int? id)
         {
             _logger.LogInformation("Fetching car with ID {CarId}.", id);
-
+            id = null;
             if (id == null)
             {
                 _logger.LogWarning("Attempted to retrieve a car with a null ID.");
-                throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
+                throw new ApiException("Car ID cannot be null");
+                //throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
             }
 
             try

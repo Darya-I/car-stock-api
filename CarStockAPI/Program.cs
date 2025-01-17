@@ -141,7 +141,7 @@ options.AddPolicy("CorsPolicy", policy =>
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandling>();
+app.UseMiddleware<BussinessExceptionHandle>();
 
 if (app.Environment.IsDevelopment())
 {
