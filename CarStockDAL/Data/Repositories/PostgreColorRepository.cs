@@ -24,12 +24,20 @@ namespace CarStockDAL.Data.Repositories
             _colors = dbContext.Colors;
         }
 
+        /// <summary>
+        /// Создает новую запись цвета автомобиля
+        /// </summary>
+        /// <param name="color">Объект цвета автомобиля для создания</param>
         public async Task CreateColorAsync(Color color)
         {
             _colors.Add(color);
             await SaveAsync();
         }
 
+        /// <summary>
+        /// Удаляет запись цвета автомобиля по Id
+        /// </summary>
+        /// <param name="id">Id цвета</param>
         public async Task DeleteColorAsync(int id)
         {
             var colorToDelete = await _colors.FindAsync(id);
@@ -41,6 +49,11 @@ namespace CarStockDAL.Data.Repositories
             }
         }
 
+        /// <summary>
+        /// Получает список всех цветов автомобилей
+        /// </summary>
+        /// <param name="tracked">Указывает, отслеживаются ли изменения сущностей. По умолчанию true</param>
+        /// <returns>Список цветов</returns>
         public async Task<List<Color>> GetAllColorsAsync(bool tracked = true)
         {
             IQueryable<Color> query = _colors;
@@ -52,17 +65,31 @@ namespace CarStockDAL.Data.Repositories
             return await query.ToListAsync();
         }
 
+        /// <summary>
+        /// Получает запись цвета автомобиля по Id
+        /// </summary>
+        /// <param name="id">Id цвета</param>
+        /// <returns>Цвет автомобиля</returns>
         public async Task<Color> GetColorByIdAsync(int id)
         {
             return await _colors.FindAsync(id);
         }
 
+        /// <summary>
+        /// Обновляет запись цвета автомобиля
+        /// </summary>
+        /// <param name="color">Объект цвета автомобиля для обновления</param>
         public async Task UpdateColorAsync(Color color)
         {
             _colors.Update(color);
             await SaveAsync();
         }
 
+        /// <summary>
+        /// Получает цвет автомобиля по названию
+        /// </summary>
+        /// <param name="name">Название цвета</param>
+        /// <returns>Цвет автомобиля</returns>
         public async Task<Color?> GetColorByNameAsync(string name)
         {
             return await _colors.FirstOrDefaultAsync(b => b.Name == name);

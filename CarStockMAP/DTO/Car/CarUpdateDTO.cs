@@ -1,15 +1,35 @@
-﻿namespace CarStockMAP.DTO.Car
+﻿/// <summary>
+/// DTO для обновления информации об автомобиле
+/// </summary>
+public class CarUpdateDTO
 {
     /// <summary>
-    /// DTO обновленного автомобиля
+    /// Идентификатор автомобиля
     /// </summary>
-    public class CarUpdateDTO
-    {
-        public int Id { get; set; }
-        public int BrandId { get; set; }
-        public int CarModelId { get; set; }
-        public int ColorId { get; set; }
-        public int Amount { get; set; }
-        public bool IsAvailable { get; set; }
-    }
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Идентификатор марки автомобиля
+    /// </summary>
+    public int BrandId { get; set; }
+
+    /// <summary>
+    /// Идентификатор модели автомобиля
+    /// </summary>
+    public int CarModelId { get; set; }
+
+    /// <summary>
+    /// Идентификатор цвета автомобиля
+    /// </summary>
+    public int ColorId { get; set; }
+
+    /// <summary>
+    /// Количество автомобилей в наличии
+    /// </summary>
+    public int Amount { get; set; }
+
+    /// <summary>
+    /// Доступность автомобиля
+    /// </summary>
+    public bool IsAvailable { get; set; }
 }

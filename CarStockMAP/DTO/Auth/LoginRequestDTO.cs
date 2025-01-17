@@ -1,11 +1,15 @@
-﻿namespace CarStockMAP.DTO.Auth
+﻿/// <summary>
+/// DTO для запроса на вход пользователя
+/// </summary>
+public class LoginRequestDTO
 {
     /// <summary>
-    /// DTO входа пользователя
+    /// Почта пользователя
     /// </summary>
-    public class LoginRequestDTO
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    public string Email { get; set; }
+
+    /// <summary>
+    /// Пароль пользователя
+    /// </summary>
+    public string Password { get; set; }
 }

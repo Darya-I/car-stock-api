@@ -23,18 +23,30 @@ namespace CarStockDAL.Data.Repositories
             _cars = dbContext.Cars;
         }
 
+        /// <summary>
+        /// Создает новую запись автомобиля
+        /// </summary>
+        /// <param name="car">Объект автомобиля для создания</param>
         public async Task CreateCarAsync(Car car)
         {
             _cars.Add(car);
             await SaveAsync();
         }
 
+        /// <summary>
+        /// Обновляет запись автомобиля
+        /// </summary>
+        /// <param name="car">Объект автомобиля для обновления</param>
         public async Task UpdateCarAsync(Car car)
         {
             _cars.Update(car);
             await SaveAsync();
         }
 
+        /// <summary>
+        /// Удаляет запись автомобиля по Id
+        /// </summary>
+        /// <param name="id">Id автомобиля</param>
         public async Task DeleteCarAsync(int id)
         {
             var carToDelete = await _cars.SingleOrDefaultAsync(c => c.Id == id);
@@ -42,6 +54,11 @@ namespace CarStockDAL.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Получает запись автомобиля по Id
+        /// </summary>
+        /// <param name="id">Id автомобиля</param>
+        /// <returns>Автомобиль</returns>
         public async Task<Car> GetCarByIdAsync(int id)
         {
             
@@ -54,6 +71,11 @@ namespace CarStockDAL.Data.Repositories
             return car == null ? throw new KeyNotFoundException("Car not found") : car;
         }
 
+        /// <summary>
+        /// Получает список всех автомобилей
+        /// </summary>
+        /// <param name="tracked">Указывает, отслеживаются ли изменения сущностей. По умолчанию true</param>
+        /// <returns>Список автомобилей</returns>
         public async Task<List<Car>> GetAllCarsAsync(bool tracked = true)
         {
             IQueryable<Car> query = _cars

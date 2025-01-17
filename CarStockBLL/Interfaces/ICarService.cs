@@ -1,5 +1,4 @@
-﻿using CarStockBLL.Models;
-using CarStockDAL.Models;
+﻿using CarStockDAL.Models;
 
 
 namespace CarStockBLL.Interfaces
@@ -34,7 +33,7 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="car">Автомобиль</param>
         /// <returns>Значение <c>true</c>, если обновление выполнено успешно; иначе <c>false</c>.</returns>
-        Task<bool> UpdateCarAsync(Car car);
+        Task<Car> UpdateCarAsync(Car car);
 
         /// <summary>
         /// Удаляет автомобиль из базы данных

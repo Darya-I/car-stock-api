@@ -1,13 +1,25 @@
-﻿namespace CarStockMAP.DTO.User
+﻿/// <summary>
+/// DTO для обновления данных пользователя.
+/// </summary>
+public class UpdateUserDTO
 {
     /// <summary>
-    /// DTO обновленного пользователя
+    /// Новый почты пользователя
     /// </summary>
-    public class UpdateUserDTO
-    {
-        public string? Email { get; set; }
-        public string? Password { get; set; }
-        public string? UserName { get; set; }
-        public string? Role { get; set; }
-    }
+    public string? Email { get; set; }
+
+    /// <summary>
+    /// Новый пароль пользователя
+    /// </summary>
+    public string? Password { get; set; }
+
+    /// <summary>
+    /// Новое имя пользователя
+    /// </summary>
+    public string? UserName { get; set; }
+
+    /// <summary>
+    /// Назначаемая или обновляемая роль пользователя
+    /// </summary>
+    public string? Role { get; set; }
 }

@@ -1,6 +1,4 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
-using CarStockDAL.Data;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
@@ -9,10 +7,17 @@ namespace CarStockBLL.Services
     public class BrandService : IBrandService
     {
         private readonly IBrandRepository<Brand> _brandRepository;
+
+        /// <param name="brandRepository">Репозиторий для доступа к маркам автомобилей</param>
         public BrandService(IBrandRepository<Brand> brandRepository)
         {
             _brandRepository = brandRepository;
         }
+        /// <summary>
+        /// Получает марку автомобиля по названию из базы данных
+        /// </summary>
+        /// <param name="name">Название марки</param>
+        /// <returns>Марка автомобиля</returns>
         public async Task<Brand> GetBrandByNameAsync(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))

@@ -1,5 +1,4 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
@@ -9,11 +8,17 @@ namespace CarStockBLL.Services
     {
         private ICarModelRepository<CarModel> _carModelRepository;
 
+        /// <param name="carModelRepository">Репозиторий для доступа к моделям автомобилей</param>
         public CarModelService(ICarModelRepository<CarModel> carModelRepository)
         {
             _carModelRepository = carModelRepository;
         }
 
+        /// <summary>
+        /// Получает модель по названию из базы данных
+        /// </summary>
+        /// <param name="name">Название модели</param>
+        /// <returns>Модель</returns>
         public async Task<CarModel> GetCarModelByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))

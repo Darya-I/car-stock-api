@@ -14,6 +14,7 @@ namespace CarStockBLL.Interfaces
         /// <param name="expires">Время истечения</param>
         /// <returns>Access токен</returns>
         public string GetAccessToken(IEnumerable<Claim> claims, out DateTime expires);
+        
         /// <summary>
         /// Генерирует refresh токен пользователя
         /// </summary>

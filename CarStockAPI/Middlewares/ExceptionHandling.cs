@@ -1,15 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace CarStockAPI.Middlewares
 {
+    /// <summary>
+    /// Middleware обработки исключений
+    /// </summary>
     public class ExceptionHandling
     {
         private readonly ILogger<ExceptionHandling> _logger;
         private readonly RequestDelegate _next;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр middlware исключений
+        /// </summary>
+        /// <param name="logger">Логгер</param>
+        /// <param name="next">Делегат передачи управления следующему middleware</param>
         public ExceptionHandling(ILogger<ExceptionHandling> logger, RequestDelegate next)
         {
             _logger = logger;
@@ -17,7 +24,7 @@ namespace CarStockAPI.Middlewares
         }
 
         /// <summary>
-        /// основная точка входа middleware
+        /// Основная точка входа middleware. Обрабатывает исключения
         /// </summary>
         public async Task InvokeAsync(HttpContext httpContext)
         {
@@ -45,6 +52,12 @@ namespace CarStockAPI.Middlewares
             }
         }
 
+        /// <summary>
+        /// Обрабатывает исключение и формирует стандартный ответ для клиента
+        /// </summary>
+        /// <param name="httpContext">Контекст запросаparam>
+        /// <param name="exception">Исключение</param>
+        /// <returns>Задача, представляющая асинхронную операцию записи ответа</returns>
         public static Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
         {
             var status = HttpStatusCode.InternalServerError;

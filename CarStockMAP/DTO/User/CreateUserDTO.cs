@@ -1,11 +1,15 @@
-﻿namespace CarStockMAP.DTO.User
+﻿/// <summary>
+/// DTO для создания нового пользователя
+/// </summary>
+public class CreateUserDTO
 {
     /// <summary>
-    /// DTO нового пользователя
+    /// Почта пользователя
     /// </summary>
-    public class CreateUserDTO
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    public string Email { get; set; }
+
+    /// <summary>
+    /// Пароль пользователя
+    /// </summary>
+    public string Password { get; set; }
 }

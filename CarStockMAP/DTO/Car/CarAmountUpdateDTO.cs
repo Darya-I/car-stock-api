@@ -5,7 +5,14 @@
     /// </summary>
     public class CarAmountUpdateDTO
     {
+        /// <summary>
+        /// Идентификатор
+        /// </summary>
         public int Id {  get; set; }
+
+        /// <summary>
+        /// Количество автомобилей
+        /// </summary>
         public int Amount { get; set; }
     }
 }

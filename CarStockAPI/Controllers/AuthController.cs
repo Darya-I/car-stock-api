@@ -10,16 +10,28 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 namespace CarStockAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер аутентификации и авторизации пользователей.
+    /// Обрабатывает аутентификацию напрямую и через Гугл
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
-        public readonly UserMapService _mapService;
+        public readonly UserMapService _useMapService;
         private readonly IAuthorizeUserService _authorizationService;
         private readonly ILogger<AuthController> _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр контроллера аутентификации
+        /// </summary>
+        /// <param name="userService">Сервис операций над пользователями</param>
+        /// <param name="tokenService">Сервис работы с токенами</param>
+        /// <param name="mapService">Серпис маппинга пользователей</param>
+        /// <param name="authorizeUserService">Сервис авторизации пользователей</param>
+        /// <param name="logger">Логгер</param>
         public AuthController(IUserService userService,
                               ITokenService tokenService,
                               UserMapService mapService,
@@ -28,7 +40,7 @@ namespace CarStockAPI.Controllers
         {
             _userService = userService;
             _tokenService = tokenService;
-            _mapService = mapService;
+            _useMapService = mapService;
             _authorizationService = authorizeUserService;
             _logger = logger;
         }
@@ -74,7 +86,7 @@ namespace CarStockAPI.Controllers
             };
 
             _logger.LogInformation("Mapping Google user: {Email}", googleUser.Email);
-            var mapResult = await _mapService.MapGoogle(googleUser);
+            var mapResult = await _useMapService.MapGoogle(googleUser);
 
             _logger.LogInformation("Google user mapping successful. Access token generated");
             return Ok(new
@@ -92,7 +104,7 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
             _logger.LogInformation("Mapping user: {Email}", loginRequest.Email);
-            var response = await _mapService.MapUserLogin(loginRequest);
+            var response = await _useMapService.MapUserLogin(loginRequest);
             _logger.LogInformation("Authentication successful for user: {Email}. Setting refresh token cookie.", loginRequest.Email);
             SetTokenCookie(response.RefreshToken);
             return Ok(response);

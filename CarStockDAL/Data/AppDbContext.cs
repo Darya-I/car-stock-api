@@ -4,17 +4,42 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CarStockDAL.Data
 {
+    /// <summary>
+    /// Контекст базы данных приложения, содержащий DbSet для автомобилей, цветов, марок и моделей
+    /// </summary>
     public class AppDbContext : IdentityDbContext<User>
     {
+        /// <summary>
+        /// Создает новый экземпляр контекста базы данных с указанными параметрами конфигурации
+        /// </summary>
+        /// <param name="options">Параметры конфигурации для контекста базы данных</param>
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
+        /// <summary>
+        /// Набор данных автомобилей
+        /// </summary>
         public DbSet<Car> Cars { get; set; }
+
+        /// <summary>
+        /// Набор данных цветов
+        /// </summary>
         public DbSet<Color> Colors { get; set; }
+
+        /// <summary>
+        /// Набор данных марок
+        /// </summary>
         public DbSet<Brand> Brands { get; set; }
+
+        /// <summary>
+        /// Набор данных моделей автомобилей
+        /// </summary>
         public DbSet<CarModel> Models { get; set; }
 
+        /// <summary>
+        /// Настройка моделей базы данных с определением связей и первичных ключей, добавление дефолтных записей
+        /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            modelBuilder.Entity<Car>()

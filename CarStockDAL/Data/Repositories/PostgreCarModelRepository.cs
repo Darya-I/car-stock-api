@@ -25,12 +25,20 @@ namespace CarStockDAL.Data.Repositories
             _carModels = dbContext.Models;
         }
 
+        /// <summary>
+        /// Создает новую запись модели автомобиля
+        /// </summary>
+        /// <param name="carModel">Объект модели автомобиля для создания</param>
         public async Task CreateCarModelAsync(CarModel carModel)
         {
             _carModels.Add(carModel);
             await SaveAsync();
         }
 
+        /// <summary>
+        /// Удаляет запись модели автомобиля по Id
+        /// </summary>
+        /// <param name="id">Id модели</param>
         public async Task DeleteCarModelAsync(int id)
         {
             var carModelToDelete = await _carModels.FindAsync(id);
@@ -42,11 +50,21 @@ namespace CarStockDAL.Data.Repositories
             }
         }
 
+        /// <summary>
+        /// Получает запись модели автомобиля по Id
+        /// </summary>
+        /// <param name="id">Id модели</param>
+        /// <returns>Марка автомобиля</returns>
         public async Task<CarModel> GetCarModelByIdAsync(int id)
         {
             return await _carModels.FindAsync(id);
         }
 
+        /// <summary>
+        /// Получает список всех моделей автомобилей
+        /// </summary>
+        /// <param name="tracked">Указывает, отслеживаются ли изменения сущностей. По умолчанию true</param>
+        /// <returns>Список моделей</returns>
         public async Task<List<CarModel>> GetCarModelsAsync(bool tracked = true)
         {
             IQueryable<CarModel> query = _carModels;
@@ -58,12 +76,22 @@ namespace CarStockDAL.Data.Repositories
             return await query.ToListAsync();
         }
 
+        /// <summary>
+        /// Обновляет запись модели автомобиля
+        /// </summary>
+        /// <param name="carModel">Объект модели автомобиля для обновления</param>
         public async Task UpdateCarModelAsync(CarModel carModel)
         {
             _carModels.Update(carModel);
             await SaveAsync();
         }
 
+
+        /// <summary>
+        /// Получает модель автомобиля по названию
+        /// </summary>
+        /// <param name="name">Название модели</param>
+        /// <returns>Модель автомобиля</returns>
         public async Task<CarModel?> GetCarModelByNameAsync(string name)
         {
             return await _carModels.FirstOrDefaultAsync(b => b.Name == name);

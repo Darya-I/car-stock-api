@@ -1,7 +1,4 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
-using CarStockBLL.Services;
-using CarStockDAL.Models;
 using CarStockMAP.DTO.Car;
 using CarStockMAP.Mapping;
 
@@ -30,13 +27,14 @@ namespace CarStockMAP
         /// Маппит DTO обновленного автомобиля на Car, передает в CarService
         /// </summary>
         /// <param name="carUpdateDTO">Обновленный автомобиль</param>
-        public async Task GetUpdatedMappedCarAsync(CarUpdateDTO carUpdateDTO)
+        public async Task<CarUpdateDTO> GetUpdatedMappedCarAsync(CarUpdateDTO carUpdateDTO)
         {
             try
             {
                 var mapper = new CarMapper();
                 var updatedCar = mapper.MapUpdateCarDtoToCar(carUpdateDTO);
                 await _carService.UpdateCarAsync(updatedCar);
+                return carUpdateDTO;
             }
             catch (Exception)
             {

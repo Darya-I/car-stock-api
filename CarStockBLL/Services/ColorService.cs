@@ -1,5 +1,4 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
@@ -9,11 +8,17 @@ namespace CarStockBLL.Services
     {
         private readonly IColorRepository<Color> _colorRepository;
 
+        /// <param name="colorRepository">Репозиторий для доступа к цветам автомобилей</param>
         public ColorService(IColorRepository<Color> colorRepository)
         {
             _colorRepository = colorRepository;
         }
 
+        /// <summary>
+        /// Получает цвет по названию из базы данных
+        /// </summary>
+        /// <param name="name">Название цвета</param>
+        /// <returns>Цвет</returns>
         public async Task<Color> GetColorByNameAsync(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))

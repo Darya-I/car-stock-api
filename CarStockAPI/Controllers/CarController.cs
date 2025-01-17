@@ -7,6 +7,10 @@ using CarStockMAP.DTO.Car;
 
 namespace CarStockAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления автомобилями
+    /// Обрабатывает CRUD, количество и доступность автомобилей
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CarController : ControllerBase
@@ -15,6 +19,12 @@ namespace CarStockAPI.Controllers
         public readonly CarMapService _carMapService;
         private readonly ILogger<CarController> _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр контроллера автомобилей
+        /// </summary>
+        /// <param name="carService">Сервис операций над автомобилями</param>
+        /// <param name="carMapService">Сервис маппинга автомобилей</param>
+        /// <param name="logger">Логгер</param>
         public CarController(ICarService carService, 
                             CarMapService carMapService,
                             ILogger<CarController> logger)
@@ -24,6 +34,10 @@ namespace CarStockAPI.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Получение списка автомобилей
+        /// </summary>
+        /// <returns>Коллекция автомобилей</returns>
         [Authorize(Roles = "Admin, Manager, User")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
@@ -34,6 +48,11 @@ namespace CarStockAPI.Controllers
             return Ok(carDtos);
         }
 
+        /// <summary>
+        /// Создание нового автомобиля
+        /// </summary>
+        /// <param name="car">DTO автомобиля</param>
+        /// <returns>Строку с информацией о добавленном автомобиле</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost("CreateCar")]
         public async Task<ActionResult> CreateCarAsync(CarDTO car)
@@ -44,9 +63,14 @@ namespace CarStockAPI.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Получение автомобиля по идентификатору
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <returns>Автомобиль</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("GetCar/{id}")]
-        public async Task<ActionResult<CarViewModel>> GetCarByIdAsync(int id)
+        public async Task<ActionResult> GetCarByIdAsync(int id)
         {
             _logger.LogInformation("Attempting to get car with ID {id}", id);
             var result = await _carService.GetCarByIdAsync(id);
@@ -54,6 +78,12 @@ namespace CarStockAPI.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Обновление автомобиля
+        /// </summary>
+        /// <param name="id">Идентификатор обновляемого автомобиля</param>
+        /// <param name="carUpdateDto">DTO автомобиля для обновления</param>
+        /// <returns>Результат обновления</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCar/{id}")]
         public async Task<IActionResult> UpdateCar(int id, [FromBody] CarUpdateDTO carUpdateDto)
@@ -70,11 +100,16 @@ namespace CarStockAPI.Controllers
                 return BadRequest("Car ID in the URL does not match the ID in the body.");
             }
 
-            await _carMapService.GetUpdatedMappedCarAsync(carUpdateDto);
+            var newUpdatedCar = await _carMapService.GetUpdatedMappedCarAsync(carUpdateDto);
             _logger.LogInformation("Updating car successful");
-            return Ok(carUpdateDto);
+            return Ok(newUpdatedCar);
         }
 
+        /// <summary>
+        /// Удаление автомобиля
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <returns>Результат удаления</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
@@ -85,6 +120,12 @@ namespace CarStockAPI.Controllers
             return Ok($"Car with Id: {id} was deleted");
         }
 
+        /// <summary>
+        /// Обновление доступности автомобиля
+        /// </summary>
+        /// <param name="id">Идентификатор обновляемого автомобиля</param>
+        /// <param name="carAvailabilityUpdateDTO">DTO доступности</param>
+        /// <returns>Результат изменения доступности</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPatch("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability([FromRoute] int id, CarAvailabilityUpdateDTO carAvailabilityUpdateDTO)
@@ -105,6 +146,12 @@ namespace CarStockAPI.Controllers
             return Ok($"The availability of car with ID {id} has been successfully updated. The current availability is: {carAvailabilityUpdateDTO.IsAvailable}.");
         }
 
+        /// <summary>
+        /// Обновление количества автомобиля
+        /// </summary>
+        /// <param name="id">Идентификатор обновляемого автомобиля</param>
+        /// <param name="carAmountUpdateDTO">DTO количества автомобиля</param>
+        /// <returns>Результат изменения количества</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPatch("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount([FromRoute] int id, CarAmountUpdateDTO carAmountUpdateDTO)

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using CarStockAPI.Middlewares;
 using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
 using CarStockDAL.Models;
@@ -9,7 +8,6 @@ using CarStockMAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NpgsqlTypes;
 using Serilog;
@@ -17,7 +15,6 @@ using Serilog.Sinks.PostgreSQL;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Data.Repositories;
-using NuGet.Packaging.Signing;
 using CarStockAPI.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,7 +77,6 @@ builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();
 
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
-//
 builder.Services.AddScoped<ITokenService, TokenService>(sp =>
 {
     var logger = sp.GetRequiredService<ILogger<ITokenService>>();

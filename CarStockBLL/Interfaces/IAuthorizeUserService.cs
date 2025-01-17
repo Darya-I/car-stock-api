@@ -1,4 +1,4 @@
-﻿using CarStockDAL.Models;
+﻿ using CarStockDAL.Models;
 
 namespace CarStockBLL.Interfaces
 {

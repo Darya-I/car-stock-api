@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CarStockAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер управления пользователями CRUD
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -15,6 +18,13 @@ namespace CarStockAPI.Controllers
         public readonly UserMapService _userMapService;
         private readonly ILogger<UserController> _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр контроллера пользователей
+        /// </summary>
+        /// <param name="userMapService">Сервис маппинга пользователей</param>
+        /// <param name="userService">Сервис операций над пользователями</param>
+        /// <param name="authorizeUserService">Сервис авторизации пользователей</param>
+        /// <param name="logger">Логгер</param>
         public UserController(UserMapService userMapService, 
                               IUserService userService, 
                               IAuthorizeUserService authorizeUserService,

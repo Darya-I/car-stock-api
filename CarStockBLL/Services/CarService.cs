@@ -14,6 +14,11 @@ namespace CarStockBLL.Services
         private readonly IColorService _colorService;
         private readonly ILogger<CarService> _logger;
 
+        /// <param name="carRepository">Репозиторий доступа к автомобилям</param>
+        /// <param name="brandService">Сервис операций над маркой автомобиля</param>
+        /// <param name="carModelService">Сервис операций над моделями автомобиля</param>
+        /// <param name="colorService">Сервис операций над цветом автомобиля</param>
+        /// <param name="logger">Логгер</param>
         public CarService(
             ICarRepository<Car> carRepository, 
             IBrandService brandService, 
@@ -28,6 +33,11 @@ namespace CarStockBLL.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Получает автомобиль из базы данных
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <returns>Автомобиль</returns>
         public async Task<Car> GetCarByIdAsync(int? id)
         {
             _logger.LogInformation("Fetching car with ID {CarId}.", id);
@@ -36,12 +46,6 @@ namespace CarStockBLL.Services
             {
                 _logger.LogWarning("Attempted to retrieve a car with a null ID.");
                 throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
-            }
-
-            if (id < 1)
-            {
-                _logger.LogWarning("Attempted to retrieve a car with a negative ID.");
-                throw new ValidationException("Id must be greater than 0");
             }
 
             try
@@ -73,7 +77,12 @@ namespace CarStockBLL.Services
             }
         }
 
-        public async Task<bool> UpdateCarAsync(Car car)
+        /// <summary>
+        /// Обновляет информацию об автомобиле в базе данных
+        /// </summary>
+        /// <param name="car">Автомобиль</param>
+        /// <returns>Значение <c>true</c>, если обновление выполнено успешно; иначе <c>false</c>.</returns>
+        public async Task<Car> UpdateCarAsync(Car car)
         {
             _logger.LogInformation("Fetching car with ID {CarId}.", car.Id);
 
@@ -97,7 +106,7 @@ namespace CarStockBLL.Services
                 
                 _logger.LogInformation("Car with ID {CarId} successfully updated.", car.Id);
 
-                return true;
+                return car;
             }
             catch (Exception ex) 
             {
@@ -106,6 +115,10 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Удаляет автомобиль из базы данных
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
         public async Task DeleteCarAsync(int? id) 
         {
             if (id == null) 
@@ -135,6 +148,10 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Получает список автомобилей из базы данных
+        /// </summary>
+        /// <returns>Коллекция автомобилей</returns>
         public async Task<IEnumerable<Car>> GetAllCarsAsync() 
         {
             try
@@ -149,6 +166,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Создает новый автомобиль в базе данных
+        /// </summary>
+        /// <param name="car">Автомобиль</param>
+        /// <returns>Информация о новом автомобиле</returns>
         public async Task<string> CreateCarAsync(Car car)
         {
             try
@@ -167,7 +189,6 @@ namespace CarStockBLL.Services
                     Amount = car.Amount,
                     IsAvailable = car.IsAvailable,
                 };
-
 
                 await _carRepository.CreateCarAsync(newCar);
 
@@ -193,6 +214,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Обновляет доступность автомобиля
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <param name="isAvaible">Доступность</param>
         public async Task UpdateCarAvailabilityAsync(int id, bool IsAvailable)
         {
             try
@@ -217,6 +243,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Обновляет количество автомобилей
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <param name="amount">Количество</param>
         public async Task UpdateCarAmountAsync(int id, int amount)
         {
             var existingCar = await _carRepository.GetCarByIdAsync(id);
@@ -234,8 +265,6 @@ namespace CarStockBLL.Services
                 }
 
                 existingCar.Amount = amount;
-
-                existingCar.IsAvailable = amount > 0;
 
                 await _carRepository.UpdateCarAsync(existingCar);
             }

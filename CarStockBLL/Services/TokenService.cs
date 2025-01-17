@@ -14,6 +14,10 @@ namespace CarStockBLL.Services
         public readonly string _audience;
         public readonly ILogger<ITokenService> _logger;
 
+        /// <param name="secretKey">Секретный ключ</param>
+        /// <param name="issuer">Издатель токена</param>
+        /// <param name="audience">Аудитория токена</param>
+        /// <param name="logger">Логгер</param>
         public TokenService(
             string secretKey,
             string issuer,
@@ -25,7 +29,13 @@ namespace CarStockBLL.Services
             _audience = audience;
             _logger = logger;
         }
-        
+
+        /// <summary>
+        /// Генерирует access токен пользователя
+        /// </summary>
+        /// <param name="claims">Клеймы пользователя</param>
+        /// <param name="expires">Время истечения</param>
+        /// <returns>Access токен</returns>
         public string GetAccessToken(IEnumerable<Claim> claims, out DateTime expires)
         {
             try
@@ -64,6 +74,10 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Генерирует refresh токен пользователя
+        /// </summary>
+        /// <returns>Refresh токен</returns>
         public string GetRefreshToken()
         {
             try

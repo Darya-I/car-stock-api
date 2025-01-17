@@ -1,24 +1,29 @@
-﻿using CarStockBLL.Interfaces;
-using CarStockMAP;
+﻿using CarStockMAP;
 using CarStockMAP.DTO.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarStockAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер регистрации пользователей
+    /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
     public class RegisterController : ControllerBase
     {
-        private readonly IUserService _userService;
         public readonly UserMapService _userMapService;
         private readonly ILogger<RegisterController> _logger;
 
+        /// <summary>
+        /// Инициализирует экземляр контроллера регистрации
+        /// </summary>
+        /// <param name="userMapService">Сервис маппинга пользователей</param>
+        /// <param name="logger">Логгер</param>
         public RegisterController(UserMapService userMapService,
-                              IUserService userService,
                               ILogger<RegisterController> logger)
         {
             _userMapService = userMapService;
-            _userService = userService;
             _logger = logger;
-
         }
 
         /// <summary>

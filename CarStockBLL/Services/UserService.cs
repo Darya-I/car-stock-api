@@ -12,6 +12,9 @@ namespace CarStockBLL.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserRepository _userRepository;
 
+        /// <param name="userManager">Менеджер управления пользователями</param>
+        /// <param name="roleManager">Менеджер управления ролями пользователей</param>
+        /// <param name="userRepository">Репозиторий доступа к пользователям</param>
         public UserService(
             UserManager<User> userManager, 
             RoleManager<IdentityRole> roleManager, 
@@ -22,6 +25,11 @@ namespace CarStockBLL.Services
             _userRepository = userRepository;
         }
 
+        /// <summary>
+        /// Получает пользователя с списком ролей из базы данных
+        /// </summary>
+        /// <param name="email">Почта</param>
+        /// <returns>Пользователь и список его ролей</returns>
         public async Task<(User user, List<string> roles)?> GetUserAsync(string email)
         {
             try
@@ -42,6 +50,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Получает список ролей пользователя
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>Список ролей пользователя</returns>
         public async Task<List<string>> GetUserRolesAsync(User user)
         {
             try 
@@ -54,6 +67,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Создает нового пользователя в базе данных
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>Созданный пользователь</returns>
         public async Task<User> CreateUserAsync(User user)
         {
             try
@@ -78,6 +96,10 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Удаляет пользователя из базы данных
+        /// </summary>
+        /// <param name="email">Почта</param>
         public async Task DeleteUserAsync(string email)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
@@ -93,6 +115,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Обновляет данные пользователя
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>Обновленный пользователь</returns>
         public async Task<User> UpdateUserAsync(User user)
         {
             try
@@ -138,6 +165,11 @@ namespace CarStockBLL.Services
             }
         }
 
+        /// <summary>
+        /// Обновляет роль пользователя
+        /// </summary>
+        /// <param name="userEmail">Почта</param>
+        /// <param name="newRole">Роль</param>
         public async Task UpdateUserRoleAsync(string userEmail, string newRole)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
@@ -167,9 +199,13 @@ namespace CarStockBLL.Services
             }
         }
 
-        //С вложенным списком для ролей
+        /// <summary>
+        /// Получает список пользователей и список их ролей из базы данных
+        /// </summary>
+        /// <returns>Список пользователей с их ролями</returns>
         public async Task<List<(User user, List<string> roles)>> GetAllUsersAsync()
         {
+            //С вложенным списком для ролей
             try
             {
                 var users = _userManager.Users.ToList();
