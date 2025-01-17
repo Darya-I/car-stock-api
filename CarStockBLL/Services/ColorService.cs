@@ -1,34 +1,48 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
-using CarStockDAL.Data.Repos;
+using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис операций над цветом автомобиля
+    /// </summary>
     public class ColorService : IColorService
     {
+        /// <summary>
+        /// Экземпляр репозитория для работы с цветом автомобиля
+        /// </summary>
         private readonly IColorRepository<Color> _colorRepository;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса операций над цветом
+        /// </summary>
+        /// <param name="colorRepository">Репозиторий для доступа к цветам автомобилей</param>
         public ColorService(IColorRepository<Color> colorRepository)
         {
             _colorRepository = colorRepository;
         }
 
-        public async Task<OperationResult<Color>> GetColorByNameAsync(string name)
+        /// <summary>
+        /// Получает цвет по названию из базы данных
+        /// </summary>
+        /// <param name="name">Название цвета</param>
+        /// <returns>Цвет</returns>
+        public async Task<Color> GetColorByNameAsync(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return OperationResult<Color>.Failure("Color name cannot be null or empty.");
+                throw new ArgumentNullException("Color name cannot be null or empty.");
             }
 
             var color = await _colorRepository.GetColorByNameAsync(name);
+            
             if (color == null)
             {
-                return OperationResult<Color>.Failure($"Color with name '{name}' not found.");
+                throw new KeyNotFoundException($"Color with name '{name}' not found.");
             }
 
-            return OperationResult<Color>.SuccessResult(new Color { Name = color.Name, Id = color.Id });
+            return (new Color { Name = color.Name, Id = color.Id });
         }
-
     }
 }

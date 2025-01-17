@@ -1,22 +1,21 @@
 ﻿using System.Text;
 using CarStockAPI.Middlewares;
 using CarStockBLL.Interfaces;
-using CarStockBLL.Models;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
-using CarStockDAL.Data.Repos;
 using CarStockDAL.Models;
 using CarStockMAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NpgsqlTypes;
 using Serilog;
 using Serilog.Sinks.PostgreSQL;
-using CarStockAPI.Models.Configs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using CarStockDAL.Data.Interfaces;
+using CarStockDAL.Data.Repositories;
+using CarStockAPI.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,13 +69,19 @@ builder.Services.AddScoped<ICarModelService, CarModelService>();
 builder.Services.AddScoped<IColorService, ColorService>();
 
 
-builder.Services.AddScoped<MapService>();
-builder.Services.AddScoped<IUserService, UserService>();
-// ???
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<UserMapService>();
+builder.Services.AddScoped<CarMapService>();
 
-// JWT
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();
+
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+
+builder.Services.AddScoped<ITokenService, TokenService>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<ITokenService>>();
+    return new TokenService(jwtConfig.Secret, jwtConfig.Issuer, jwtConfig.Audience, logger);
+});
 
 // Google
 builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Authentication:Google"));
@@ -88,8 +93,6 @@ builder.Services.AddAuthentication((options => {
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })).AddJwtBearer(options =>
             {
-                var serviceProvider = builder.Services.BuildServiceProvider();
-                var jwtConfig = serviceProvider.GetRequiredService<IOptions<JwtConfig>>().Value;
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -103,7 +106,11 @@ builder.Services.AddAuthentication((options => {
                     ClockSkew = TimeSpan.Zero
                 };
             })
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme) // Добавление схемы Cookie
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            options.SlidingExpiration = true;
+        }) // Добавление схемы Cookie
         .AddGoogle(options =>
         {
             var googleConfig = builder.Configuration.GetSection("Authentication:Google").Get<GoogleConfig>();

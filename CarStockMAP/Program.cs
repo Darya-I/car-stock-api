@@ -10,7 +10,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     );
 
 // Регистрация MapService
-builder.Services.AddScoped<MapService>();
+builder.Services.AddScoped<UserMapService>();
 
 var app = builder.Build();
 

@@ -1,124 +1,168 @@
-﻿using CarStockMAP.DTO;
-using CarStockBLL.Interfaces;
+﻿using CarStockBLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using CarStockMAP;
-using CarStockBLL.Infrastructure;
-using CarStockBLL.Models;
 using CarStockAPI.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-
+using CarStockMAP.DTO.Car;
 
 namespace CarStockAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления автомобилями
+    /// Обрабатывает CRUD, количество и доступность автомобилей
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CarController : ControllerBase
     {
+        /// <summary>
+        /// Экземпляр сервиса операций над автомобилями
+        /// </summary>
         public readonly ICarService _carService;
-        public readonly MapService _mapService;
 
-        public CarController(ICarService carService, MapService mapService)
+        /// <summary>
+        /// Экземляр сервиса маппинга автомобилей
+        /// </summary>
+        private readonly CarMapService _carMapService;
+
+        /// <summary>
+        /// Экземляр логгера
+        /// </summary>
+        private readonly ILogger<CarController> _logger;
+
+        /// <summary>
+        /// Инициализирует новый экземпляр контроллера автомобилей
+        /// </summary>
+        /// <param name="carService">Сервис операций над автомобилями</param>
+        /// <param name="carMapService">Сервис маппинга автомобилей</param>
+        /// <param name="logger">Логгер</param>
+        public CarController(ICarService carService, 
+                            CarMapService carMapService,
+                            ILogger<CarController> logger)
         {
             _carService = carService;
-            _mapService = mapService;
+            _carMapService = carMapService;
+            _logger = logger;
         }
 
+        /// <summary>
+        /// Получение списка автомобилей
+        /// </summary>
+        /// <returns>Коллекция автомобилей</returns>
         [Authorize(Roles = "Admin, Manager, User")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
         {
-            var carDtos = await _mapService.GetMappedCarsAsync();
+            _logger.LogInformation("Attempting to get cars");
+            var carDtos = await _carMapService.GetMappedCarsAsync();
+            _logger.LogInformation("Geting cars successful");
             return Ok(carDtos);
         }
 
+        /// <summary>
+        /// Создание нового автомобиля
+        /// </summary>
+        /// <param name="car">DTO автомобиля</param>
+        /// <returns>Строку с информацией о добавленном автомобиле</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost("CreateCar")]
         public async Task<ActionResult> CreateCarAsync(CarDTO car)
         {
-            var result = await _mapService.CreateMappedCarAsync(car);
-
-            if (!result.Success)
-            {
-                return BadRequest(new { message = result.ErrorMessage });
-            }
-
-            return Ok(new { message = result.Data });
+            _logger.LogInformation("Attempting to create car");
+            var result = await _carMapService.CreateMappedCarAsync(car);
+            _logger.LogInformation("Creating car successful");
+            return Ok(result);
         }
 
+        /// <summary>
+        /// Получение автомобиля по идентификатору
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <returns>Автомобиль</returns>
         [Authorize(Roles = "Admin, Manager")]
-        [HttpGet("GetCar{id:int}")]
-        public async Task<ActionResult<CarViewModel>> GetCarByIdAsync(int id)
+        [HttpGet("GetCar/{id}")]
+        public async Task<ActionResult> GetCarByIdAsync(int id)
         {
-            if (id < 1)
-            {
-                return BadRequest("Id must be greater than 0");
-            }
-
-            return Ok(await _carService.GetCarByIdAsync(id));
+            _logger.LogInformation("Attempting to get car with ID {id}", id);
+            var result = await _carService.GetCarByIdAsync(id);
+            _logger.LogInformation("Geting car successful");
+            return Ok(result);
         }
 
+        /// <summary>
+        /// Обновление автомобиля
+        /// </summary>
+        /// <param name="carUpdateDto">DTO автомобиля для обновления</param>
+        /// <returns>Результат обновления</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCar/{id}")]
-        public async Task<IActionResult> UpdateCar(int id, [FromBody] CarUpdateDto carUpdateDto)
+        public async Task<IActionResult> UpdateCar([FromBody] CarUpdateDTO carUpdateDto)
         {
+            _logger.LogInformation("Attempting to update car with ID {id}", carUpdateDto.Id);
+
             if (carUpdateDto == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-            if (id != carUpdateDto.Id)
-            {
-                return BadRequest("Car ID in the URL does not match the ID in the body.");
-            }
-
-            await _carService.UpdateCarAsync(carUpdateDto);
-            return Ok(carUpdateDto);
+            var newUpdatedCar = await _carMapService.GetUpdatedMappedCarAsync(carUpdateDto);
+            _logger.LogInformation("Updating car successful");
+            return Ok(newUpdatedCar);
         }
 
-        //availability
-        [Authorize(Roles = "Admin, Manager")]
-        [HttpPut("UpdateCarAvailability/{id}")]
-        public async Task<IActionResult> UpdateCarAvailability(int id, [FromBody] CarUpdateDto carUpdateDto)
-        {
-            if (carUpdateDto == null)
-            {
-                return BadRequest("Invalid data.");
-            }
-
-            if (id != carUpdateDto.Id)
-            {
-                return BadRequest("Car ID in the URL does not match the ID in the body.");
-            }
-            await _carService.UpdateCarAvailabilityAsync(id, carUpdateDto.IsAvaible);
-            return Ok(carUpdateDto);
-        }
-
+        /// <summary>
+        /// Удаление автомобиля
+        /// </summary>
+        /// <param name="id">Идентификатор автомобиля</param>
+        /// <returns>Результат удаления</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
         {
+            _logger.LogInformation("Attempting to delete car with ID {id}",id);
             await _carService.DeleteCarAsync(id);
+            _logger.LogInformation("Deleting car successful");
             return Ok($"Car with Id: {id} was deleted");
         }
 
+        /// <summary>
+        /// Обновление доступности автомобиля
+        /// </summary>
+        /// <param name="carAvailabilityUpdateDTO">DTO доступности</param>
+        /// <returns>Результат изменения доступности</returns>
         [Authorize(Roles = "Admin, Manager")]
-        [HttpPut("UpdateCarAmount/{id}")]
-        public async Task<IActionResult> UpdateCarAmount(int id, [FromBody] CarUpdateDto carUpdateDto)
+        [HttpPatch("UpdateCarAvailability/{id}")]
+        public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityUpdateDTO carAvailabilityUpdateDTO)
         {
-            if (carUpdateDto == null)
+            _logger.LogInformation("Attempting to update availability for car with ID {id}", carAvailabilityUpdateDTO.Id);
+            if (carAvailabilityUpdateDTO == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-            if (id != carUpdateDto.Id)
+            _logger.LogInformation("Updating availability of car successful");
+            await _carService.UpdateCarAvailabilityAsync(carAvailabilityUpdateDTO.Id, carAvailabilityUpdateDTO.IsAvailable);
+            return Ok($"The availability of car with ID {carAvailabilityUpdateDTO.Id} has been successfully updated. The current availability is: {carAvailabilityUpdateDTO.IsAvailable}.");
+        }
+
+        /// <summary>
+        /// Обновление количества автомобиля
+        /// </summary>
+        /// <param name="carAmountUpdateDTO">DTO количества автомобиля</param>
+        /// <returns>Результат изменения количества</returns>
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPatch("UpdateCarAmount/{id}")]
+        public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountUpdateDTO carAmountUpdateDTO)
+        {
+            _logger.LogInformation("Attempting to update amount for car with ID {id}", carAmountUpdateDTO.Id);
+            if (carAmountUpdateDTO == null)
             {
-                return BadRequest("Car ID in the URL does not match the ID in the body.");
+                return BadRequest("Invalid data.");
             }
 
-            await _carService.UpdateCarAmountAsync(id, carUpdateDto.Amount);
-            return Ok(carUpdateDto);
+            _logger.LogInformation("Updating amount of car successful");
+            await _carService.UpdateCarAmountAsync(carAmountUpdateDTO.Id, carAmountUpdateDTO.Amount);
+            return Ok($"The amount of car with ID {carAmountUpdateDTO.Id} has been successfully updated. The current amount is: {carAmountUpdateDTO.Amount}.");
         }
     }
 }

@@ -2,30 +2,56 @@
 
 namespace CarStockBLL.Interfaces
 {
+    /// <summary>
+    /// Интерфейс для сервиса операций над пользователями
+    /// </summary>
     public interface IUserService
     {
+        /// <summary>
+        /// Получает пользователя с списком ролей из базы данных
+        /// </summary>
+        /// <param name="email">Почта</param>
+        /// <returns>Пользователь и список его ролей</returns>
         Task<(User user, List<string> roles)?> GetUserAsync(string email);
-
-        Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
-
-       Task<List<string>> GetUserRolesAsync(User user);
-
-        Task UpdateRefreshTokenAsync(User user);
-
+        
+        /// <summary>
+        /// Получает список ролей пользователя
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>Список ролей пользователя</returns>
+        Task<List<string>> GetUserRolesAsync(User user);
+        
+        /// <summary>
+        /// Создает нового пользователя в базе данных
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>Созданный пользователь</returns>
         Task<User> CreateUserAsync(User user);
-
+        
+        /// <summary>
+        /// Удаляет пользователя из базы данных
+        /// </summary>
+        /// <param name="email">Почта</param>
         Task DeleteUserAsync(string email);
-
+        
+        /// <summary>
+        /// Обновляет данные пользователя
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>Обновленный пользователь</returns>
         Task<User> UpdateUserAsync(User user);
-
+        
+        /// <summary>
+        /// Обновляет роль пользователя
+        /// </summary>
+        /// <param name="userEmail">Почта</param>
+        /// <param name="newRole">Роль</param>
         Task UpdateUserRoleAsync(string userEmail, string newRole);
-
+        
+        /// <summary>
+        /// Получает список пользователей и список их ролей из базы данных
+        /// </summary>
+        /// <returns>Список пользователей с их ролями</returns>
         Task<List<(User user, List<string> roles)>> GetAllUsersAsync();
-
-        Task<(User, string AccessToken)> Authenticate(User user);
-
-        Task<(User, string AccessToken)> GoogleAuthenticate(User user);
-
-        Task<(User, string)> HandleGoogleUser(User user);
     }
 }
