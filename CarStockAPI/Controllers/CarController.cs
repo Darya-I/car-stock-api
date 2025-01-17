@@ -92,23 +92,17 @@ namespace CarStockAPI.Controllers
         /// <summary>
         /// Обновление автомобиля
         /// </summary>
-        /// <param name="id">Идентификатор обновляемого автомобиля</param>
         /// <param name="carUpdateDto">DTO автомобиля для обновления</param>
         /// <returns>Результат обновления</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPut("UpdateCar/{id}")]
-        public async Task<IActionResult> UpdateCar(int id, [FromBody] CarUpdateDTO carUpdateDto)
+        public async Task<IActionResult> UpdateCar([FromBody] CarUpdateDTO carUpdateDto)
         {
-            _logger.LogInformation("Attempting to update car with ID {id}", id);
+            _logger.LogInformation("Attempting to update car with ID {id}", carUpdateDto.Id);
 
             if (carUpdateDto == null)
             {
                 return BadRequest("Invalid data.");
-            }
-
-            if (id != carUpdateDto.Id)
-            {
-                return BadRequest("Car ID in the URL does not match the ID in the body.");
             }
 
             var newUpdatedCar = await _carMapService.GetUpdatedMappedCarAsync(carUpdateDto);
@@ -134,7 +128,6 @@ namespace CarStockAPI.Controllers
         /// <summary>
         /// Обновление доступности автомобиля
         /// </summary>
-        /// <param name="id">Идентификатор обновляемого автомобиля</param>
         /// <param name="carAvailabilityUpdateDTO">DTO доступности</param>
         /// <returns>Результат изменения доступности</returns>
         [Authorize(Roles = "Admin, Manager")]
@@ -155,7 +148,6 @@ namespace CarStockAPI.Controllers
         /// <summary>
         /// Обновление количества автомобиля
         /// </summary>
-        /// <param name="id">Идентификатор обновляемого автомобиля</param>
         /// <param name="carAmountUpdateDTO">DTO количества автомобиля</param>
         /// <returns>Результат изменения количества</returns>
         [Authorize(Roles = "Admin, Manager")]
