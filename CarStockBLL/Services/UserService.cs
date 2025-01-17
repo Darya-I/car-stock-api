@@ -6,12 +6,29 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис операций над пользователями
+    /// </summary>
     public class UserService : IUserService
     {
+        /// <summary>
+        /// Экземпляр менеджера для работы с пользователями
+        /// </summary>
         private readonly UserManager<User> _userManager;
+
+        /// <summary>
+        /// Экземпляр менеджера для работы с ролями пользователей
+        /// </summary>
         private readonly RoleManager<IdentityRole> _roleManager;
+
+        /// <summary>
+        /// Экземпляр репозитория для работы с пользователями
+        /// </summary>
         private readonly IUserRepository _userRepository;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса операций над пользователями
+        /// </summary>
         /// <param name="userManager">Менеджер управления пользователями</param>
         /// <param name="roleManager">Менеджер управления ролями пользователей</param>
         /// <param name="userRepository">Репозиторий доступа к пользователям</param>

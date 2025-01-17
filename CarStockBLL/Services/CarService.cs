@@ -5,15 +5,39 @@ using CarStockDAL.Models;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис операций над автомобилями
+    /// </summary>
     public class CarService : ICarService
     {
+        /// <summary>
+        /// Экземпляр репозитория для работы с автомобилями
+        /// </summary>
         private readonly ICarRepository<Car> _carRepository;
 
+        /// <summary>
+        /// Экземпляр сервиса операций над марками
+        /// </summary>
         private readonly IBrandService _brandService;
+
+        /// <summary>
+        /// Экземпляр сервиса операций над моделями
+        /// </summary>
         private readonly ICarModelService _carModelService;
+
+        /// <summary>
+        /// Экземпляр сервиса операций над цветом
+        /// </summary>
         private readonly IColorService _colorService;
+
+        /// <summary>
+        /// Экземпляр логгера
+        /// </summary>
         private readonly ILogger<CarService> _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса операций над автомобилями
+        /// </summary>
         /// <param name="carRepository">Репозиторий доступа к автомобилям</param>
         /// <param name="brandService">Сервис операций над маркой автомобиля</param>
         /// <param name="carModelService">Сервис операций над моделями автомобиля</param>

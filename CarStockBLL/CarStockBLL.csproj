@@ -15,8 +15,4 @@
     <ProjectReference Include="..\CarStockDAL\CarStockDAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
 </Project>

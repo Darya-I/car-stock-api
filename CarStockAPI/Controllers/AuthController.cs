@@ -18,10 +18,29 @@ namespace CarStockAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        /// <summary>
+        /// Экземпляр сервиса операций над пользователями
+        /// </summary>
         private readonly IUserService _userService;
+        
+        /// <summary>
+        /// Экземпляр сервиса генерации токенов
+        /// </summary>
         private readonly ITokenService _tokenService;
-        public readonly UserMapService _useMapService;
+        
+        /// <summary>
+        /// Экземляр сервиса маппинга пользователей
+        /// </summary>
+        private readonly UserMapService _useMapService;
+
+        /// <summary>
+        /// Экземпляр сервиса авторизации пользователей
+        /// </summary>
         private readonly IAuthorizeUserService _authorizationService;
+
+        /// <summary>
+        /// Экземляр логгера
+        /// </summary>
         private readonly ILogger<AuthController> _logger;
 
         /// <summary>
@@ -29,7 +48,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="userService">Сервис операций над пользователями</param>
         /// <param name="tokenService">Сервис работы с токенами</param>
-        /// <param name="mapService">Серпис маппинга пользователей</param>
+        /// <param name="mapService">Сервис маппинга пользователей</param>
         /// <param name="authorizeUserService">Сервис авторизации пользователей</param>
         /// <param name="logger">Логгер</param>
         public AuthController(IUserService userService,

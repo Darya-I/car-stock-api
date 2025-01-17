@@ -7,13 +7,34 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис генераций токенов
+    /// </summary>
     public class TokenService : ITokenService
     {
+        /// <summary>
+        /// Секретный ключ для подписи
+        /// </summary>
         public readonly string _secretKey;
+
+        /// <summary>
+        /// Издатель JWT токенов
+        /// </summary>
         public readonly string _issuer;
+
+        /// <summary>
+        /// Аудитория JWT токенов
+        /// </summary>
         public readonly string _audience;
+
+        /// <summary>
+        /// Экземпляр логгера
+        /// </summary>
         public readonly ILogger<ITokenService> _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса токенов
+        /// </summary>
         /// <param name="secretKey">Секретный ключ</param>
         /// <param name="issuer">Издатель токена</param>
         /// <param name="audience">Аудитория токена</param>

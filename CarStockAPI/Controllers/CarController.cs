@@ -15,8 +15,19 @@ namespace CarStockAPI.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
+        /// <summary>
+        /// Экземпляр сервиса операций над автомобилями
+        /// </summary>
         public readonly ICarService _carService;
-        public readonly CarMapService _carMapService;
+
+        /// <summary>
+        /// Экземляр сервиса маппинга автомобилей
+        /// </summary>
+        private readonly CarMapService _carMapService;
+
+        /// <summary>
+        /// Экземляр логгера
+        /// </summary>
         private readonly ILogger<CarController> _logger;
 
         /// <summary>
@@ -128,22 +139,17 @@ namespace CarStockAPI.Controllers
         /// <returns>Результат изменения доступности</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPatch("UpdateCarAvailability/{id}")]
-        public async Task<IActionResult> UpdateCarAvailability([FromRoute] int id, CarAvailabilityUpdateDTO carAvailabilityUpdateDTO)
+        public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityUpdateDTO carAvailabilityUpdateDTO)
         {
-            _logger.LogInformation("Attempting to update availability for car with ID {id}", id);
+            _logger.LogInformation("Attempting to update availability for car with ID {id}", carAvailabilityUpdateDTO.Id);
             if (carAvailabilityUpdateDTO == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-            if (id != carAvailabilityUpdateDTO.Id)
-            {
-                return BadRequest("Car ID in the URL does not match the ID in the body.");
-            }
-
             _logger.LogInformation("Updating availability of car successful");
             await _carService.UpdateCarAvailabilityAsync(carAvailabilityUpdateDTO.Id, carAvailabilityUpdateDTO.IsAvailable);
-            return Ok($"The availability of car with ID {id} has been successfully updated. The current availability is: {carAvailabilityUpdateDTO.IsAvailable}.");
+            return Ok($"The availability of car with ID {carAvailabilityUpdateDTO.Id} has been successfully updated. The current availability is: {carAvailabilityUpdateDTO.IsAvailable}.");
         }
 
         /// <summary>
@@ -154,22 +160,17 @@ namespace CarStockAPI.Controllers
         /// <returns>Результат изменения количества</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPatch("UpdateCarAmount/{id}")]
-        public async Task<IActionResult> UpdateCarAmount([FromRoute] int id, CarAmountUpdateDTO carAmountUpdateDTO)
+        public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountUpdateDTO carAmountUpdateDTO)
         {
-            _logger.LogInformation("Attempting to update amount for car with ID {id}", id);
+            _logger.LogInformation("Attempting to update amount for car with ID {id}", carAmountUpdateDTO.Id);
             if (carAmountUpdateDTO == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-            if (id != carAmountUpdateDTO.Id)
-            {
-                return BadRequest("Car ID in the URL does not match the ID in the body.");
-            }
-
             _logger.LogInformation("Updating amount of car successful");
             await _carService.UpdateCarAmountAsync(carAmountUpdateDTO.Id, carAmountUpdateDTO.Amount);
-            return Ok($"The amount of car with ID {id} has been successfully updated. The current amount is: {carAmountUpdateDTO.Amount}.");
+            return Ok($"The amount of car with ID {carAmountUpdateDTO.Id} has been successfully updated. The current amount is: {carAmountUpdateDTO.Amount}.");
         }
     }
 }

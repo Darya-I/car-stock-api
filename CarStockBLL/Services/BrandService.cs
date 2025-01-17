@@ -4,10 +4,17 @@ using CarStockDAL.Models;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис операций над маркой автомобиля
+    /// </summary>
     public class BrandService : IBrandService
     {
+        /// <summary>
+        /// Экземпляр репозитория для работы с марками автомобиля
+        /// </summary>
         private readonly IBrandRepository<Brand> _brandRepository;
-
+        
+        /// Инициализирует новый экземпляр сервиса операций с марками
         /// <param name="brandRepository">Репозиторий для доступа к маркам автомобилей</param>
         public BrandService(IBrandRepository<Brand> brandRepository)
         {

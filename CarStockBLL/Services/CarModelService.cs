@@ -4,10 +4,17 @@ using CarStockDAL.Models;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис операций над моделями автомобиля
+    /// </summary>
     public class CarModelService : ICarModelService
     {
+        /// <summary>
+        /// Экземпляр репозитория для работы с моделями
+        /// </summary>
         private ICarModelRepository<CarModel> _carModelRepository;
 
+        /// Инициализирует новый экземпляр сервиса операций над моделями
         /// <param name="carModelRepository">Репозиторий для доступа к моделям автомобилей</param>
         public CarModelService(ICarModelRepository<CarModel> carModelRepository)
         {

@@ -4,10 +4,19 @@ using CarStockDAL.Models;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис операций над цветом автомобиля
+    /// </summary>
     public class ColorService : IColorService
     {
+        /// <summary>
+        /// Экземпляр репозитория для работы с цветом автомобиля
+        /// </summary>
         private readonly IColorRepository<Color> _colorRepository;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса операций над цветом
+        /// </summary>
         /// <param name="colorRepository">Репозиторий для доступа к цветам автомобилей</param>
         public ColorService(IColorRepository<Color> colorRepository)
         {

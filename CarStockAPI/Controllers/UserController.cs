@@ -14,8 +14,19 @@ namespace CarStockAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        /// <summary>
+        /// Экземпляр сервиса операций над пользователями
+        /// </summary>
         private readonly IUserService _userService;
+
+        /// <summary>
+        /// Экземляр сервиса маппинга пользователей
+        /// </summary>
         public readonly UserMapService _userMapService;
+
+        /// <summary>
+        /// Экземляр логгера
+        /// </summary>
         private readonly ILogger<UserController> _logger;
 
         /// <summary>

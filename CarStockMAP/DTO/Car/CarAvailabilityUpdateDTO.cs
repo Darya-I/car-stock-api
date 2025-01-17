@@ -5,6 +5,9 @@
     /// </summary>
     public class CarAvailabilityUpdateDTO
     {
+        /// <summary>
+        /// Идентификатор автомобиля
+        /// </summary>
         public int Id { get; set; }
 
         /// <summary>

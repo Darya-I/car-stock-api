@@ -7,12 +7,29 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CarStockBLL.Services
 {
+    /// <summary>
+    /// Сервис авторизации и аутентификации пользователей
+    /// </summary>
     public class AuthorizeUserService : IAuthorizeUserService
     {
+        /// <summary>
+        /// Экземпляр менеджера для работы с пользователями
+        /// </summary>
         private readonly UserManager<User> _userManager;
+
+        /// <summary>
+        /// Экземпляр репозитория для работы с пользователями
+        /// </summary>
         private readonly IUserRepository _userRepository;
+
+        /// <summary>
+        /// Экземпляр сервиса генерации токенов
+        /// </summary>
         private readonly ITokenService _tokenService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса авторизации и аутентификации
+        /// </summary>
         /// <param name="userManager">Менеджер управления пользователями</param>
         /// <param name="userRepository">Репозиторий доступа к пользователям</param>
         /// <param name="tokenService">Сервис работы с токенами</param>

@@ -11,7 +11,14 @@ namespace CarStockAPI.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
+        /// <summary>
+        /// Экземляр сервиса маппинга пользователей
+        /// </summary>
         public readonly UserMapService _userMapService;
+
+        /// <summary>
+        /// Экземляр логгера
+        /// </summary>
         private readonly ILogger<RegisterController> _logger;
 
         /// <summary>
