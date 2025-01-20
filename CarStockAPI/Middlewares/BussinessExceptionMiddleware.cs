@@ -45,7 +45,6 @@ namespace CarStockAPI.Middlewares
                     code = HttpStatusCode.InternalServerError;
                     break;
                 default:
-                    //_logger.LogError("Error during executing {httpContext}. Details: {details}", httpContext.Request, ex.Message);
                     code = HttpStatusCode.InternalServerError;
                     break;
             }
