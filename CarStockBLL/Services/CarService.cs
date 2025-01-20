@@ -66,12 +66,10 @@ namespace CarStockBLL.Services
         public async Task<Car> GetCarByIdAsync(int? id)
         {
             _logger.LogInformation("Fetching car with ID {CarId}.", id);
-            id = null;
             if (id == null)
             {
                 _logger.LogWarning("Attempted to retrieve a car with a null ID.");
                 throw new ApiException("Car ID cannot be null");
-                //throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
             }
 
             try
@@ -81,7 +79,7 @@ namespace CarStockBLL.Services
                 if (car == null)
                 {
                     _logger.LogWarning("Car with ID {CarId} not found.", id);
-                    throw new KeyNotFoundException($"Car with ID {id} not found.");
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
                 }
 
                 _logger.LogInformation("Car with ID {CarId} successfully retrieved.", id);
@@ -119,7 +117,7 @@ namespace CarStockBLL.Services
                 if (existingCar == null)
                 {
                     _logger.LogWarning("Car with ID {CarId} not found.", car.Id);
-                    throw new KeyNotFoundException("Car not found.");
+                    throw new EntityNotFoundException("Car not found.");
                 }
 
                 existingCar.BrandId = car.BrandId;
@@ -150,7 +148,7 @@ namespace CarStockBLL.Services
             if (id == null) 
             {
                 _logger.LogWarning("Attempted to retrieve a car with a null ID.");
-                throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
+                throw new ValidationErrorException("Car ID cannot be null.");
             }
 
             try
@@ -160,7 +158,7 @@ namespace CarStockBLL.Services
                 if (car == null)
                 {
                     _logger.LogWarning("Car with ID {CarId} not found.", id);
-                    throw new KeyNotFoundException("Сar not found");
+                    throw new EntityNotFoundException("Сar not found");
                 }
 
                 _logger.LogInformation("Car with ID {CarId} successfully deleted.", car.Id);
@@ -222,17 +220,6 @@ namespace CarStockBLL.Services
 
                 return $"Car '{car.CarModel.Name}' of brand '{car.Brand.Name}' and color '{car.Color.Name}' successfully created.";
             }
-
-            catch (ArgumentException ex) 
-            {
-                _logger.LogWarning(ex, "Invalid argument: {Details}", ex.Message);
-                throw;
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Missing data: {Details}", ex.Message);
-                throw;
-            }
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while creating car. Details: {Details}", ex.Message);
@@ -252,15 +239,16 @@ namespace CarStockBLL.Services
                 _logger.LogInformation("Fetching car with ID {CarId}.", id);
 
                 var existingCar = await _carRepository.GetCarByIdAsync(id);
+                if (existingCar == null) 
+                {
+                    _logger.LogWarning("Car with ID {CarId} not found.", id);
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
+                }
 
                 existingCar.IsAvailable = IsAvailable;
 
                 await _carRepository.UpdateCarAsync(existingCar);
 
-            }
-            catch (KeyNotFoundException)
-            {
-                throw;
             }
             catch (Exception ex) 
             {
@@ -282,21 +270,23 @@ namespace CarStockBLL.Services
             {
                 if (existingCar == null)
                 {
-                    throw new ValidationException("Car not found");
+                    _logger.LogWarning("Car with ID {CarId} not found.", id);
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
                 }
 
                 if (amount < 0)
                 {
-                    throw new ValidationException("Amount cannot be negative.");
+                    _logger.LogWarning("Attempted to update a car with a negative amount.");
+                    throw new ValidationErrorException("Amount cannot be negative.");
                 }
 
                 existingCar.Amount = amount;
 
                 await _carRepository.UpdateCarAsync(existingCar);
             }
-            catch (ValidationException)
+            catch (Exception ex)
             {
-                _logger.LogError("An error occurred while deleting the car with ID {CarId}.", id);
+                _logger.LogError("An error occurred while updating amount for car with ID {CarId}. Details: {details}", id, ex.Message);
                 throw;
             }
         }

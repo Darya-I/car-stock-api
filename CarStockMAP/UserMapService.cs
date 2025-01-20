@@ -1,4 +1,5 @@
-﻿using CarStockBLL.Interfaces;
+﻿using CarStockBLL.CustomException;
+using CarStockBLL.Interfaces;
 using CarStockMAP.DTO.Auth;
 using CarStockMAP.DTO.User;
 using CarStockMAP.Mapping;
@@ -36,6 +37,10 @@ namespace CarStockMAP
         {
             try
             {
+                if (googleLoginRequestDTO == null)
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
                 var mapper = new UserMapper();
                 var user = mapper.MapGoogleLoginRequestToUser(googleLoginRequestDTO);
                 var token = await _authorizeUserService.ProcessGoogle(user);
@@ -57,6 +62,10 @@ namespace CarStockMAP
         {
             try
             {
+                if (loginRequest == null)
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
                 var mapper = new UserMapper();
                 var user = mapper.MapLoginRequestToUser(loginRequest);
                 // Метод возвращает пользователя и access token в метод маппинга
@@ -80,7 +89,11 @@ namespace CarStockMAP
         {
             try
             {
-                var mapper = new UserMapper();
+                if (createUserDTO == null) 
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
+                    var mapper = new UserMapper();
                 var user = mapper.MapCreateUserDtoToUser(createUserDTO);
                 var result = await _userService.CreateUserAsync(user);
                 return mapper.MapUserToCreateUserDto(result);
@@ -101,12 +114,16 @@ namespace CarStockMAP
         {
             try
             {
+                if (string.IsNullOrEmpty(email))
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
                 var mapper = new UserMapper();
                 // Получить пользователя и его роли
                 var userWithRoles = await _userService.GetUserAsync(email);
                 if (userWithRoles == null)
                 {
-                    throw new InvalidOperationException($"User with email '{email}' was not found.");
+                    throw new EntityNotFoundException($"User with email '{email}' was not found.");
                 }
                 // Извлечь пользователя и роли
                 var user = userWithRoles.Value.user;
@@ -159,6 +176,10 @@ namespace CarStockMAP
         {
             try
             {
+                if (updateUserDTO == null) 
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
                 var mapper = new UserMapper();
                 var user = mapper.MapUpdateUserDtoToUser(updateUserDTO);
                 await _userService.UpdateUserAsync(user);

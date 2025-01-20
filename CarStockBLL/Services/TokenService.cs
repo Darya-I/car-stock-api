@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
@@ -86,7 +87,7 @@ namespace CarStockBLL.Services
             catch (ArgumentException ex)
             {
                 _logger.LogError("Invalid argument provided for JWT creation. Details: {Details}", ex.Message);
-                throw new InvalidOperationException("Failed to create access token due to invalid parameters.");
+                throw new ApiException("Failed to create access token due to invalid parameters.");
             }
             catch (Exception ex) 
             {
@@ -109,7 +110,11 @@ namespace CarStockBLL.Services
                 rng.GetBytes(randomNumber);
                 _logger.LogInformation("Refresh token succesfully genereted");
                 return Convert.ToHexString(randomNumber);
-                
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError("Failed to create refresh token due to invalid parameters Details: {Details}", ex.Message);
+                throw new ApiException("Failed to create refresh token due to invalid parameters");
             }
             catch (Exception ex) 
             {
