@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
 
 namespace CarStockDAL.Models
 {
@@ -6,5 +7,8 @@ namespace CarStockDAL.Models
     {
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpireTime { get; set; }
+
+        [JsonIgnore]
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

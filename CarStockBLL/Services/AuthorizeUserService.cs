@@ -73,7 +73,7 @@ namespace CarStockBLL.Services
                 }
 
                 // Получить роль
-                var roles = await _userManager.GetRolesAsync(userFromDb);
+                var roles = await _userRepository.GetUserRolesAsync(userFromDb.Id);
 
                 var claims = new List<Claim>
                 {
@@ -83,7 +83,21 @@ namespace CarStockBLL.Services
 
                 if (roles.Any())
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.First()));
+                    foreach (var role in roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role.Name));
+                        
+                        // Добавляем возможности ролей
+                        claims.Add(new Claim("CanViewCar", role.CanViewCar.ToString().ToLower()));
+                        claims.Add(new Claim("CanCreateCar", role.CanCreateCar.ToString().ToLower()));
+                        claims.Add(new Claim("CanEditCar", role.CanEditCar.ToString().ToLower()));
+                        claims.Add(new Claim("CanDeleteCar", role.CanDeleteCar.ToString().ToLower()));
+
+                        claims.Add(new Claim("CanCreateUser", role.CanCreateUser.ToString().ToLower()));
+                        claims.Add(new Claim("CanViewUser", role.CanViewUser.ToString().ToLower()));
+                        claims.Add(new Claim("CanEditUser", role.CanEditUser.ToString().ToLower()));
+                        claims.Add(new Claim("CanDeleteUser", role.CanDeleteUser.ToString().ToLower()));
+                    }
                 }
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
@@ -169,6 +183,7 @@ namespace CarStockBLL.Services
                     }
 
                     userFromDb = user;
+                    // NEED TO REFACTOR на ишью маппинга
                     await _userManager.AddToRoleAsync(user, "User");
                 }
 
@@ -178,18 +193,32 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException("User not found and creation is not allowed.");
                 }
 
-                // Получить роли
-                var roles = await _userManager.GetRolesAsync(user);
+                // Получить роль
+                var roles = await _userRepository.GetUserRolesAsync(userFromDb.Id);
 
                 var claims = new List<Claim>
                 {
-                new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
-                new Claim(ClaimTypes.Email, userFromDb.Email),
+                    new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
+                    new Claim(ClaimTypes.Email, userFromDb.Email),
                 };
 
                 if (roles.Any())
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.First()));
+                    foreach (var role in roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role.Name));
+                        
+                        // Добавляем возможности ролей
+                        claims.Add(new Claim("CanViewCar", role.CanViewCar.ToString().ToLower()));
+                        claims.Add(new Claim("CanCreateCar", role.CanCreateCar.ToString().ToLower()));
+                        claims.Add(new Claim("CanEditCar", role.CanEditCar.ToString().ToLower()));
+                        claims.Add(new Claim("CanDeleteCar", role.CanDeleteCar.ToString().ToLower()));
+
+                        claims.Add(new Claim("CanCreateUser", role.CanCreateUser.ToString().ToLower()));
+                        claims.Add(new Claim("CanViewUser", role.CanViewUser.ToString().ToLower()));
+                        claims.Add(new Claim("CanEditUser", role.CanEditUser.ToString().ToLower()));
+                        claims.Add(new Claim("CanDeleteUser", role.CanDeleteUser.ToString().ToLower()));
+                    }
                 }
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);

@@ -91,9 +91,9 @@ builder.Services.AddAuthentication((options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })).AddJwtBearer(options =>
+        }))
+    .AddJwtBearer(options =>
             {
-
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -139,6 +139,28 @@ options.AddPolicy("CorsPolicy", policy =>
 })
     );
 
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CreateCarPolicy", policy =>
+        policy.RequireClaim("CanCreateCar", "true"));
+    options.AddPolicy("EditCarPolicy", policy =>
+        policy.RequireClaim("CanEditCar", "true"));
+    options.AddPolicy("DeleteCarPolicy", policy =>
+        policy.RequireClaim("CanDeleteCar", "true"));
+    options.AddPolicy("ViewCarPolicy", policy =>
+        policy.RequireClaim("CanViewCar", "true"));
+
+    options.AddPolicy("CreateUserPolicy", policy =>
+        policy.RequireClaim("CanCreateUser", "true"));
+    options.AddPolicy("EditUserPolicy", policy =>
+            policy.RequireClaim("CanEditUser", "true"));
+    options.AddPolicy("DeleteUserPolicy", policy =>
+            policy.RequireClaim("CanDeleteUser", "true"));
+    options.AddPolicy("ViewUserPolicy", policy =>
+            policy.RequireClaim("CanViewUser", "true"));
+});
+
 var app = builder.Build();
 
 app.UseMiddleware<BussinessExceptionMiddleware>();
@@ -153,6 +175,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 
 app.MapControllers();
 app.UseCors("CorsPolicy");

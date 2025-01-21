@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;

@@ -49,7 +49,7 @@ namespace CarStockAPI.Controllers
         /// Получение списка автомобилей
         /// </summary>
         /// <returns>Коллекция автомобилей</returns>
-        [Authorize(Roles = "Admin, Manager, User")]
+        [Authorize(Policy = "ViewCarPolicy")]
         [HttpGet("GetCars")]
         public async Task<ActionResult<IEnumerable<CarViewModel>>> GetAllCarsAsync()
         {
@@ -64,7 +64,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="car">DTO автомобиля</param>
         /// <returns>Строку с информацией о добавленном автомобиле</returns>
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Policy = "CreateCarPolicy")]
         [HttpPost("CreateCar")]
         public async Task<ActionResult> CreateCarAsync(CarDTO car)
         {
@@ -79,7 +79,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <returns>Автомобиль</returns>
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Policy = "ViewCarPolicy")]
         [HttpGet("GetCar/{id}")]
         public async Task<ActionResult> GetCarByIdAsync(int id)
         {
@@ -94,7 +94,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carUpdateDto">DTO автомобиля для обновления</param>
         /// <returns>Результат обновления</returns>
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Policy = "EditCarPolicy")]
         [HttpPut("UpdateCar/{id}")]
         public async Task<IActionResult> UpdateCar([FromBody] CarUpdateDTO carUpdateDto)
         {
@@ -115,7 +115,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <returns>Результат удаления</returns>
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Policy = "DeleteCarPolicy")]
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
         {
@@ -130,7 +130,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carAvailabilityUpdateDTO">DTO доступности</param>
         /// <returns>Результат изменения доступности</returns>
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Policy = "EditCarPolicy")]
         [HttpPatch("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityUpdateDTO carAvailabilityUpdateDTO)
         {
@@ -150,7 +150,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carAmountUpdateDTO">DTO количества автомобиля</param>
         /// <returns>Результат изменения количества</returns>
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Policy = "EditCarPolicy")]
         [HttpPatch("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountUpdateDTO carAmountUpdateDTO)
         {

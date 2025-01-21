@@ -41,7 +41,11 @@ namespace CarStockDAL.Data.Repositories
         /// <returns>Пользователь или <c>null</c>, если пользователь не найден</returns>
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            var user = await _dbContext.Users
+                .Include(u => u.UserRoles)
+                .FirstOrDefaultAsync(u => u.Email == username);
+            return user;
+            //return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         /// <summary>
@@ -78,5 +82,12 @@ namespace CarStockDAL.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<List<Role>> GetUserRolesAsync(string id)
+        {
+            return await _dbContext.UserRoles
+                .Where(ur => ur.UserId == id)
+                .Select(ur => ur.Role) // Только роли
+                .ToListAsync();
+        }
     }
 }

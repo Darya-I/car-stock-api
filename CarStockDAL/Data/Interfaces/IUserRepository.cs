@@ -41,5 +41,7 @@ namespace CarStockDAL.Data.Interfaces
         /// <param name="email">Адрес электронной почты</param>
         /// <returns>Пользователь или <c>null</c>, если пользователь не найден</returns>
         Task<User?> GetUserByEmailAsync(string email);
+
+        Task<List<Role>> GetUserRolesAsync(string id);
     }
 }

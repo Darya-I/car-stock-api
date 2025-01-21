@@ -18,6 +18,17 @@ namespace CarStockDAL.Data
         }
 
         /// <summary>
+        /// Набор данных ролей
+        /// </summary>
+        public DbSet<Role> Roles {  get; set; }
+
+        
+        /// <summary>
+        /// Набор данных связи между User и Role
+        /// </summary>
+        public DbSet<UserRole> UserRoles {  get; set; }
+
+        /// <summary>
         /// Набор данных автомобилей
         /// </summary>
         public DbSet<Car> Cars { get; set; }
@@ -42,7 +53,22 @@ namespace CarStockDAL.Data
         /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           modelBuilder.Entity<Car>()
+            modelBuilder.Entity<UserRole>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(r => r.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Car>()
                 .HasOne(c => c.Brand)
                 .WithMany(c => c.Cars)
                 .HasForeignKey(c => c.BrandId)
@@ -59,6 +85,49 @@ namespace CarStockDAL.Data
                 .WithMany(c => c.Colors)
                 .HasForeignKey(m => m.CarModelId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Ролт
+            modelBuilder.Entity<Role>().HasData(
+                new Role 
+                {   Id = 1,
+                    Name = "Admin", 
+                    CanViewCar = true, 
+                    CanCreateCar = true, 
+                    CanDeleteCar = true, 
+                    CanEditCar = true,
+                    CanViewUser = true, 
+                    CanDeleteUser = true, 
+                    CanEditUser = true, 
+                    CanCreateUser = true,
+                },
+                new Role 
+                { 
+                    Id = 2, 
+                    Name = "User",
+                    CanViewCar = true,
+                    CanCreateCar = false,
+                    CanDeleteCar = false,
+                    CanEditCar = false,
+                    CanViewUser = false,
+                    CanDeleteUser = false,
+                    CanEditUser = false,
+                    CanCreateUser = false,
+                },
+
+                new Role 
+                { 
+                    Id = 3,
+                    Name = "Manager",
+                    CanViewCar = true,
+                    CanCreateCar = true,
+                    CanDeleteCar = true,
+                    CanEditCar = true,
+                    CanViewUser = false,
+                    CanDeleteUser = false,
+                    CanEditUser = false,
+                    CanCreateUser = false,
+                }
+            );
 
             modelBuilder.Entity<Brand>().HasData(
                new Brand { Id = 1, Name = "Toyota" },
@@ -105,7 +174,6 @@ namespace CarStockDAL.Data
             );
 
             base.OnModelCreating(modelBuilder);
- 
         }
     }
 }
