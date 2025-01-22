@@ -70,7 +70,7 @@ namespace CarStockAPI.Controllers
         [HttpDelete("DeleteUser")]
         public async Task<IActionResult> DeleteUser([FromBody] string email)
         {
-            _logger.LogInformation("Attempting to delete user with email: {email}", email);
+            _logger.LogInformation($"Attempting to delete user with email: {email}");
             await _userService.DeleteUserAsync(email);
             _logger.LogInformation("Deleting user successful");
             return Ok($"User with email: {email} was deleted");
@@ -85,7 +85,7 @@ namespace CarStockAPI.Controllers
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser(UpdateUserDTO updateUserDto)
         {
-            _logger.LogInformation("Attempting to update user with email: {email}",updateUserDto.Email);
+            _logger.LogInformation($"Attempting to update user with email: {updateUserDto.Email}");
             await _userMapService.UpdateMappedUserAsync(updateUserDto);
             _logger.LogInformation("Updating user successful");
             return Ok("User updated successfully.");
@@ -114,9 +114,9 @@ namespace CarStockAPI.Controllers
         [HttpGet("GetUser/{email}")]
         public async Task<IActionResult> GetUser([FromRoute] string email)
         {
-            _logger.LogInformation("Attempting to update user with email: {email}", email);
+            _logger.LogInformation($"Attempting to update user with email: {email}");
             var users = await _userMapService.GetMappedUserAsync(email);
-            _logger.LogInformation("Geting user successful");
+            _logger.LogInformation("Retrive user successful");
             return Ok(users);
         }
     }

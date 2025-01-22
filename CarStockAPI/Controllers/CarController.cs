@@ -83,7 +83,7 @@ namespace CarStockAPI.Controllers
         [HttpGet("GetCar/{id}")]
         public async Task<ActionResult> GetCarByIdAsync(int id)
         {
-            _logger.LogInformation("Attempting to get car with ID {id}", id);
+            _logger.LogInformation($"Attempting to get car with ID {id}");
             var result = await _carService.GetCarByIdAsync(id);
             _logger.LogInformation("Geting car successful");
             return Ok(result);
@@ -98,7 +98,7 @@ namespace CarStockAPI.Controllers
         [HttpPut("UpdateCar/{id}")]
         public async Task<IActionResult> UpdateCar([FromBody] CarUpdateDTO carUpdateDto)
         {
-            _logger.LogInformation("Attempting to update car with ID {id}", carUpdateDto.Id);
+            _logger.LogInformation($"Attempting to update car with ID {carUpdateDto.Id}");
 
             if (carUpdateDto == null)
             {
@@ -119,50 +119,50 @@ namespace CarStockAPI.Controllers
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
         {
-            _logger.LogInformation("Attempting to delete car with ID {id}",id);
+            _logger.LogInformation($"Attempting to delete car with ID {id}");
             await _carService.DeleteCarAsync(id);
             _logger.LogInformation("Deleting car successful");
-            return Ok($"Car with Id: {id} was deleted");
+            return NoContent();
         }
 
         /// <summary>
         /// Обновление доступности автомобиля
         /// </summary>
         /// <param name="carAvailabilityUpdateDTO">DTO доступности</param>
-        /// <returns>Результат изменения доступности</returns>
+        /// <returns>Результат изменения доступности, объект автомобиля</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPatch("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityUpdateDTO carAvailabilityUpdateDTO)
         {
-            _logger.LogInformation("Attempting to update availability for car with ID {id}", carAvailabilityUpdateDTO.Id);
+            _logger.LogInformation($"Attempting to update availability for car with ID {carAvailabilityUpdateDTO.Id}");
             if (carAvailabilityUpdateDTO == null)
             {
                 return BadRequest("Invalid data.");
             }
 
             _logger.LogInformation("Updating availability of car successful");
-            await _carService.UpdateCarAvailabilityAsync(carAvailabilityUpdateDTO.Id, carAvailabilityUpdateDTO.IsAvailable);
-            return Ok($"The availability of car with ID {carAvailabilityUpdateDTO.Id} has been successfully updated. The current availability is: {carAvailabilityUpdateDTO.IsAvailable}.");
+            var result = await _carService.UpdateCarAvailabilityAsync(carAvailabilityUpdateDTO.Id, carAvailabilityUpdateDTO.IsAvailable);
+            return Ok(result);
         }
 
         /// <summary>
         /// Обновление количества автомобиля
         /// </summary>
         /// <param name="carAmountUpdateDTO">DTO количества автомобиля</param>
-        /// <returns>Результат изменения количества</returns>
+        /// <returns>Результат изменения количества, объект автомобиля</returns>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPatch("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountUpdateDTO carAmountUpdateDTO)
         {
-            _logger.LogInformation("Attempting to update amount for car with ID {id}", carAmountUpdateDTO.Id);
+            _logger.LogInformation($"Attempting to update amount for car with ID {carAmountUpdateDTO.Id}");
             if (carAmountUpdateDTO == null)
             {
                 return BadRequest("Invalid data.");
             }
 
             _logger.LogInformation("Updating amount of car successful");
-            await _carService.UpdateCarAmountAsync(carAmountUpdateDTO.Id, carAmountUpdateDTO.Amount);
-            return Ok($"The amount of car with ID {carAmountUpdateDTO.Id} has been successfully updated. The current amount is: {carAmountUpdateDTO.Amount}.");
+            var result = await _carService.UpdateCarAmountAsync(carAmountUpdateDTO.Id, carAmountUpdateDTO.Amount);
+            return Ok(result);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <returns>Автомобиль</returns>
-        Task<Car> GetCarByIdAsync(int? id);
+        Task<Car> GetCarByIdAsync(int id);
 
         /// <summary>
         /// Получает список автомобилей из базы данных
@@ -26,7 +26,7 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="car">Автомобиль</param>
         /// <returns>Информация о новом автомобиле</returns>
-        Task<string> CreateCarAsync(Car car);
+        Task<Car> CreateCarAsync(Car car);
 
         /// <summary>
         /// Обновляет информацию об автомобиле в базе данных
@@ -39,20 +39,20 @@ namespace CarStockBLL.Interfaces
         /// Удаляет автомобиль из базы данных
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
-        Task DeleteCarAsync(int? id);
+        Task DeleteCarAsync(int id);
 
         /// <summary>
         /// Обновляет доступность автомобиля
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="isAvaible">Доступность</param>
-        Task UpdateCarAvailabilityAsync(int id, bool isAvaible);
+        Task<Car> UpdateCarAvailabilityAsync(int id, bool isAvaible);
 
         /// <summary>
         /// Обновляет количество автомобилей
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="amount">Количество</param>
-        Task UpdateCarAmountAsync(int id, int amount);
+        Task<Car> UpdateCarAmountAsync(int id, int amount);
     }
 }
