@@ -7,7 +7,7 @@
 CarStockAPI/appsettings.json
 
 # Database-specific directories
-CarStockDAL/Migrations
+CarStockDAL/Migrations/
 
 # User-specific files
 *.rsuser

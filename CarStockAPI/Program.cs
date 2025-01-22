@@ -86,7 +86,7 @@ builder.Services.AddScoped<ITokenService, TokenService>(sp =>
 // Google
 builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Authentication:Google"));
 
-//аутентификация с JWT
+// Аутентификация с JWT
 builder.Services.AddAuthentication((options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -119,31 +119,14 @@ builder.Services.AddAuthentication((options => {
             options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Использование Cookie для Google
         });
 
+// Настройки политик
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
-});
-
-// для откладки пока не используется чтоб потрогать гугл
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-
-builder.Services.AddCors(options =>
-options.AddPolicy("CorsPolicy", policy =>
-{
-    policy.AllowAnyMethod()
-    .AllowAnyHeader()
-    .AllowAnyOrigin();
-    //WithOrigins(allowedOrigins);
-})
-    );
-
-
-builder.Services.AddAuthorization(options =>
-{
     options.AddPolicy("CreateCarPolicy", policy =>
-        policy.RequireClaim("CanCreateCar", "true"));
+       policy.RequireClaim("CanCreateCar", "true"));
     options.AddPolicy("EditCarPolicy", policy =>
         policy.RequireClaim("CanEditCar", "true"));
     options.AddPolicy("DeleteCarPolicy", policy =>
@@ -161,6 +144,19 @@ builder.Services.AddAuthorization(options =>
             policy.RequireClaim("CanViewUser", "true"));
 });
 
+// для откладки пока не используется чтоб потрогать гугл
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+options.AddPolicy("CorsPolicy", policy =>
+{
+    policy.AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowAnyOrigin();
+    //WithOrigins(allowedOrigins);
+})
+    );
+
 var app = builder.Build();
 
 app.UseMiddleware<BussinessExceptionMiddleware>();
@@ -175,8 +171,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-
 
 app.MapControllers();
 app.UseCors("CorsPolicy");
