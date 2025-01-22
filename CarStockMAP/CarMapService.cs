@@ -1,4 +1,6 @@
-﻿using CarStockBLL.Interfaces;
+﻿using CarStockBLL.CustomException;
+using CarStockBLL.Interfaces;
+using CarStockDAL.Models;
 using CarStockMAP.DTO.Car;
 using CarStockMAP.Mapping;
 
@@ -31,6 +33,10 @@ namespace CarStockMAP
         {
             try
             {
+                if (carUpdateDTO == null) 
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
                 var mapper = new CarMapper();
                 var updatedCar = mapper.MapUpdateCarDtoToCar(carUpdateDTO);
                 await _carService.UpdateCarAsync(updatedCar);
@@ -67,10 +73,14 @@ namespace CarStockMAP
         /// </summary>
         /// <param name="carDto">DTO автомобиля</param>
         /// <returns>Строка с результатом</returns>
-        public async Task<string> CreateMappedCarAsync(CarDTO carDto)
+        public async Task<Car> CreateMappedCarAsync(CarDTO carDto)
         {
             try
             {
+                if (carDto == null)
+                {
+                    throw new ValidationErrorException("Invalid data");
+                }
                 var mapper = new CarMapper();
                 // Преобразуем DTO в модель уровня BLL
                 var car = mapper.MapCarDTOToCar(carDto);

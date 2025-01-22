@@ -56,7 +56,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
-//                                              регистрация сервисов
+//                                              Регистрация сервисов
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
@@ -141,7 +141,7 @@ options.AddPolicy("CorsPolicy", policy =>
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandling>();
+app.UseMiddleware<BussinessExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

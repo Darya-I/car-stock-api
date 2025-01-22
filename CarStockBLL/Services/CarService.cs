@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
@@ -62,27 +63,21 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <returns>Автомобиль</returns>
-        public async Task<Car> GetCarByIdAsync(int? id)
+        public async Task<Car> GetCarByIdAsync(int id)
         {
-            _logger.LogInformation("Fetching car with ID {CarId}.", id);
-
-            if (id == null)
-            {
-                _logger.LogWarning("Attempted to retrieve a car with a null ID.");
-                throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
-            }
+            _logger.LogInformation($"Fetching car with ID {id}.");
 
             try
             {
-                var car = await _carRepository.GetCarByIdAsync(id.Value);
+                var car = await _carRepository.GetCarByIdAsync(id);
 
                 if (car == null)
                 {
-                    _logger.LogWarning("Car with ID {CarId} not found.", id);
-                    throw new KeyNotFoundException($"Car with ID {id} not found.");
+                    _logger.LogWarning($"Car with ID {id} not found.");
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
                 }
 
-                _logger.LogInformation("Car with ID {CarId} successfully retrieved.", id);
+                _logger.LogInformation($"Car with ID {id} successfully retrieved.");
                 
                 return new Car
                 {
@@ -94,9 +89,13 @@ namespace CarStockBLL.Services
                     IsAvailable = car.IsAvailable,
                 };
             }
+            catch (ApiException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving the car with ID {CarId}.", id);
+                _logger.LogError($"An error occurred while retrieving the car with ID {id}. Details: {ex.Message}");
                 throw;
             }
         }
@@ -108,7 +107,7 @@ namespace CarStockBLL.Services
         /// <returns>Значение <c>true</c>, если обновление выполнено успешно; иначе <c>false</c>.</returns>
         public async Task<Car> UpdateCarAsync(Car car)
         {
-            _logger.LogInformation("Fetching car with ID {CarId}.", car.Id);
+            _logger.LogInformation($"Fetching car with ID {car.Id}.");
 
             try
             {               
@@ -116,8 +115,8 @@ namespace CarStockBLL.Services
 
                 if (existingCar == null)
                 {
-                    _logger.LogWarning("Car with ID {CarId} not found.", car.Id);
-                    throw new KeyNotFoundException("Car not found.");
+                    _logger.LogWarning($"Car with ID {car.Id} not found.");
+                    throw new EntityNotFoundException($"Car with ID {car.Id} not found.");
                 }
 
                 existingCar.BrandId = car.BrandId;
@@ -128,13 +127,17 @@ namespace CarStockBLL.Services
 
                 await _carRepository.UpdateCarAsync(existingCar);
                 
-                _logger.LogInformation("Car with ID {CarId} successfully updated.", car.Id);
+                _logger.LogInformation($"Car with ID {car.Id} successfully updated.");
 
                 return car;
             }
+            catch (ApiException)
+            {
+                throw;
+            }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "An error occurred while updating the car with ID {CarId}.", car.Id);
+                _logger.LogError($"An error occurred while updating the car with ID {car.Id}. Details: {ex.Message}");
                 throw;
             }
         }
@@ -143,31 +146,29 @@ namespace CarStockBLL.Services
         /// Удаляет автомобиль из базы данных
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
-        public async Task DeleteCarAsync(int? id) 
-        {
-            if (id == null) 
-            {
-                _logger.LogWarning("Attempted to retrieve a car with a null ID.");
-                throw new ArgumentNullException(nameof(id), "Car ID cannot be null.");
-            }
-
+        public async Task DeleteCarAsync(int id) 
+        {            
             try
             {
-                var car = await _carRepository.GetCarByIdAsync(id.Value);
+                var car = await _carRepository.GetCarByIdAsync(id);
 
                 if (car == null)
                 {
-                    _logger.LogWarning("Car with ID {CarId} not found.", id);
-                    throw new KeyNotFoundException("Сar not found");
+                    _logger.LogWarning($"Car with ID {id} not found.");
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
                 }
 
-                _logger.LogInformation("Car with ID {CarId} successfully deleted.", car.Id);
+                _logger.LogInformation($"Car with ID {car.Id} successfully deleted.");
 
-                await _carRepository.DeleteCarAsync(id.Value);
+                await _carRepository.DeleteCarAsync(id);
+            }
+            catch (ApiException)
+            {
+                throw;
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "An error occurred while deleting the car with ID {CarId}.", id);
+                _logger.LogError($"An error occurred while deleting the car with ID {id}. Details: {ex.Message}");
                 throw;
             }
         }
@@ -185,7 +186,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex) 
             {
-                _logger.LogError("An error occurred while retrieving cars. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while retrieving cars. Details: {ex.Message}");
                 throw;
             }
         }
@@ -195,7 +196,7 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="car">Автомобиль</param>
         /// <returns>Информация о новом автомобиле</returns>
-        public async Task<string> CreateCarAsync(Car car)
+        public async Task<Car> CreateCarAsync(Car car)
         {
             try
             {
@@ -204,6 +205,8 @@ namespace CarStockBLL.Services
                 var brand = await _brandService.GetBrandByNameAsync(car.Brand.Name);
                 var carModel = await _carModelService.GetCarModelByNameAsync(car.CarModel.Name);
                 var color = await _colorService.GetColorByNameAsync(car.Color.Name);
+
+                //      NEED TO REFACTOR нет проверки на дубликат, добавлю позже
 
                 var newCar = new Car
                 {
@@ -216,24 +219,17 @@ namespace CarStockBLL.Services
 
                 await _carRepository.CreateCarAsync(newCar);
 
-                _logger.LogInformation("Car with ID {CarId} successfully created.", newCar.Id);
+                _logger.LogInformation($"Car with ID {newCar.Id} successfully created.");
 
-                return $"Car '{car.CarModel.Name}' of brand '{car.Brand.Name}' and color '{car.Color.Name}' successfully created.";
+                return newCar;        
             }
-
-            catch (ArgumentException ex) 
+            catch (ApiException)
             {
-                _logger.LogWarning(ex, "Invalid argument: {Details}", ex.Message);
-                throw;
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Missing data: {Details}", ex.Message);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while creating car. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while creating car. Details: {ex.Message}");
                 throw;
             }
         }
@@ -243,26 +239,31 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="isAvaible">Доступность</param>
-        public async Task UpdateCarAvailabilityAsync(int id, bool IsAvailable)
+        public async Task<Car> UpdateCarAvailabilityAsync(int id, bool IsAvailable)
         {
             try
             {
-                _logger.LogInformation("Fetching car with ID {CarId}.", id);
+                _logger.LogInformation($"Fetching car with ID {id}.");
 
                 var existingCar = await _carRepository.GetCarByIdAsync(id);
+                if (existingCar == null) 
+                {
+                    _logger.LogWarning($"Car with ID {id} not found.");
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
+                }
 
                 existingCar.IsAvailable = IsAvailable;
 
                 await _carRepository.UpdateCarAsync(existingCar);
-
+                return existingCar;
             }
-            catch (KeyNotFoundException)
+            catch (ApiException)
             {
                 throw;
             }
             catch (Exception ex) 
             {
-                _logger.LogError("An error occurred while updating availability of car with ID {CarId}. Details: {Details}", id, ex.Message);
+                _logger.LogError($"An error occurred while updating availability of car with ID {id}. Details: {ex.Message}");
                 throw;
             }
         }
@@ -272,7 +273,7 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="amount">Количество</param>
-        public async Task UpdateCarAmountAsync(int id, int amount)
+        public async Task<Car> UpdateCarAmountAsync(int id, int amount)
         {
             var existingCar = await _carRepository.GetCarByIdAsync(id);
 
@@ -280,21 +281,28 @@ namespace CarStockBLL.Services
             {
                 if (existingCar == null)
                 {
-                    throw new ValidationException("Car not found");
+                    _logger.LogWarning($"Car with ID {id} not found.");
+                    throw new EntityNotFoundException($"Car with ID {id} not found.");
                 }
 
                 if (amount < 0)
                 {
-                    throw new ValidationException("Amount cannot be negative.");
+                    _logger.LogWarning("Attempted to update a car with a negative amount.");
+                    throw new ValidationErrorException("Amount cannot be negative.");
                 }
 
                 existingCar.Amount = amount;
 
                 await _carRepository.UpdateCarAsync(existingCar);
+                return existingCar;
             }
-            catch (ValidationException)
+            catch (ApiException)
             {
-                _logger.LogError("An error occurred while deleting the car with ID {CarId}.", id);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while updating amount of car with ID {id}. Details: {ex.Message}");
                 throw;
             }
         }

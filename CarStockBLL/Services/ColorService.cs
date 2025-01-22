@@ -1,4 +1,5 @@
-﻿using CarStockBLL.Interfaces;
+﻿using CarStockBLL.CustomException;
+using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
@@ -15,12 +16,19 @@ namespace CarStockBLL.Services
         private readonly IColorRepository<Color> _colorRepository;
 
         /// <summary>
+        /// Экземпляр логгера
+        /// </summary>
+        private readonly ILogger<Color> _logger;
+
+        /// <summary>
         /// Инициализирует новый экземпляр сервиса операций над цветом
         /// </summary>
         /// <param name="colorRepository">Репозиторий для доступа к цветам автомобилей</param>
-        public ColorService(IColorRepository<Color> colorRepository)
+        /// <param name="logger">Логгер</param>
+        public ColorService(IColorRepository<Color> colorRepository, ILogger<Color> logger)
         {
             _colorRepository = colorRepository;
+            _logger = logger;
         }
 
         /// <summary>
@@ -30,16 +38,20 @@ namespace CarStockBLL.Services
         /// <returns>Цвет</returns>
         public async Task<Color> GetColorByNameAsync(string? name)
         {
+            _logger.LogInformation($"Fetching color with name {name}.");
+
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException("Color name cannot be null or empty.");
+                _logger.LogWarning("Failed to retrieve a color. The provided color name was null or invalid.");
+                throw new ValidationErrorException("Color name cannot be null or empty.");
             }
 
             var color = await _colorRepository.GetColorByNameAsync(name);
             
             if (color == null)
             {
-                throw new KeyNotFoundException($"Color with name '{name}' not found.");
+                _logger.LogWarning($"Color with name {name} not found.");
+                throw new EntityNotFoundException($"Color with name '{name}' not found.");
             }
 
             return (new Color { Name = color.Name, Id = color.Id });

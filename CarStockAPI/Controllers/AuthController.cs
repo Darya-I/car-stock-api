@@ -104,7 +104,7 @@ namespace CarStockAPI.Controllers
                 Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value.ToString(),
             };
 
-            _logger.LogInformation("Mapping Google user: {Email}", googleUser.Email);
+            _logger.LogInformation($"Mapping Google user: {googleUser.Email}");
             var mapResult = await _useMapService.MapGoogle(googleUser);
 
             _logger.LogInformation("Google user mapping successful. Access token generated");
@@ -122,9 +122,9 @@ namespace CarStockAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
-            _logger.LogInformation("Mapping user: {Email}", loginRequest.Email);
+            _logger.LogInformation($"Mapping user: {loginRequest.Email}");
             var response = await _useMapService.MapUserLogin(loginRequest);
-            _logger.LogInformation("Authentication successful for user: {Email}. Setting refresh token cookie.", loginRequest.Email);
+            _logger.LogInformation($"Authentication successful for user: {loginRequest.Email}. Setting refresh token cookie.");
             SetTokenCookie(response.RefreshToken);
             return Ok(response);
         }
@@ -176,7 +176,7 @@ namespace CarStockAPI.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refresh-token", token, cookieOpt);
-            _logger.LogInformation("Refresh token cookie set successfully with expiration date: {ExpirationDate}", cookieOpt.Expires);
+            _logger.LogInformation($"Refresh token cookie set successfully with expiration date: {cookieOpt.Expires}");
         }
     }
 }

@@ -61,14 +61,13 @@ namespace CarStockDAL.Data.Repositories
         /// <returns>Автомобиль</returns>
         public async Task<Car> GetCarByIdAsync(int id)
         {
-            
             var car = await _cars
                 .Include(c => c.Brand)     // Загрузить связанный объект Brand
                 .Include(c => c.CarModel)  // Загрузить связанный объект CarModel
                 .Include(c => c.Color)     // Загрузить связанный объект Color
                 .FirstOrDefaultAsync(c => c.Id == id);  // Фильтруем по ID
-            
-            return car == null ? throw new KeyNotFoundException("Car not found") : car;
+
+            return car;
         }
 
         /// <summary>

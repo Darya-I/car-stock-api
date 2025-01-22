@@ -6,6 +6,9 @@
 # Confidential file
 CarStockAPI/appsettings.json
 
+# Database-specific directories
+CarStockDAL/Migrations/
+
 # User-specific files
 *.rsuser
 *.suo

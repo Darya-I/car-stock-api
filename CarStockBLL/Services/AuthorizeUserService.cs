@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
+using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
@@ -28,19 +29,27 @@ namespace CarStockBLL.Services
         private readonly ITokenService _tokenService;
 
         /// <summary>
+        /// Экземпляр логгера
+        /// </summary>
+        public readonly ILogger<IAuthorizeUserService> _logger;
+
+        /// <summary>
         /// Инициализирует новый экземпляр сервиса авторизации и аутентификации
         /// </summary>
         /// <param name="userManager">Менеджер управления пользователями</param>
         /// <param name="userRepository">Репозиторий доступа к пользователям</param>
         /// <param name="tokenService">Сервис работы с токенами</param>
+        /// <param name="logger">Логгер</param>
         public AuthorizeUserService(
             UserManager<User> userManager,
             IUserRepository userRepository,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            ILogger<IAuthorizeUserService> logger)
         {
             _userManager = userManager;
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -54,10 +63,14 @@ namespace CarStockBLL.Services
             {
                 var userFromDb = await _userRepository.GetUserByUsernameAsync(user.Email);
                 if (userFromDb == null)
-                    throw new UnauthorizedAccessException("Invalid email.");
-
+                {
+                    _logger.LogWarning($"User with email {user.Email} not found.");
+                    throw new InvalidUserDataException("Invalid email.");
+                }
                 if (!await _userManager.CheckPasswordAsync(userFromDb, user.PasswordHash))
-                    throw new UnauthorizedAccessException("Invalid password.");
+                {
+                    throw new InvalidUserDataException("Invalid password.");
+                }
 
                 // Получить роль
                 var roles = await _userManager.GetRolesAsync(userFromDb);
@@ -85,8 +98,13 @@ namespace CarStockBLL.Services
 
                 return (userFromDb, accessToken);
             }
-            catch (Exception)
+            catch (ApiException)
             {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unexpected error while authenticating user Details: {ex.Message}");
                 throw;
             }
         }
@@ -102,8 +120,9 @@ namespace CarStockBLL.Services
             {
                 return await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError($"Unexpected error while retrieving user with refresh token. Details: {ex.Message}");
                 throw;
             }
         }
@@ -120,8 +139,10 @@ namespace CarStockBLL.Services
                 var refreshTokenExpireTime = DateTime.UtcNow.AddDays(1);
                 await _userRepository.UpdateRefreshTokenAsync(user, newRefreshToken, refreshTokenExpireTime);
             }
-            catch (Exception)
+
+            catch (Exception ex)
             {
+                _logger.LogError($"Unexpected error while updating user`s refresh token Details: {ex.Message}");
                 throw;
             }
         }
@@ -143,7 +164,8 @@ namespace CarStockBLL.Services
                     if (!creationResult.Succeeded)
                     {
                         var info = string.Join("; ", creationResult.Errors.Select(e => e.Description));
-                        throw new InvalidOperationException($"Failed to create a new user. Details: {info}");
+                        _logger.LogError($"Failed to create a new user. Details: {info}");
+                        throw new ApiException($"Failed to create a new user");
                     }
 
                     userFromDb = user;
@@ -152,7 +174,8 @@ namespace CarStockBLL.Services
 
                 if (userFromDb == null)
                 {
-                    throw new KeyNotFoundException("User not found and creation is not allowed.");
+                    _logger.LogWarning($"User with Email {user.Email} not found.");
+                    throw new EntityNotFoundException("User not found and creation is not allowed.");
                 }
 
                 // Получить роли
@@ -179,8 +202,13 @@ namespace CarStockBLL.Services
 
                 return accessToken;
             }
-            catch (Exception) 
+            catch (ApiException) 
+            { 
+                throw; 
+            }
+            catch (Exception ex) 
             {
+                _logger.LogError($"Unexpected error while authenticating user with Google. Details: {ex.Message}");
                 throw;
             }
         }

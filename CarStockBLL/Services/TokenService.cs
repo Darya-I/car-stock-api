@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
@@ -85,12 +86,12 @@ namespace CarStockBLL.Services
             }
             catch (ArgumentException ex)
             {
-                _logger.LogError("Invalid argument provided for JWT creation. Details: {Details}", ex.Message);
-                throw new InvalidOperationException("Failed to create access token due to invalid parameters.");
+                _logger.LogError($"Invalid argument provided for JWT creation. Details: {ex.Message}");
+                throw new ApiException("Failed to create access token due to invalid parameters.");
             }
             catch (Exception ex) 
             {
-                _logger.LogError("Unexpected error while generating access token. Details: {Details}", ex.Message);
+                _logger.LogError($"Unexpected error while generating access token. Details: {ex.Message}");
                 throw;
             }
         }
@@ -109,11 +110,15 @@ namespace CarStockBLL.Services
                 rng.GetBytes(randomNumber);
                 _logger.LogInformation("Refresh token succesfully genereted");
                 return Convert.ToHexString(randomNumber);
-                
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError($"Failed to create refresh token due to invalid parameters Details: {ex.Message}");
+                throw new ApiException("Failed to create refresh token due to invalid parameters");
             }
             catch (Exception ex) 
             {
-                _logger.LogError("Unexpected error while generating refresh token. Details: {Details}", ex.Message);
+                _logger.LogError($"Unexpected error while generating refresh token. Details: {ex.Message}");
                 throw;
             }
         }
