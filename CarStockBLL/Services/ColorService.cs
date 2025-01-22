@@ -38,11 +38,11 @@ namespace CarStockBLL.Services
         /// <returns>Цвет</returns>
         public async Task<Color> GetColorByNameAsync(string? name)
         {
-            _logger.LogInformation("Fetching color with name {name}.", name);
+            _logger.LogInformation($"Fetching color with name {name}.");
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                _logger.LogWarning("Attempted to retrieve a color with a null name.");
+                _logger.LogWarning("Failed to retrieve a color. The provided color name was null or invalid.");
                 throw new ValidationErrorException("Color name cannot be null or empty.");
             }
 
@@ -50,7 +50,7 @@ namespace CarStockBLL.Services
             
             if (color == null)
             {
-                _logger.LogWarning("Color with name {name} not found.", name);
+                _logger.LogWarning($"Color with name {name} not found.");
                 throw new EntityNotFoundException($"Color with name '{name}' not found.");
             }
 

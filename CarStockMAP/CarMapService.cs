@@ -1,5 +1,6 @@
 ﻿using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
+using CarStockDAL.Models;
 using CarStockMAP.DTO.Car;
 using CarStockMAP.Mapping;
 
@@ -72,7 +73,7 @@ namespace CarStockMAP
         /// </summary>
         /// <param name="carDto">DTO автомобиля</param>
         /// <returns>Строка с результатом</returns>
-        public async Task<string> CreateMappedCarAsync(CarDTO carDto)
+        public async Task<Car> CreateMappedCarAsync(CarDTO carDto)
         {
             try
             {

@@ -64,7 +64,7 @@ namespace CarStockBLL.Services
                 var userFromDb = await _userRepository.GetUserByUsernameAsync(user.Email);
                 if (userFromDb == null)
                 {
-                    _logger.LogWarning("User with email '{Email}' not found.", user.Email);
+                    _logger.LogWarning($"User with email {user.Email} not found.");
                     throw new InvalidUserDataException("Invalid email.");
                 }
                 if (!await _userManager.CheckPasswordAsync(userFromDb, user.PasswordHash))
@@ -118,7 +118,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Unexpected error while authenticating user Details: {Details}", ex.Message);
+                _logger.LogError($"Unexpected error while authenticating user Details: {ex.Message}");
                 throw;
             }
         }
@@ -136,7 +136,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Unexpected error while retrieving user with refresh token. Details: {Details}", ex.Message);
+                _logger.LogError($"Unexpected error while retrieving user with refresh token. Details: {ex.Message}");
                 throw;
             }
         }
@@ -156,7 +156,7 @@ namespace CarStockBLL.Services
 
             catch (Exception ex)
             {
-                _logger.LogError("Unexpected error while updating user`s refresh token Details: {Details}", ex.Message);
+                _logger.LogError($"Unexpected error while updating user`s refresh token Details: {ex.Message}");
                 throw;
             }
         }
@@ -189,7 +189,7 @@ namespace CarStockBLL.Services
 
                 if (userFromDb == null)
                 {
-                    _logger.LogWarning("User with Email {email} not found.", user.Email);
+                    _logger.LogWarning($"User with Email {user.Email} not found.");
                     throw new EntityNotFoundException("User not found and creation is not allowed.");
                 }
 
@@ -237,7 +237,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex) 
             {
-                _logger.LogError("Unexpected error while authenticating user with Google. Details: {Details}", ex.Message);
+                _logger.LogError($"Unexpected error while authenticating user with Google. Details: {ex.Message}");
                 throw;
             }
         }

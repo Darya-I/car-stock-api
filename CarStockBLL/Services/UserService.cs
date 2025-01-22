@@ -5,6 +5,7 @@ using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace CarStockBLL.Services
 {
@@ -73,7 +74,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while retrieving user. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while retrieving user. Details: {ex.Message}");
                 throw;
             }
         }
@@ -91,7 +92,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while retrieving user`s roles. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while retrieving user`s roles. Details: {ex.Message}");
                 throw;
             }
         }
@@ -114,7 +115,8 @@ namespace CarStockBLL.Services
                 var result = await _userManager.CreateAsync(user, user.PasswordHash);
                 if (!result.Succeeded)
                 {
-                    throw new ValidationErrorException("Failed to create the user. Errors: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                    _logger.LogError(string.Join($"Failed to create the user. Errors:", result.Errors.Select(e => e.Description)));
+                    throw new ValidationErrorException("Failed to create the user. Errors:");
                 }
 
                 // NEED TO REFACTOR на ишью маппинга
@@ -127,7 +129,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while creating user. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while creating user. Details: {ex.Message}");
                 throw;
             }
         }
@@ -155,7 +157,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while deleting user. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while deleting user. Details: {ex.Message}");
                 throw;
             }
         }
@@ -208,7 +210,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex) 
             {
-                _logger.LogError("An error occurred while updating user. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while updating user. Details: {ex.Message}");
                 throw;
             }
         }
@@ -235,7 +237,7 @@ namespace CarStockBLL.Services
                 var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
                 if (!removeResult.Succeeded)
                 {
-                    _logger.LogError($"Failed to removing roles: {string.Join("; ", removeResult.Errors.Select(e => e.Description))}");
+                    _logger.LogError(string.Join($"Failed to removing roles: ", removeResult.Errors.Select(e => e.Description)));
                     throw new ApiException($"Failed to removing roles");
                 }
 
@@ -248,13 +250,13 @@ namespace CarStockBLL.Services
                 var addRoleResult = await _userManager.AddToRoleAsync(user, newRole);
                 if (!addRoleResult.Succeeded)
                 {
-                    _logger.LogError($"Failed to adding role: {string.Join("; ", addRoleResult.Errors.Select(e => e.Description))}");
+                    _logger.LogError(string.Join($"Failed to adding role: ", addRoleResult.Errors.Select(e => e.Description)));
                     throw new ApiException($"Failed to adding role");
                 }
             }
             catch (Exception ex) 
             {
-                _logger.LogError("An error occurred while updating user`s roles. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while updating user`s roles. Details: {ex.Message}");
             }
         }
 
@@ -287,7 +289,7 @@ namespace CarStockBLL.Services
             }
             catch (Exception ex) 
             {
-                _logger.LogError("An error occurred while retrieving all users. Details: {Details}", ex.Message);
+                _logger.LogError($"An error occurred while retrieving all users. Details: {ex.Message}");
                 throw;
             }
         }

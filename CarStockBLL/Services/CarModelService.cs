@@ -36,18 +36,18 @@ namespace CarStockBLL.Services
         /// <returns>Модель</returns>
         public async Task<CarModel> GetCarModelByNameAsync(string? name)
         {
-            _logger.LogInformation("Fetching model with name {name}.", name);
+            _logger.LogInformation($"Fetching model with name {name}.");
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                _logger.LogWarning("Attempted to retrieve a model with a null name.");
+                _logger.LogWarning("Failed to retrieve a car model. The provided model name was null or invalid.");
                 throw new ValidationErrorException("Model name cannot be null or empty.");
             }
 
             var carModel = await _carModelRepository.GetCarModelByNameAsync(name);
             if (carModel == null)
             {
-                _logger.LogWarning("Car model with name {name} not found.", name);
+                _logger.LogWarning($"Car model with name {name} not found.");
                 throw new EntityNotFoundException($"Car model with name '{name}' not found.");
             }
 

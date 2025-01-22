@@ -35,11 +35,11 @@ namespace CarStockBLL.Services
         /// <returns>Марка автомобиля</returns>
         public async Task<Brand> GetBrandByNameAsync(string? name)
         {
-            _logger.LogInformation("Fetching brand with name {name}.", name);
+            _logger.LogInformation($"Fetching brand with name {name}.");
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                _logger.LogWarning("Attempted to retrieve a brand with a null name.");
+                _logger.LogWarning("Failed to retrieve a brand. The provided brand name was null or invalid.");
                 throw new ValidationErrorException("Brand name cannot be null or empty.");
             }
 
@@ -47,7 +47,7 @@ namespace CarStockBLL.Services
 
             if (brand == null)
             {
-                _logger.LogWarning("Brand with name {name} not found.", name);
+                _logger.LogWarning($"Brand with name {name} not found.");
                 throw new EntityNotFoundException($"Brand with name '{name}' not found.");
             }
 

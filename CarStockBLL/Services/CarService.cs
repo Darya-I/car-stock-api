@@ -238,7 +238,7 @@ namespace CarStockBLL.Services
         /// Обновляет доступность автомобиля
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
-        /// <param name="IsAvailable">Доступность</param>
+        /// <param name="isAvaible">Доступность</param>
         public async Task<Car> UpdateCarAvailabilityAsync(int id, bool IsAvailable)
         {
             try
