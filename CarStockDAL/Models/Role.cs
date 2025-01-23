@@ -10,17 +10,50 @@ namespace CarStockDAL.Models
         public int Id { get; set; }
         public string Name { get; set; }
         
-        public bool CanViewCar { get; set; } = true;        
+        /// <summary>
+        /// Допустимость просмотра автомобиля
+        /// </summary>
+        public bool CanViewCar { get; set; } = true;
+
+        /// <summary>
+        /// Допустимость создания автомобиля
+        /// </summary>
         public bool CanCreateCar { get; set; } = false;
+
+        /// <summary>
+        /// Допустимость редактирования автомобиля
+        /// </summary>
         public bool CanEditCar { get; set; } = false;
+
+        /// <summary>
+        /// Допустимость удаления автомобиля
+        /// </summary>
         public bool CanDeleteCar { get; set; } = false;
- 
+
+        /// <summary>
+        /// Допустимость создания пользователя 
+        /// </summary>
         public bool CanCreateUser { get; set; } = false;
-        public bool CanViewUser { get; set; } = false;        
-        public bool CanEditUser { get; set; } = false;       
+
+        /// <summary>
+        /// Допустимость просмотра пользователя
+        /// </summary>
+        public bool CanViewUser { get; set; } = false;
+
+        /// <summary>
+        /// Допустимость редактирования пользователя
+        /// </summary>
+        public bool CanEditUser { get; set; } = false;
+
+        /// <summary>
+        /// Допустимость удаления пользователя
+        /// </summary>
         public bool CanDeleteUser { get; set; } = false;
 
+        /// <summary>
+        /// Связные пользователи
+        /// </summary>
         [JsonIgnore]
-        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public ICollection<User> Users { get; set; } = new List<User>();
     }
 }

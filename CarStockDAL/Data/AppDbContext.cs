@@ -22,12 +22,6 @@ namespace CarStockDAL.Data
         /// </summary>
         public DbSet<Role> Roles {  get; set; }
 
-        
-        /// <summary>
-        /// Набор данных связи между User и Role
-        /// </summary>
-        public DbSet<UserRole> UserRoles {  get; set; }
-
         /// <summary>
         /// Набор данных автомобилей
         /// </summary>
@@ -53,20 +47,12 @@ namespace CarStockDAL.Data
         /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserRole>()
-                .HasKey(ur => new { ur.UserId, ur.RoleId });
 
-            modelBuilder.Entity<UserRole>()
-                .HasOne(ur => ur.User)
-                .WithMany(u => u.UserRoles)
-                .HasForeignKey(u => u.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<UserRole>()
-                .HasOne(ur => ur.Role)
-                .WithMany(r => r.UserRoles)
-                .HasForeignKey(r => r.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Car>()
                 .HasOne(c => c.Brand)
@@ -86,7 +72,7 @@ namespace CarStockDAL.Data
                 .HasForeignKey(m => m.CarModelId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Ролт
+            // Роли
             modelBuilder.Entity<Role>().HasData(
                 new Role 
                 {   Id = 1,

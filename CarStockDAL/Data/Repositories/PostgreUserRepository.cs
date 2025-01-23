@@ -38,21 +38,21 @@ namespace CarStockDAL.Data.Repositories
         /// Получает пользователя по имени пользователя
         /// </summary>
         /// <param name="username">Имя пользователя</param>
-        /// <returns>Пользователь или <c>null</c>, если пользователь не найден</returns>
+        /// <returns>Пользователь</returns>
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
             var user = await _dbContext.Users
-                .Include(u => u.UserRoles)
+                .Include(r => r.Role) // Получить связную роль
                 .FirstOrDefaultAsync(u => u.Email == username);
+
             return user;
-            //return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         /// <summary>
         /// Получает пользователя по электронной почте
         /// </summary>
         /// <param name="email">Адрес электронной почты</param>
-        /// <returns>Пользователь или <c>null</c>, если пользователь не найден</returns>
+        /// <returns>Пользователь</returns>
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
@@ -82,12 +82,17 @@ namespace CarStockDAL.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<Role>> GetUserRolesAsync(string id)
+        /// <summary>
+        /// Получает роль пользователя
+        /// </summary>
+        /// <param name="id">Идентификатор пользователя</param>
+        /// <returns>Роль</returns>
+        public async Task<Role> GetUserRolesAsync(int? id)
         {
-            return await _dbContext.UserRoles
-                .Where(ur => ur.UserId == id)
-                .Select(ur => ur.Role) // Только роли
-                .ToListAsync();
+            var role = await _dbContext.Roles
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            return role;
         }
     }
 }

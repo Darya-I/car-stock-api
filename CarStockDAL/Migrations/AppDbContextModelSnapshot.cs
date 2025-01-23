@@ -247,6 +247,9 @@ namespace CarStockDAL.Migrations
                     b.Property<DateTime>("RefreshTokenExpireTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -266,22 +269,9 @@ namespace CarStockDAL.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("CarStockDAL.Models.UserRole", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "RoleId");
-
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -465,23 +455,15 @@ namespace CarStockDAL.Migrations
                     b.Navigation("CarModel");
                 });
 
-            modelBuilder.Entity("CarStockDAL.Models.UserRole", b =>
+            modelBuilder.Entity("CarStockDAL.Models.User", b =>
                 {
                     b.HasOne("CarStockDAL.Models.Role", "Role")
-                        .WithMany("UserRoles")
+                        .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CarStockDAL.Models.User", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -549,12 +531,7 @@ namespace CarStockDAL.Migrations
 
             modelBuilder.Entity("CarStockDAL.Models.Role", b =>
                 {
-                    b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("CarStockDAL.Models.User", b =>
-                {
-                    b.Navigation("UserRoles");
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

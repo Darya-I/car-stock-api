@@ -125,23 +125,30 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Bearer", policy =>
         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
+    
     options.AddPolicy("CreateCarPolicy", policy =>
-       policy.RequireClaim("CanCreateCar", "true"));
+       policy.RequireClaim("Permission", "CanCreateCar"));
+    
     options.AddPolicy("EditCarPolicy", policy =>
-        policy.RequireClaim("CanEditCar", "true"));
+        policy.RequireClaim("Permission", "CanEditCar"));
+    
     options.AddPolicy("DeleteCarPolicy", policy =>
-        policy.RequireClaim("CanDeleteCar", "true"));
+        policy.RequireClaim("Permission", "CanDeleteCar"));
+    
     options.AddPolicy("ViewCarPolicy", policy =>
-        policy.RequireClaim("CanViewCar", "true"));
+        policy.RequireClaim("Permission", "CanViewCar"));
 
     options.AddPolicy("CreateUserPolicy", policy =>
-        policy.RequireClaim("CanCreateUser", "true"));
+        policy.RequireClaim("Permission", "CanCreateUser"));
+    
     options.AddPolicy("EditUserPolicy", policy =>
-            policy.RequireClaim("CanEditUser", "true"));
+            policy.RequireClaim("Permission", "CanEditUser"));
+    
     options.AddPolicy("DeleteUserPolicy", policy =>
-            policy.RequireClaim("CanDeleteUser", "true"));
+            policy.RequireClaim("Permission", "CanDeleteUser"));
+    
     options.AddPolicy("ViewUserPolicy", policy =>
-            policy.RequireClaim("CanViewUser", "true"));
+            policy.RequireClaim("Permission", "CanViewUser"));
 });
 
 // для откладки пока не используется чтоб потрогать гугл
@@ -169,9 +176,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("CorsPolicy");
+
 app.Run();

@@ -7,8 +7,12 @@ namespace CarStockDAL.Models
     {
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpireTime { get; set; }
-
+        public int RoleId { get; set; }
+        
+        /// <summary>
+        /// Навигационное свойство для роли
+        /// </summary>
         [JsonIgnore]
-        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public Role Role { get; set; }
     }
 }
