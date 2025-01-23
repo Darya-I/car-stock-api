@@ -13,5 +13,12 @@ namespace CarStockBLL.Interfaces
         /// <param name="name">Название модели</param>
         /// <returns>Модель</returns>
         Task<CarModel> GetCarModelByNameAsync(string? name);
+
+        /// <summary>
+        /// Получает модель автомобиля по идентификатору из базы данных
+        /// </summary>
+        /// <param name="id">Идентификатор модели</param>
+        /// <returns>Объект модели автомобиля</returns>
+        Task<CarModel> GetCarModelByIdAsync(int id);
     }
 }

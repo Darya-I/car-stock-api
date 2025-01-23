@@ -70,7 +70,6 @@ builder.Services.AddScoped<IColorService, ColorService>();
 
 
 builder.Services.AddScoped<UserMapService>();
-builder.Services.AddScoped<CarMapService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();

@@ -89,5 +89,13 @@ namespace CarStockDAL.Data.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<bool> CarExistAsync(int brandId, int carModelId, int colorId)
+        {
+            return await _cars.AnyAsync(c =>
+            c.BrandId == brandId &&
+            c.CarModelId == carModelId &&
+            c.ColorId == colorId);
+        }
     }
 }

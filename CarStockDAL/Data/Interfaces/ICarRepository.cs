@@ -40,5 +40,14 @@ namespace CarStockDAL.Data.Interfaces
         /// <param name="tracked">Указывает, отслеживаются ли изменения сущностей. По умолчанию true</param>
         /// <returns>Список автомобилей</returns>
         Task<List<Car>> GetAllCarsAsync(bool tracked = true);
+
+        /// <summary>
+        /// Вспомогательный метод для проверки наличия автомобиля
+        /// </summary>
+        /// <param name="brandId">Идентификатор марки</param>
+        /// <param name="carModelId">Идентификатор модели</param>
+        /// <param name="colorId">Идентификатор цвета</param>
+        /// <returns><c>true</c> если машина создана, иначе <c>false</c></returns>
+        Task<bool> CarExistAsync(int brandId, int carModelId, int colorId);
     }
 }
