@@ -1,10 +1,8 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
-using Common;
 using Microsoft.AspNetCore.Identity;
 
 namespace CarStockBLL.Services
@@ -77,7 +75,7 @@ namespace CarStockBLL.Services
                 var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
 
                 // Получить клеймы для пользователя и его роли
-                var claims = ClaimAssignment.AssignClaimAsync(userFromDb, role);
+                var claims = AssignClaim(userFromDb, role);
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
                 var refreshToken = _tokenService.GetRefreshToken();
@@ -176,7 +174,7 @@ namespace CarStockBLL.Services
                 var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
 
                 // Получить клеймы для пользователя и его роли
-                var claims = ClaimAssignment.AssignClaimAsync(userFromDb, role);
+                var claims = AssignClaim(userFromDb, role);
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
                 var refreshToken = _tokenService.GetRefreshToken();
@@ -197,6 +195,37 @@ namespace CarStockBLL.Services
                 _logger.LogError($"Unexpected error while authenticating user with Google. Details: {ex.Message}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для присваивания клеймов пользователю
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <param name="role">Роль пользователя</param>
+        /// <returns>Список клеймов</returns>
+        private static List<Claim> AssignClaim(User user, Role role)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+            };
+
+            if (role != null)
+            {
+                var permissions = role.GetPermissions();
+
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+
+                foreach (var permission in permissions)
+                {
+                    if (permission.Value)
+                    {
+                        claims.Add(new Claim("Permission", permission.Key));
+                    }
+                }
+            }
+            return claims;
         }
     }
 }
