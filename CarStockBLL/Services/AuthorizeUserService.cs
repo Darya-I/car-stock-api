@@ -4,6 +4,7 @@ using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
+using Common;
 using Microsoft.AspNetCore.Identity;
 
 namespace CarStockBLL.Services
@@ -72,32 +73,13 @@ namespace CarStockBLL.Services
                     throw new InvalidUserDataException("Invalid password.");
                 }
 
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
-                    new Claim(ClaimTypes.Email, userFromDb.Email),
-                };
-
                 // Получить роль
                 var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
 
-                if (role != null)
-                {
-                    var permissions = GetRolePermissions(role);
-
-                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
-
-                    foreach (var permission in permissions)
-                    {
-                        if (permission.Value)
-                        {
-                            claims.Add(new Claim("Permission", permission.Key));
-                        }
-                    }
-                }
+                // Получить клеймы для пользователя и его роли
+                var claims = ClaimAssignment.AssignClaimAsync(userFromDb, role);
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
-
                 var refreshToken = _tokenService.GetRefreshToken();
 
                 // Присвоить refresh-токен пользователю
@@ -190,30 +172,11 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException("User not found and creation is not allowed.");
                 }
 
-
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
-                    new Claim(ClaimTypes.Email, userFromDb.Email),
-                };
-
                 // Получить роль
                 var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
 
-                if (role != null)
-                {
-                    var permissions = GetRolePermissions(role);
-
-                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
-
-                    foreach (var permission in permissions)
-                    {
-                        if(permission.Value)
-                        {
-                            claims.Add(new Claim("Permission", permission.Key));
-                        }
-                    }
-                }
+                // Получить клеймы для пользователя и его роли
+                var claims = ClaimAssignment.AssignClaimAsync(userFromDb, role);
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
                 var refreshToken = _tokenService.GetRefreshToken();
@@ -234,28 +197,6 @@ namespace CarStockBLL.Services
                 _logger.LogError($"Unexpected error while authenticating user with Google. Details: {ex.Message}");
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Вспомогательный метод для маппинга на строки возможности ролей
-        /// </summary>
-        /// <param name="role">Роль</param>
-        /// <returns>Словарь с возможностями роли</returns>
-        private static Dictionary<string, bool> GetRolePermissions(Role role)
-        {
-            var permissionsMap = new Dictionary<string, bool>
-            {
-                { "CanViewCar", role.CanViewCar },
-                { "CanCreateCar", role.CanCreateCar },
-                { "CanEditCar", role.CanEditCar },
-                { "CanDeleteCar", role.CanDeleteCar },
-                { "CanCreateUser", role.CanCreateUser },
-                { "CanViewUser", role.CanViewUser },
-                { "CanEditUser", role.CanEditUser },
-                { "CanDeleteUser", role.CanDeleteUser }
-            };
-
-            return permissionsMap;
         }
     }
 }
