@@ -86,14 +86,14 @@ builder.Services.AddScoped<ITokenService, TokenService>(sp =>
 // Google
 builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Authentication:Google"));
 
-//аутентификация с JWT
+// Аутентификация с JWT
 builder.Services.AddAuthentication((options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })).AddJwtBearer(options =>
+        }))
+    .AddJwtBearer(options =>
             {
-
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -119,11 +119,36 @@ builder.Services.AddAuthentication((options => {
             options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Использование Cookie для Google
         });
 
+// Настройки политик
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
+    
+    options.AddPolicy("CreateCarPolicy", policy =>
+       policy.RequireClaim("Permission", "CanCreateCar"));
+    
+    options.AddPolicy("EditCarPolicy", policy =>
+        policy.RequireClaim("Permission", "CanEditCar"));
+    
+    options.AddPolicy("DeleteCarPolicy", policy =>
+        policy.RequireClaim("Permission", "CanDeleteCar"));
+    
+    options.AddPolicy("ViewCarPolicy", policy =>
+        policy.RequireClaim("Permission", "CanViewCar"));
+
+    options.AddPolicy("CreateUserPolicy", policy =>
+        policy.RequireClaim("Permission", "CanCreateUser"));
+    
+    options.AddPolicy("EditUserPolicy", policy =>
+            policy.RequireClaim("Permission", "CanEditUser"));
+    
+    options.AddPolicy("DeleteUserPolicy", policy =>
+            policy.RequireClaim("Permission", "CanDeleteUser"));
+    
+    options.AddPolicy("ViewUserPolicy", policy =>
+            policy.RequireClaim("Permission", "CanViewUser"));
 });
 
 // для откладки пока не используется чтоб потрогать гугл
@@ -151,9 +176,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("CorsPolicy");
+
 app.Run();

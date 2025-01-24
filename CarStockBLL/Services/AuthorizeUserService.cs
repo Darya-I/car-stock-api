@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using CarStockBLL.CustomException;
 using CarStockBLL.Interfaces;
 using CarStockDAL.Data.Interfaces;
@@ -73,21 +72,12 @@ namespace CarStockBLL.Services
                 }
 
                 // Получить роль
-                var roles = await _userManager.GetRolesAsync(userFromDb);
+                var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
 
-                var claims = new List<Claim>
-                {
-                new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
-                new Claim(ClaimTypes.Email, userFromDb.Email),
-                };
-
-                if (roles.Any())
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.First()));
-                }
+                // Получить клеймы для пользователя и его роли
+                var claims = AssignClaim(userFromDb, role);
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
-
                 var refreshToken = _tokenService.GetRefreshToken();
 
                 // Присвоить refresh-токен пользователю
@@ -169,7 +159,9 @@ namespace CarStockBLL.Services
                     }
 
                     userFromDb = user;
+                    // NEED TO REFACTOR на ишью маппинга
                     await _userManager.AddToRoleAsync(user, "User");
+                    
                 }
 
                 if (userFromDb == null)
@@ -178,19 +170,11 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException("User not found and creation is not allowed.");
                 }
 
-                // Получить роли
-                var roles = await _userManager.GetRolesAsync(user);
+                // Получить роль
+                var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
 
-                var claims = new List<Claim>
-                {
-                new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString()),
-                new Claim(ClaimTypes.Email, userFromDb.Email),
-                };
-
-                if (roles.Any())
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.First()));
-                }
+                // Получить клеймы для пользователя и его роли
+                var claims = AssignClaim(userFromDb, role);
 
                 var accessToken = _tokenService.GetAccessToken(claims, out var expires);
                 var refreshToken = _tokenService.GetRefreshToken();
@@ -211,6 +195,37 @@ namespace CarStockBLL.Services
                 _logger.LogError($"Unexpected error while authenticating user with Google. Details: {ex.Message}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для присваивания клеймов пользователю
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <param name="role">Роль пользователя</param>
+        /// <returns>Список клеймов</returns>
+        private static List<Claim> AssignClaim(User user, Role role)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+            };
+
+            if (role != null)
+            {
+                var permissions = role.GetPermissions();
+
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+
+                foreach (var permission in permissions)
+                {
+                    if (permission.Value)
+                    {
+                        claims.Add(new Claim("Permission", permission.Key));
+                    }
+                }
+            }
+            return claims;
         }
     }
 }

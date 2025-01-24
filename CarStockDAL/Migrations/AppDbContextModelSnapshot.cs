@@ -17,7 +17,7 @@ namespace CarStockDAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "6.0.35")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -93,98 +93,6 @@ namespace CarStockDAL.Migrations
                     b.HasIndex("BrandId");
 
                     b.ToTable("Models");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BrandId = 1,
-                            Name = "Corolla"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BrandId = 1,
-                            Name = "Camry"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            BrandId = 1,
-                            Name = "RAV4"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            BrandId = 2,
-                            Name = "X5"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            BrandId = 2,
-                            Name = "3 Series"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            BrandId = 2,
-                            Name = "5 Series"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            BrandId = 3,
-                            Name = "911 Carrera"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            BrandId = 3,
-                            Name = "Cayenne"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            BrandId = 3,
-                            Name = "Macan"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            BrandId = 4,
-                            Name = "C-Class"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            BrandId = 4,
-                            Name = "E-Class"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            BrandId = 4,
-                            Name = "GLE"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            BrandId = 4,
-                            Name = "A4"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            BrandId = 4,
-                            Name = "Q5"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            BrandId = 4,
-                            Name = "A6"
-                        });
                 });
 
             modelBuilder.Entity("CarStockDAL.Models.Color", b =>
@@ -207,79 +115,87 @@ namespace CarStockDAL.Migrations
                     b.HasIndex("CarModelId");
 
                     b.ToTable("Colors");
+                });
+
+            modelBuilder.Entity("CarStockDAL.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("CanCreateCar")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanCreateUser")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanDeleteCar")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanDeleteUser")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditCar")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditUser")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanViewCar")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanViewUser")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CarModelId = 4,
-                            Name = "Black"
+                            CanCreateCar = true,
+                            CanCreateUser = true,
+                            CanDeleteCar = true,
+                            CanDeleteUser = true,
+                            CanEditCar = true,
+                            CanEditUser = true,
+                            CanViewCar = true,
+                            CanViewUser = true,
+                            Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            CarModelId = 4,
-                            Name = "White"
+                            CanCreateCar = false,
+                            CanCreateUser = false,
+                            CanDeleteCar = false,
+                            CanDeleteUser = false,
+                            CanEditCar = false,
+                            CanEditUser = false,
+                            CanViewCar = true,
+                            CanViewUser = false,
+                            Name = "User"
                         },
                         new
                         {
                             Id = 3,
-                            CarModelId = 5,
-                            Name = "Grey"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CarModelId = 5,
-                            Name = "Blue"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CarModelId = 6,
-                            Name = "Silver"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CarModelId = 6,
-                            Name = "Black"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CarModelId = 7,
-                            Name = "Red"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CarModelId = 7,
-                            Name = "Yellow"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CarModelId = 8,
-                            Name = "White"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CarModelId = 8,
-                            Name = "Red"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CarModelId = 9,
-                            Name = "Green"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CarModelId = 9,
-                            Name = "Blue"
+                            CanCreateCar = true,
+                            CanCreateUser = false,
+                            CanDeleteCar = true,
+                            CanDeleteUser = false,
+                            CanEditCar = true,
+                            CanEditUser = false,
+                            CanViewCar = true,
+                            CanViewUser = false,
+                            Name = "Manager"
                         });
                 });
 
@@ -331,6 +247,9 @@ namespace CarStockDAL.Migrations
                     b.Property<DateTime>("RefreshTokenExpireTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -349,6 +268,8 @@ namespace CarStockDAL.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -534,6 +455,17 @@ namespace CarStockDAL.Migrations
                     b.Navigation("CarModel");
                 });
 
+            modelBuilder.Entity("CarStockDAL.Models.User", b =>
+                {
+                    b.HasOne("CarStockDAL.Models.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -595,6 +527,11 @@ namespace CarStockDAL.Migrations
             modelBuilder.Entity("CarStockDAL.Models.CarModel", b =>
                 {
                     b.Navigation("Colors");
+                });
+
+            modelBuilder.Entity("CarStockDAL.Models.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

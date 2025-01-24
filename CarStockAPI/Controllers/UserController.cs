@@ -51,7 +51,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="createUserDto">DTO для создания пользователя</param>
         /// <returns>Созданный пользователь</returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "CreateUserPolicy")]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser(CreateUserDTO createUserDto)
         {
@@ -66,7 +66,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="email">Почта пользователя</param>
         /// <returns>Результат удаления</returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "DeleteUserPolicy")]
         [HttpDelete("DeleteUser")]
         public async Task<IActionResult> DeleteUser([FromBody] string email)
         {
@@ -81,7 +81,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="updateUserDto">DTO пользователя для обновления</param>
         /// <returns>Результат обновления</returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "EditUserPolicy")]
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser(UpdateUserDTO updateUserDto)
         {
@@ -95,7 +95,7 @@ namespace CarStockAPI.Controllers
         /// Получение списка пользователей
         /// </summary>
         /// <returns>Коллекция пользователй</returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "ViewUserPolicy")]
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
@@ -110,7 +110,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="email">Почта пользователя</param>
         /// <returns>Пользователь</returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "ViewUserPolicy")]
         [HttpGet("GetUser/{email}")]
         public async Task<IActionResult> GetUser([FromRoute] string email)
         {

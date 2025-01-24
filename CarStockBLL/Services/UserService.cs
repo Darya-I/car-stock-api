@@ -118,6 +118,8 @@ namespace CarStockBLL.Services
                     _logger.LogError(string.Join($"Failed to create the user. Errors:", result.Errors.Select(e => e.Description)));
                     throw new ValidationErrorException("Failed to create the user. Errors:");
                 }
+
+                // NEED TO REFACTOR на ишью маппинга
                 await _userManager.AddToRoleAsync(user, "User");
                 return user;
             }

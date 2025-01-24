@@ -6,15 +6,24 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockDAL", "CarStockDAL.csproj", "{3C57D220-C3EA-4700-8761-7EEE5B39ED48}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockBLL", "..\CarStockBLL\CarStockBLL.csproj", "{420EB0FE-42D8-4EA5-AEE1-CD8F16687F79}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B} = {3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockAPI", "..\CarStockAPI\CarStockAPI.csproj", "{C023E390-8EE6-4670-9580-1AAEBCDA6B06}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{DF70DDAD-DE68-407A-AE5D-26A9780D32ED}"
 	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockMAP", "..\CarStockMAP\CarStockMAP.csproj", "{C6C1B11B-391E-4417-B36A-8BE3A00B5B46}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3C57D220-C3EA-4700-8761-7EEE5B39ED48} = {3C57D220-C3EA-4700-8761-7EEE5B39ED48}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3C57D220-C3EA-4700-8761-7EEE5B39ED48} = {3C57D220-C3EA-4700-8761-7EEE5B39ED48}
 	EndProjectSection
@@ -41,6 +50,10 @@ Global
 		{C6C1B11B-391E-4417-B36A-8BE3A00B5B46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6C1B11B-391E-4417-B36A-8BE3A00B5B46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6C1B11B-391E-4417-B36A-8BE3A00B5B46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E685C67-31AF-4BB7-AC1A-2A4E461B9C8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
