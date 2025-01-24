@@ -55,5 +55,24 @@ namespace CarStockDAL.Models
         /// </summary>
         [JsonIgnore]
         public ICollection<User> Users { get; set; } = new List<User>();
+
+        /// <summary>
+        /// Получение прав роли в виде словаря
+        /// </summary>
+        /// <returns>Словарь с возможностями роли</returns>
+        public Dictionary<string, bool> GetPermissions()
+        {
+            return new Dictionary<string, bool>
+            {
+                { "CanViewCar", CanViewCar },
+                { "CanCreateCar", CanCreateCar },
+                { "CanEditCar", CanEditCar },
+                { "CanDeleteCar", CanDeleteCar },
+                { "CanCreateUser", CanCreateUser },
+                { "CanViewUser", CanViewUser },
+                { "CanEditUser", CanEditUser },
+                { "CanDeleteUser", CanDeleteUser }
+            };
+        }
     }
 }
