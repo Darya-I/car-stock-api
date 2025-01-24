@@ -94,5 +94,12 @@ namespace CarStockDAL.Data.Repositories
 
             return role;
         }
+
+        public async Task<Role?> GetRoleByNameAsync(string roleName)
+        {
+            var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+            
+            return role;
+        }
     }
 }

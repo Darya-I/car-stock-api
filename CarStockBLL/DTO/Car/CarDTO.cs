@@ -1,4 +1,4 @@
-﻿namespace CarStockBLL.DTO
+﻿namespace CarStockBLL.DTO.Car
 {
     /// <summary>
     /// DTO автомобиля

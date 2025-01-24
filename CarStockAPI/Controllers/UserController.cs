@@ -1,4 +1,5 @@
-﻿using CarStockBLL.Interfaces;
+﻿using CarStockBLL.DTO.User;
+using CarStockBLL.Interfaces;
 using CarStockBLL.Services;
 using CarStockMAP;
 using CarStockMAP.DTO.User;
@@ -51,12 +52,13 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="createUserDto">DTO для создания пользователя</param>
         /// <returns>Созданный пользователь</returns>
-        [Authorize(Policy = "CreateUserPolicy")]
+        //[Authorize(Policy = "CreateUserPolicy")]
         [HttpPost("CreateUser")]
-        public async Task<IActionResult> CreateUser(CreateUserDTO createUserDto)
+        public async Task<IActionResult> CreateUser(UserDTO user)
         {
             _logger.LogInformation("Attempting to create user");
-            var result = await _userMapService.CreateMappedUserAsync(createUserDto);
+            //var result = await _userMapService.CreateMappedUserAsync(createUserDto);
+            var result = await _userService.CreateUserAsync(user);
             _logger.LogInformation("Creating user successful");
             return Ok(result);
         }
@@ -99,10 +101,10 @@ namespace CarStockAPI.Controllers
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            _logger.LogInformation("Attempting to get users");
-            var users = await _userMapService.GetMappedUsersAsync();
-            _logger.LogInformation("Geting users successful");
-            return Ok(users);
+            _logger.LogInformation("Attempting to get user");
+            var result = await _userService.GetAllUsersAsync();
+            _logger.LogInformation("Geting user successful");
+            return Ok(result);
         }
 
         /// <summary>
@@ -115,9 +117,9 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> GetUser([FromRoute] string email)
         {
             _logger.LogInformation($"Attempting to update user with email: {email}");
-            var users = await _userMapService.GetMappedUserAsync(email);
+            var user = await _userService.GetUserAsync(email);
             _logger.LogInformation("Retrive user successful");
-            return Ok(users);
+            return Ok(user);
         }
     }
 }

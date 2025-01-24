@@ -1,5 +1,5 @@
 ﻿using CarStockBLL.CustomException;
-using CarStockBLL.DTO;
+using CarStockBLL.DTO.Car;
 using CarStockBLL.Interfaces;
 using CarStockBLL.Map;
 using CarStockDAL.Data.Interfaces;

@@ -1,4 +1,5 @@
-﻿using CarStockDAL.Models;
+﻿using CarStockBLL.DTO.User;
+using CarStockDAL.Models;
 
 namespace CarStockBLL.Interfaces
 {
@@ -12,7 +13,7 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="email">Почта</param>
         /// <returns>Пользователь и список его ролей</returns>
-        Task<(User user, List<string> roles)?> GetUserAsync(string email);
+        Task<GetUserDTOdraft> GetUserAsync(string email);
         
         /// <summary>
         /// Получает список ролей пользователя
@@ -20,14 +21,14 @@ namespace CarStockBLL.Interfaces
         /// <param name="user">Пользователь</param>
         /// <returns>Список ролей пользователя</returns>
         Task<List<string>> GetUserRolesAsync(User user);
-        
+
         /// <summary>
         /// Создает нового пользователя в базе данных
         /// </summary>
         /// <param name="user">Пользователь</param>
         /// <returns>Созданный пользователь</returns>
-        Task<User> CreateUserAsync(User user);
-        
+        Task<GetUserDTOdraft> CreateUserAsync(UserDTO userDto);
+
         /// <summary>
         /// Удаляет пользователя из базы данных
         /// </summary>
@@ -52,6 +53,6 @@ namespace CarStockBLL.Interfaces
         /// Получает список пользователей и список их ролей из базы данных
         /// </summary>
         /// <returns>Список пользователей с их ролями</returns>
-        Task<List<(User user, List<string> roles)>> GetAllUsersAsync();
+        Task<List<GetUserDTOdraft>> GetAllUsersAsync();
     }
 }

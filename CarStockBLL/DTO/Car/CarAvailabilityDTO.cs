@@ -1,9 +1,9 @@
-﻿namespace CarStockBLL.DTO
+﻿namespace CarStockBLL.DTO.Car
 {
     /// <summary>
-    /// DTO обновления количества автомобилей
+    /// DTO обновления наличия автомобиля
     /// </summary>
-    public class CarAmountDTO
+    public class CarAvailabilityDTO
     {
         /// <summary>
         /// Идентификатор автомобиля
@@ -11,8 +11,8 @@
         public int Id { get; set; }
 
         /// <summary>
-        /// Количество автомобилей
+        /// Доступность автомобиля
         /// </summary>
-        public int Amount { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

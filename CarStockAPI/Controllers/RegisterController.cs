@@ -1,4 +1,5 @@
-﻿using CarStockMAP;
+﻿using CarStockBLL.DTO.User;
+using CarStockMAP;
 using CarStockMAP.DTO.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,9 +43,9 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> Register(CreateUserDTO createUserDTO)
         {
             _logger.LogInformation("Attempting to register user");
-            var result = await _userMapService.CreateMappedUserAsync(createUserDTO);
+            //var result = await _userMapService.CreateMappedUserAsync(createUserDTO);
             _logger.LogInformation("Register user successful");
-            return Ok(result);
+            return Ok();
         }
     }
 }

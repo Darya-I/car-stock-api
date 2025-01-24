@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Data;
 using CarStockBLL.CustomException;
+using CarStockBLL.DTO.User;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Map;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CarStockBLL.Services
@@ -58,7 +61,7 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="email">Почта</param>
         /// <returns>Пользователь и список его ролей</returns>
-        public async Task<(User user, List<string> roles)?> GetUserAsync(string email)
+        public async Task<GetUserDTOdraft> GetUserAsync(string email)
         {
             try
             {
@@ -67,10 +70,9 @@ namespace CarStockBLL.Services
                 {
                     throw new EntityNotFoundException($"User with email '{email}' was not found.");
                 }
+                var mapper = new UserMapperBLL();
 
-                // Получить роли для пользователя
-                var roles = await _userManager.GetRolesAsync(user);
-                return (user, roles.ToList());
+                return mapper.UserToGetUserDto(user);
             }
             catch (Exception ex)
             {
@@ -102,26 +104,47 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="user">Пользователь</param>
         /// <returns>Созданный пользователь</returns>
-        public async Task<User> CreateUserAsync(User user)
+        public async Task<GetUserDTOdraft> CreateUserAsync(UserDTO userDto)
         {
             try
             {
-                var existingUser = await _userManager.FindByEmailAsync(user.Email);
+                var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
+
                 if (existingUser != null)
                 {
                     throw new EntityAlreadyExistsException("A user with this email already exists.");
                 }
 
+                var role = await _userRepository.GetRoleByNameAsync(userDto.RoleName);
+
+                if (role== null)
+                {
+                    _logger.LogWarning($"Role with name {userDto.RoleName} not found");
+                    throw new EntityNotFoundException($"Role with name {userDto.RoleName} not found");
+                }
+
+                var mapper = new UserMapperBLL();
+
+                // С DTO на объект пользователя
+                var user = mapper.UserDtoToUser(userDto);
+
+                user.RoleId = role.Id;
+
                 var result = await _userManager.CreateAsync(user, user.PasswordHash);
+                
                 if (!result.Succeeded)
                 {
+                    // NEED TO FIX не отображает ошибку
                     _logger.LogError(string.Join($"Failed to create the user. Errors:", result.Errors.Select(e => e.Description)));
                     throw new ValidationErrorException("Failed to create the user. Errors:");
                 }
 
-                // NEED TO REFACTOR на ишью маппинга
-                await _userManager.AddToRoleAsync(user, "User");
-                return user;
+                await _userManager.AddToRoleAsync(user, userDto.RoleName);
+
+                // С объекта нового пользователя на DTO
+                var newUser = mapper.UserToGetUserDto(user);
+
+                return newUser;
             }
             catch (ApiException)
             {
@@ -264,25 +287,24 @@ namespace CarStockBLL.Services
         /// Получает список пользователей и список их ролей из базы данных
         /// </summary>
         /// <returns>Список пользователей с их ролями</returns>
-        public async Task<List<(User user, List<string> roles)>> GetAllUsersAsync()
+        public async Task<List<GetUserDTOdraft>> GetAllUsersAsync()
         {
-            //С вложенным списком для ролей
+            
             try
             {
-                var users = _userManager.Users.ToList();
+                var users = await _userManager.Users
+                    .Include(u => u.Role) // Связные роли
+                    .ToListAsync();
 
-                var result = new List<(User user, List<string> roles)>();
+                var mapper = new UserMapperBLL();
+                
+                // К каждому элементу из списка применяется маппер
+                var result = users.Select(mapper.UserToGetUserDto).ToList();
 
-                foreach (var user in users)
-                {
-                    // Получить роли для каждого пользователя
-                    var roles = await _userManager.GetRolesAsync(user);
-                    result.Add((user, roles.ToList())); // Добавить пользователя и его роли в результат
-                }
                 if (result == null)
                 {
-                    _logger.LogError("Failed to retrieve user roles");
-                    throw new ApiException("Failed to retrieve user roles");
+                    _logger.LogError("Failed to retrieve users");
+                    throw new ApiException("Failed to retrieve users");
                 }
 
                 return result;

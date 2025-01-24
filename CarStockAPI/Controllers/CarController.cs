@@ -1,8 +1,8 @@
 ﻿using CarStockBLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using CarStockBLL.DTO;
 using CarStockBLL.Map;
+using CarStockBLL.DTO.Car;
 
 namespace CarStockAPI.Controllers
 {

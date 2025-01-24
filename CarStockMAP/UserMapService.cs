@@ -85,24 +85,6 @@ namespace CarStockMAP
         /// </summary>
         /// <param name="createUserDTO">Данные добавляемого пользователя</param>
         /// <returns>Новый пользователь</returns>
-        public async Task<CreateUserDTO> CreateMappedUserAsync(CreateUserDTO createUserDTO)
-        {
-            try
-            {
-                if (createUserDTO == null) 
-                {
-                    throw new ValidationErrorException("Invalid data");
-                }
-                    var mapper = new UserMapper();
-                var user = mapper.MapCreateUserDtoToUser(createUserDTO);
-                var result = await _userService.CreateUserAsync(user);
-                return mapper.MapUserToCreateUserDto(result);
-            }
-            catch (Exception) 
-            {
-                throw;
-            }
-        }
 
         /// <summary>
         /// Вызывает UserService для поиска пользователя по почте, результат маппит на пользователя с списком его ролей
@@ -110,62 +92,15 @@ namespace CarStockMAP
         /// <param name="email">Почта пользователя</param>
         /// <returns>Пользователь и список ролей</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<GetUsersDTO> GetMappedUserAsync(string email)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(email))
-                {
-                    throw new ValidationErrorException("Invalid data");
-                }
-                var mapper = new UserMapper();
-                // Получить пользователя и его роли
-                var userWithRoles = await _userService.GetUserAsync(email);
-                if (userWithRoles == null)
-                {
-                    throw new EntityNotFoundException($"User with email '{email}' was not found.");
-                }
-                // Извлечь пользователя и роли
-                var user = userWithRoles.Value.user;
-                var roles = userWithRoles.Value.roles;
-                var userDto = mapper.MapUserToGetUsersDto(user);
-                userDto.Roles = roles;
-                return userDto;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+       
+        
 
         /// <summary>
         /// Вызывает UserService для получения списка пользователей и их ролей, результат
         /// маппит на DTO пользователя
         /// </summary>
         /// <returns>Список пользователей с их ролями</returns>
-        public async Task<IEnumerable<GetUsersDTO>> GetMappedUsersAsync()
-        {
-            try
-            {
-                var mapper = new UserMapper();
-                var userDtos = new List<GetUsersDTO>();
-                // Получить пользователей с ролями
-                var usersWithRoles = await _userService.GetAllUsersAsync();
-                foreach (var (user, roles) in usersWithRoles)
-                {
-                    // Смаппить пользователя на DTO
-                    var userDto = mapper.MapUserToGetUsersDto(user);
-                    // Добавить роли внутри списка DTO
-                    userDto.Roles = roles;
-                    userDtos.Add(userDto);
-                }
-                return userDtos;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+      
 
         /// <summary>
         /// Маппит DTO обновленного пользователя на User, передает в UserService

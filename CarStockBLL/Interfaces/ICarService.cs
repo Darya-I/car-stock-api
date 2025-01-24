@@ -1,4 +1,4 @@
-﻿using CarStockBLL.DTO;
+﻿using CarStockBLL.DTO.Car;
 using CarStockDAL.Models;
 
 
