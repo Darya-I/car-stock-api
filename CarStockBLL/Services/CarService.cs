@@ -81,7 +81,7 @@ namespace CarStockBLL.Services
 
                 _logger.LogInformation($"Car with ID {id} successfully retrieved.");
 
-                var mapper = new CarMapperBLL();
+                var mapper = new CarMapper();
 
                 var result = mapper.CarToGetCarDto(car);
 
@@ -128,7 +128,7 @@ namespace CarStockBLL.Services
                 
                 _logger.LogInformation($"Car with ID {car.Id} successfully updated.");
 
-                var mapper = new CarMapperBLL();
+                var mapper = new CarMapper();
 
                 return (mapper.CarToCarDto(car));
             }
@@ -184,7 +184,7 @@ namespace CarStockBLL.Services
             {
                 var cars = await _carRepository.GetAllCarsAsync();
                 var carsDto = cars.Any() ? cars : Enumerable.Empty<Car>();
-                var mapper = new CarMapperBLL();
+                var mapper = new CarMapper();
 
                 // К каждому элементу из списка применяется маппер
                 return carsDto.Select(mapper.CarToGetCarDto).ToList();
@@ -226,7 +226,7 @@ namespace CarStockBLL.Services
                     IsAvailable = car.IsAvailable,
                 };
 
-                var mapper = new CarMapperBLL();
+                var mapper = new CarMapper();
 
                 await _carRepository.CreateCarAsync(newCar);
 
@@ -272,7 +272,7 @@ namespace CarStockBLL.Services
 
                 await _carRepository.UpdateCarAsync(existingCar);
 
-                var mapper = new CarMapperBLL();
+                var mapper = new CarMapper();
 
                 var result = mapper.CarAvailabilityUpdateDTO(existingCar);
 
@@ -318,7 +318,7 @@ namespace CarStockBLL.Services
 
                 await _carRepository.UpdateCarAsync(existingCar);
                 
-                var mapper = new CarMapperBLL();
+                var mapper = new CarMapper();
 
                 return mapper.CarAmountToDto(existingCar);
             }

@@ -64,7 +64,7 @@ namespace CarStockAPI.Controllers
         {
             _logger.LogInformation("Attempting to create car");
 
-            var mapper = new CarMapperBLL();
+            var mapper = new CarMapper();
             
             var car = mapper.CarDtoToCar(carDto);
 
@@ -108,7 +108,7 @@ namespace CarStockAPI.Controllers
                 return BadRequest("Invalid data.");
             }
 
-            var mapper = new CarMapperBLL();
+            var mapper = new CarMapper();
             var car = mapper.CarDtoToCar(carDTO);
             var updatedCar = await _carService.UpdateCarAsync(car);
 

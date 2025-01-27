@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions;
 namespace CarStockBLL.Map
 {
     [Mapper]
-    public partial class CarMapperBLL
+    public partial class CarMapper
     {
         /// <summary>
         /// Маппинг с объекта автомобиля на DTO

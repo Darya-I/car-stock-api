@@ -1,7 +1,7 @@
 ﻿namespace CarStockBLL.DTO.Car
 {
     /// <summary>
-    /// DTO автомобиля с названиями
+    /// DTO автомобиля с названиями для представления
     /// </summary>
     public class GetCarDTO
     {

@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using CarStockBLL.CustomException;
+using CarStockBLL.DTO.Auth;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Map;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
@@ -54,25 +56,25 @@ namespace CarStockBLL.Services
         /// <summary>
         /// Аутентифицирует пользователя и генерирует токены
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Пользователь и access токен</returns>
-        public async Task<(User, string AccessToken)> Authenticate(User user)
+        /// <param name="requestDTO">DTO входа пользователя</param>
+        /// <returns>Токены</returns>
+        public async Task<LoginResponseDTO> Authenticate(LoginRequestDTO requestDTO)
         {
             try
             {
-                var userFromDb = await _userRepository.GetUserByUsernameAsync(user.Email);
+                var userFromDb = await _userRepository.GetUserByUsernameAsync(requestDTO.Email);
                 if (userFromDb == null)
                 {
-                    _logger.LogWarning($"User with email {user.Email} not found.");
+                    _logger.LogWarning($"User with email {requestDTO.Email} not found.");
                     throw new InvalidUserDataException("Invalid email.");
                 }
-                if (!await _userManager.CheckPasswordAsync(userFromDb, user.PasswordHash))
+                if (!await _userManager.CheckPasswordAsync(userFromDb, requestDTO.Password))
                 {
                     throw new InvalidUserDataException("Invalid password.");
                 }
 
                 // Получить роль
-                var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
+                var role = await _userRepository.GetUserRoleAsync(userFromDb.RoleId);
 
                 // Получить клеймы для пользователя и его роли
                 var claims = AssignClaim(userFromDb, role);
@@ -86,7 +88,11 @@ namespace CarStockBLL.Services
 
                 await _userRepository.UpdateUserAsync(userFromDb);
 
-                return (userFromDb, accessToken);
+                return new LoginResponseDTO
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                };
             }
             catch (ApiException)
             {
@@ -108,7 +114,17 @@ namespace CarStockBLL.Services
         {
             try
             {
-                return await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
+                var user = await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
+                if (user == null) 
+                {
+                    _logger.LogWarning($"User with refresh token {refreshToken} not found");
+                    throw new EntityNotFoundException($"User with refresh token {refreshToken} not found");
+                }
+                return user;
+            }
+            catch (ApiException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -121,13 +137,29 @@ namespace CarStockBLL.Services
         /// Обновляет refresh токен пользователя в базе данных
         /// </summary>
         /// <param name="user">Пользователь</param>
-        public async Task UpdateRefreshTokenAsync(User user)
+        /// <returns>Refresh токен и дату истечения</returns>
+        public async Task<RefreshTokenResponseDTO> UpdateRefreshTokenAsync(User user)
         {
             try
             {
+                // Получить роль
+                var role = await _userRepository.GetUserRoleAsync(user.RoleId);
+
+                // Получить клеймы для пользователя и его роли
+                var claims = AssignClaim(user, role);
+
+                var accessToken = _tokenService.GetAccessToken(claims, out var expires);
+
                 var newRefreshToken = _tokenService.GetRefreshToken();
                 var refreshTokenExpireTime = DateTime.UtcNow.AddDays(1);
                 await _userRepository.UpdateRefreshTokenAsync(user, newRefreshToken, refreshTokenExpireTime);
+                
+                return new RefreshTokenResponseDTO 
+                { 
+                    Token = accessToken,
+                    Expires = expires 
+                };
+
             }
 
             catch (Exception ex)
@@ -140,16 +172,23 @@ namespace CarStockBLL.Services
         /// <summary>
         /// Создает при необходимости и аутентифицирует пользователя от Гугла
         /// </summary>
-        /// <param name="user">Пользователь</param>
+        /// <param name="userDto">DTO пользователя от Гугла</param>
         /// <returns>Access токен</returns>
-        public async Task<string> ProcessGoogle(User user)
+        public async Task<string> ProcessGoogle(GoogleLoginRequestDTO userDto)
         {
             try
             {
-                var userFromDb = await _userRepository.GetUserByEmailAsync(user.Email);
+                var mapper = new UserMapper();
+                var user = mapper.GoogleDtoToUser(userDto);
+
+                var userFromDb = await _userRepository.GetUserByEmailAsync(userDto.Email);
+
+                // Создать пользователя, если его нет
                 if (userFromDb == null)
                 {
-                    // Создать пользователя, если его нет
+                    // Добавить пользователя к роли "User"
+                    user.RoleId = 2;
+                    
                     var creationResult = await _userManager.CreateAsync(user);
                     if (!creationResult.Succeeded)
                     {
@@ -159,9 +198,6 @@ namespace CarStockBLL.Services
                     }
 
                     userFromDb = user;
-                    // NEED TO REFACTOR на ишью маппинга
-                    await _userManager.AddToRoleAsync(user, "User");
-                    
                 }
 
                 if (userFromDb == null)
@@ -171,7 +207,7 @@ namespace CarStockBLL.Services
                 }
 
                 // Получить роль
-                var role = await _userRepository.GetUserRolesAsync(userFromDb.RoleId);
+                var role = await _userRepository.GetUserRoleAsync(userFromDb.RoleId);
 
                 // Получить клеймы для пользователя и его роли
                 var claims = AssignClaim(userFromDb, role);

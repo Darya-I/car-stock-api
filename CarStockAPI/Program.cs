@@ -4,7 +4,6 @@ using CarStockBLL.Interfaces;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
 using CarStockDAL.Models;
-using CarStockMAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -68,8 +67,6 @@ builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICarModelService, CarModelService>();
 builder.Services.AddScoped<IColorService, ColorService>();
 
-
-builder.Services.AddScoped<UserMapService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();

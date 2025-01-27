@@ -1,9 +1,9 @@
-﻿namespace CarStockMAP.DTO.Auth
+﻿namespace CarStockBLL.DTO.Auth
 {
     /// <summary>
-    /// DTO пользователя от Гугла
+    /// DTO авторизованного от Гугла пользователя
     /// </summary>
-    public class GoogleUserDTO
+    public class GoogleLoginRequestDTO
     {
         /// <summary>
         /// Гугл-почта пользователя

@@ -1,12 +1,12 @@
-﻿namespace CarStockMAP.DTO.User
+﻿namespace CarStockBLL.DTO.User
 {
     /// <summary>
-    /// DTO для обновления данных пользователя.
+    /// DTO для обновления данных пользователя
     /// </summary>
     public class UpdateUserDTO
     {
         /// <summary>
-        /// Новый почты пользователя
+        /// Новая почта пользователя
         /// </summary>
         public string? Email { get; set; }
 
@@ -21,8 +21,8 @@
         public string? UserName { get; set; }
 
         /// <summary>
-        /// Назначаемая или обновляемая роль пользователя
+        /// Идентификатор новой роли пользователя
         /// </summary>
-        public string? Role { get; set; }
+        public int RoleId { get; set; }
     }
 }

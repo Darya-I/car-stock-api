@@ -51,6 +51,11 @@ namespace CarStockDAL.Models
         public bool CanDeleteUser { get; set; } = false;
 
         /// <summary>
+        /// Допустимость редактирования только некоторых полей пользователя
+        /// </summary>
+        public bool CanEditAccount { get; set; } = true;
+
+        /// <summary>
         /// Связные пользователи
         /// </summary>
         [JsonIgnore]
@@ -71,7 +76,8 @@ namespace CarStockDAL.Models
                 { "CanCreateUser", CanCreateUser },
                 { "CanViewUser", CanViewUser },
                 { "CanEditUser", CanEditUser },
-                { "CanDeleteUser", CanDeleteUser }
+                { "CanDeleteUser", CanDeleteUser },
+                { "CanEditAccount", CanEditAccount }
             };
         }
     }

@@ -1,24 +1,12 @@
 ﻿namespace CarStockBLL.DTO.User
 {
     /// <summary>
-    /// DTO для создания или обновления пользователя
+    /// Общее DTO пользователя для регистрации и редактирования данных
     /// </summary>
     public class UserDTO
     {
-        /// <summary>
-        /// Почта пользователя
-        /// </summary>
         public string Email { get; set; }
-
-        /// <summary>
-        /// Пароль пользователя
-        /// </summary>
-        public string Password { get; set; }
-
-        /// <summary>
-        /// Роль пользователя
-        /// </summary>
-        public string RoleName { get; set; }
+        public string UserName { get; set; }
+        public string? Password { get; set; } // При регистрации пароль валидируется
     }
-
 }

@@ -45,10 +45,9 @@ namespace CarStockDAL.Data.Interfaces
         /// <summary>
         /// Получает роль пользователя
         /// </summary>
-        /// <param name="id">Идентификатор пользователя</param>
+        /// <param name="id">Идентификатор роли</param>
         /// <returns>Роль</returns>
-        Task<Role> GetUserRolesAsync(int? id);
+        Task<Role> GetUserRoleAsync(int id);
 
-        Task<Role?> GetRoleByNameAsync(string roleName);
     }
 }

@@ -1,9 +1,9 @@
 ﻿namespace CarStockBLL.DTO.User
 {
     /// <summary>
-    /// DTO для представления пользователя и его ролей
+    /// DTO для представления пользователя и его роли
     /// </summary>
-    public class GetUserDTOdraft
+    public class GetUserDTO
     {
         /// <summary>
         /// Почта пользователя
