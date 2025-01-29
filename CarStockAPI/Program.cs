@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Data.Repositories;
 using CarStockAPI.Configs;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,8 +45,39 @@ builder.Host.UseSerilog((context, services, configuration) =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Настройка в сваггере для авторизации
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(name: JwtBearerDefaults.AuthenticationScheme,
+        securityScheme: new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Description = "Enter the Bearer authorization : `Bearer Generated-JWT-Token`",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = JwtBearerDefaults.AuthenticationScheme
+            }
+        },
+
+        new string[] {}
+        }
+    });
+}
+);
+
 builder.Services.AddControllers();
+
 
 builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
@@ -149,19 +181,21 @@ builder.Services.AddAuthorization(options =>
 
 // для откладки пока не используется чтоб потрогать гугл
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-
+var allowedHeaders = builder.Configuration.GetSection("Cors:AllowedHeaders").Get<string[]>();
+var allowedMethods = builder.Configuration.GetSection("Cors:AllowedMethods").Get<string[]>();
 builder.Services.AddCors(options =>
-options.AddPolicy("CorsPolicy", policy =>
 {
-    policy.AllowAnyMethod()
-    .AllowAnyHeader()
-    .AllowAnyOrigin();
-    //WithOrigins(allowedOrigins);
-})
-    );
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithMethods(allowedMethods)
+        .WithHeaders(allowedHeaders)
+        .WithOrigins(allowedOrigins);
+    });
+});
 
 var app = builder.Build();
 
+app.UseCors("CorsPolicy");
 app.UseMiddleware<BussinessExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -172,7 +206,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("CorsPolicy");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
