@@ -7,8 +7,6 @@ using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using CarStockBLL.CustomExceptions.IdentityErrorsHandle;
 
 namespace CarStockBLL.Services
 {
@@ -33,19 +31,27 @@ namespace CarStockBLL.Services
         private readonly ILogger<IUserService> _logger;
 
         /// <summary>
+        /// Экземпляр маппера
+        /// </summary>
+        private readonly UserMapper _mapper;
+
+        /// <summary>
         /// Инициализирует новый экземпляр сервиса операций над пользователями
         /// </summary>
         /// <param name="userManager">Менеджер управления пользователями</param>
         /// <param name="userRepository">Репозиторий доступа к пользователям</param>
         /// <param name="logger">Логгер</param>
+        /// <param name="mapper">Маппер для модели пользователя</param>
         public UserService(
             UserManager<User> userManager,
             IUserRepository userRepository,
-            ILogger<IUserService> logger) 
+            ILogger<IUserService> logger,
+            UserMapper mapper) 
         {
             _userManager = userManager;   
             _userRepository = userRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -62,9 +68,8 @@ namespace CarStockBLL.Services
                 {
                     throw new EntityNotFoundException($"User with email '{email}' was not found.");
                 }
-                var mapper = new UserMapper();
 
-                return mapper.UserToGetUserDto(user);
+                return _mapper.UserToGetUserDto(user);
             }
             catch (Exception ex)
             {
@@ -97,31 +102,19 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException($"Role with Id {userDto.RoleId} not found");
                 }
 
-                var mapper = new UserMapper();
-
                 // С DTO на объект пользователя
-                var user = mapper.UserDtoToUser(userDto);
+                var user = _mapper.UserDtoToUser(userDto);
 
                 var result = await _userManager.CreateAsync(user, user.PasswordHash);
                 
                 if (!result.Succeeded)
                 {
-                    var identityHandler = new IdentityValidationHandle();
-
-                    var passwordErrors = identityHandler.ExtractPasswordValidationErrors(result);
-
-                    if (passwordErrors.Any())
-                    {
-                        _logger.LogWarning($"Password validation failed: , {string.Join(" ", passwordErrors.Select(e => e.Description))}");
-                        throw new ValidationErrorException($"Password validation failed: , {string.Join(", ", passwordErrors.Select(e => e.Description))}");
-                    }
-
                     _logger.LogError(string.Join($"Failed to create the user. Errors:", result.Errors.Select(e => e.Description)));
                     throw new ApiException("Failed to create the user. Errors:");
                 }
 
                 // С объекта нового пользователя на DTO
-                var newUser = mapper.UserToGetUserDto(user);
+                var newUser = _mapper.UserToGetUserDto(user);
 
                 return newUser;
             }
@@ -139,23 +132,18 @@ namespace CarStockBLL.Services
         /// <summary>
         /// Создает нового пользователя и назначает ему роль User
         /// </summary>
-        /// <param name="userDto"></param>
+        /// <param name="user">Пользователь</param>
         /// <returns>DTO представления созданного пользователя</returns>
-        public async Task<GetUserDTO> RegisterUser(UserDTO userDto) 
+        public async Task<GetUserDTO> RegisterUser(User user) 
         {
             try
             {
-                var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
+                var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
                 if (existingUser != null)
                 {
                     throw new EntityAlreadyExistsException("A user with this email already exists.");
                 }
-
-                var mapper = new UserMapper();
-
-                // С DTO на объект пользователя
-                var user = mapper.RegisterDtoToUser(userDto);
 
                 // Присваиваем роль "User" (объектом, чтобы потом сделать обратный маппинг)
                 user.Role = await _userRepository.GetUserRoleAsync(2);
@@ -164,21 +152,12 @@ namespace CarStockBLL.Services
 
                 if (!result.Succeeded)
                 {
-                    var identityHandler = new IdentityValidationHandle();
-
-                    var passwordErrors = identityHandler.ExtractPasswordValidationErrors(result);
-
-                    if (passwordErrors.Any())
-                    {
-                        _logger.LogWarning($"Password validation failed: , {string.Join(" ", passwordErrors.Select(e => e.Description))}");
-                        throw new ValidationErrorException($"Password validation failed: , {string.Join(", ", passwordErrors.Select(e => e.Description))}");
-                    }
                     _logger.LogError(string.Join($"Failed to register the user. Errors:", result.Errors.Select(e => e.Description)));
                     throw new ApiException("Failed to register the user. Errors:");
                 }
 
                 // С объекта нового пользователя на DTO
-                var newUser = mapper.UserToGetUserDto(user);
+                var newUser = _mapper.UserToGetUserDto(user);
 
                 return newUser;
             }
@@ -192,7 +171,6 @@ namespace CarStockBLL.Services
                 throw;
             }
         }
-
 
         /// <summary>
         /// Удаляет пользователя из базы данных
@@ -238,8 +216,7 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException("A user with this email does not exist.");
                 }
 
-                var mapper = new UserMapper();
-                var user = mapper.UpadateDtoToUser(userDto);
+                var user = _mapper.UpadateDtoToUser(userDto);
 
                 // Проверка и обновление роли
                 if (user.RoleId > 0 && existingUser.RoleId != user.RoleId)
@@ -272,16 +249,6 @@ namespace CarStockBLL.Services
                     
                     var passwordResult = await _userManager.ResetPasswordAsync(existingUser, token, userDto.Password);
 
-                    var identityHandler = new IdentityValidationHandle();
-
-                    var passwordErrors = identityHandler.ExtractPasswordValidationErrors(passwordResult);
-
-                    if (passwordErrors.Any())
-                    {
-                        _logger.LogWarning($"Password validation failed: , {string.Join(" ", passwordErrors.Select(e => e.Description))}");
-                        throw new ValidationErrorException($"Password validation failed: , {string.Join(", ", passwordErrors.Select(e => e.Description))}");
-                    }
-
                     if (!passwordResult.Succeeded)
                     {
                         _logger.LogError($"Failed to update user's password: {string.Join(", ", passwordResult.Errors.Select(e => e.Description))}");
@@ -298,7 +265,7 @@ namespace CarStockBLL.Services
                     throw new ApiException("Failed to update user.");
                 }
 
-                return mapper.UserToGetUserDto(existingUser);
+                return _mapper.UserToGetUserDto(existingUser);
             }
             catch (ApiException)
             {
@@ -324,11 +291,9 @@ namespace CarStockBLL.Services
                 var users = await _userManager.Users
                     .Include(u => u.Role) // Связные роли
                     .ToListAsync();
-
-                var mapper = new UserMapper();
                 
                 // К каждому элементу из списка применяется маппер
-                var result = users.Select(mapper.UserToGetUserDto).ToList();
+                var result = users.Select(_mapper.UserToGetUserDto).ToList();
 
                 if (result == null)
                 {
@@ -349,21 +314,18 @@ namespace CarStockBLL.Services
         /// <summary>
         /// Обновляет только некоторые данные пользователя
         /// </summary>
-        /// <param name="userDto">Пользователь</param>
+        /// <param name="user">Пользователь</param>
         /// <returns>DTO представления обновленного пользователя</returns>
-        public async Task<GetUserDTO> UpdateUserAccount(UserDTO userDto)
+        public async Task<GetUserDTO> UpdateUserAccount(User user)
         {
             try
             {
-                var existingUser = await _userRepository.GetUserByEmailAsync(userDto.Email);
+                var existingUser = await _userRepository.GetUserByEmailAsync(user.Email);
 
                 if (existingUser == null)
                 {
                     throw new EntityNotFoundException("A user with this email does not exist.");
                 }
-
-                var mapper = new UserMapper();
-                var user = mapper.RegisterDtoToUser(userDto);
 
                 // Проверка и обновление имени пользователя
                 if (!string.IsNullOrEmpty(user.UserName) && user.UserName != existingUser.UserName)
@@ -372,22 +334,12 @@ namespace CarStockBLL.Services
                 }
 
                 // Обновление пароля (если передан новый пароль)
-                if (!string.IsNullOrEmpty(userDto.Password))
+                if (!string.IsNullOrEmpty(user.PasswordHash))
                 {
                     var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
 
-                    var passwordResult = await _userManager.ResetPasswordAsync(existingUser, token, userDto.Password);
-
-                    var identityHandler = new IdentityValidationHandle();
-
-                    var passwordErrors = identityHandler.ExtractPasswordValidationErrors(passwordResult);
-
-                    if (passwordErrors.Any())
-                    {
-                        _logger.LogWarning($"Password validation failed: , {string.Join(" ", passwordErrors.Select(e => e.Description))}");
-                        throw new ValidationErrorException($"Password validation failed: , {string.Join(", ", passwordErrors.Select(e => e.Description))}");
-                    }
-
+                    var passwordResult = await _userManager.ResetPasswordAsync(existingUser, token, user.PasswordHash);
+                    
                     if (!passwordResult.Succeeded)
                     {
                         _logger.LogError($"Failed to update user's password: {string.Join(", ", passwordResult.Errors.Select(e => e.Description))}");
@@ -404,7 +356,7 @@ namespace CarStockBLL.Services
                     throw new ApiException("Failed to update user.");
                 }
 
-                return mapper.UserToGetUserDto(existingUser);
+                return _mapper.UserToGetUserDto(existingUser);
             }
             catch (ApiException)
             {

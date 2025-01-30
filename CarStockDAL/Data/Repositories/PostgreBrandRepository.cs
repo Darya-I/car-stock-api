@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using CarStockDAL.Data.Interfaces;
+﻿using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 

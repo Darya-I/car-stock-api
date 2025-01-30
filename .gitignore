@@ -9,6 +9,13 @@ CarStockAPI/appsettings.json
 # Database-specific directories
 CarStockDAL/Migrations/
 
+# Redundant files
+CarStockBLL/Program.cs
+CarStockBLL/appsettings.json
+CarStockDAL/Program.cs
+CarStockDAL/appsettings.json
+
+
 # User-specific files
 *.rsuser
 *.suo
@@ -404,3 +411,5 @@ FodyWeavers.xsd
 *.sln.iml
 /CarStockBLL/Interfaces/IJwtInterface.cs
 /CarStockBLL/Services/JwtService.cs
+/CarStockBLL/Program.cs
+/CarStockDAL/Program.cs

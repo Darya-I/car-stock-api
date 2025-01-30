@@ -13,27 +13,27 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="refreshToken">Значение refresh токена</param>
         /// <returns>Пользователь</returns>
-        Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
+        Task<User> GetUserByRefreshTokenAsync(string refreshToken);
 
         /// <summary>
         /// Обновляет refresh токен пользователя в базе данных
         /// </summary>
         /// <param name="user">Пользователь</param>
         /// <returns>Refresh токен и дату истечения</returns>
-        Task<RefreshTokenResponseDTO> UpdateRefreshTokenAsync(User user);
+        Task<RefreshTokenResponse> UpdateRefreshTokenAsync(User user);
 
         /// <summary>
         /// Аутентифицирует пользователя и генерирует токены
         /// </summary>
         /// <param name="requestDTO">DTO входа пользователя</param>
         /// <returns>Токены</returns>
-        Task<LoginResponseDTO> Authenticate(LoginRequestDTO requestDTO);
+        Task<AuthResponse> Authenticate(User user);
 
         /// <summary>
         /// Создает при необходимости и аутентифицирует пользователя от Гугла
         /// </summary>
         /// <param name="userDto">DTO пользователя от Гугла</param>
         /// <returns>Access токен</returns>
-        Task<string> ProcessGoogle(GoogleLoginRequestDTO userDto);
+        Task<string> ProcessGoogle(User user);
     }
 }

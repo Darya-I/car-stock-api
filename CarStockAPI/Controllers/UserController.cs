@@ -61,7 +61,7 @@ namespace CarStockAPI.Controllers
             _logger.LogInformation($"Attempting to delete user with email: {email}");
             await _userService.DeleteUserAsync(email);
             _logger.LogInformation("Deleting user successful");
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>

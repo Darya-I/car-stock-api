@@ -41,11 +41,10 @@ namespace CarStockBLL.Services
         /// <param name="userRepository">Репозиторий доступа к пользователям</param>
         /// <param name="tokenService">Сервис работы с токенами</param>
         /// <param name="logger">Логгер</param>
-        public AuthorizeUserService(
-            UserManager<User> userManager,
-            IUserRepository userRepository,
-            ITokenService tokenService,
-            ILogger<IAuthorizeUserService> logger)
+        public AuthorizeUserService(UserManager<User> userManager,
+                                    IUserRepository userRepository,
+                                    ITokenService tokenService,
+                                    ILogger<IAuthorizeUserService> logger)
         {
             _userManager = userManager;
             _userRepository = userRepository;
@@ -58,17 +57,17 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="requestDTO">DTO входа пользователя</param>
         /// <returns>Токены</returns>
-        public async Task<LoginResponseDTO> Authenticate(LoginRequestDTO requestDTO)
+        public async Task<AuthResponse> Authenticate(User user)
         {
             try
             {
-                var userFromDb = await _userRepository.GetUserByUsernameAsync(requestDTO.Email);
+                var userFromDb = await _userRepository.GetUserByUsernameAsync(user.Email);
                 if (userFromDb == null)
                 {
-                    _logger.LogWarning($"User with email {requestDTO.Email} not found.");
+                    _logger.LogWarning($"User with email {user.Email} not found.");
                     throw new InvalidUserDataException("Invalid email.");
                 }
-                if (!await _userManager.CheckPasswordAsync(userFromDb, requestDTO.Password))
+                if (!await _userManager.CheckPasswordAsync(userFromDb, user.PasswordHash))
                 {
                     throw new InvalidUserDataException("Invalid password.");
                 }
@@ -88,7 +87,7 @@ namespace CarStockBLL.Services
 
                 await _userRepository.UpdateUserAsync(userFromDb);
 
-                return new LoginResponseDTO
+                return new AuthResponse
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
@@ -110,7 +109,7 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="refreshToken">Значение refresh токена</param>
         /// <returns>Пользователь</returns>
-        public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
+        public async Task<User> GetUserByRefreshTokenAsync(string refreshToken)
         {
             try
             {
@@ -138,7 +137,7 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="user">Пользователь</param>
         /// <returns>Refresh токен и дату истечения</returns>
-        public async Task<RefreshTokenResponseDTO> UpdateRefreshTokenAsync(User user)
+        public async Task<RefreshTokenResponse> UpdateRefreshTokenAsync(User user)
         {
             try
             {
@@ -154,7 +153,7 @@ namespace CarStockBLL.Services
                 var refreshTokenExpireTime = DateTime.UtcNow.AddDays(1);
                 await _userRepository.UpdateRefreshTokenAsync(user, newRefreshToken, refreshTokenExpireTime);
                 
-                return new RefreshTokenResponseDTO 
+                return new RefreshTokenResponse 
                 { 
                     Token = accessToken,
                     Expires = expires 
@@ -174,14 +173,11 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="userDto">DTO пользователя от Гугла</param>
         /// <returns>Access токен</returns>
-        public async Task<string> ProcessGoogle(GoogleLoginRequestDTO userDto)
+        public async Task<string> ProcessGoogle(User user)
         {
             try
             {
-                var mapper = new UserMapper();
-                var user = mapper.GoogleDtoToUser(userDto);
-
-                var userFromDb = await _userRepository.GetUserByEmailAsync(userDto.Email);
+                var userFromDb = await _userRepository.GetUserByEmailAsync(user.Email);
 
                 // Создать пользователя, если его нет
                 if (userFromDb == null)

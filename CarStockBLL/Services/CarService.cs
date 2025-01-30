@@ -38,6 +38,11 @@ namespace CarStockBLL.Services
         private readonly ILogger<CarService> _logger;
 
         /// <summary>
+        /// Экземпляр маппера
+        /// </summary>
+        private readonly CarMapper _mapper;
+
+        /// <summary>
         /// Инициализирует новый экземпляр сервиса операций над автомобилями
         /// </summary>
         /// <param name="carRepository">Репозиторий доступа к автомобилям</param>
@@ -45,18 +50,21 @@ namespace CarStockBLL.Services
         /// <param name="carModelService">Сервис операций над моделями автомобиля</param>
         /// <param name="colorService">Сервис операций над цветом автомобиля</param>
         /// <param name="logger">Логгер</param>
+        /// <param name="mapper">Маппер</param>
         public CarService(
             ICarRepository<Car> carRepository, 
             IBrandService brandService, 
             ICarModelService carModelService, 
             IColorService colorService,
-            ILogger<CarService> logger)
+            ILogger<CarService> logger,
+            CarMapper mapper)
         {
             _carRepository = carRepository;
             _brandService = brandService;
             _carModelService = carModelService;
             _colorService = colorService;
             _logger = logger;
+            _mapper = mapper;
         }
 
 
@@ -81,9 +89,7 @@ namespace CarStockBLL.Services
 
                 _logger.LogInformation($"Car with ID {id} successfully retrieved.");
 
-                var mapper = new CarMapper();
-
-                var result = mapper.CarToGetCarDto(car);
+                var result = _mapper.CarToGetCarDto(car);
 
                 return result;
 
@@ -128,9 +134,7 @@ namespace CarStockBLL.Services
                 
                 _logger.LogInformation($"Car with ID {car.Id} successfully updated.");
 
-                var mapper = new CarMapper();
-
-                return (mapper.CarToCarDto(car));
+                return (_mapper.CarToCarDto(car));
             }
             catch (ApiException)
             {
@@ -184,10 +188,9 @@ namespace CarStockBLL.Services
             {
                 var cars = await _carRepository.GetAllCarsAsync();
                 var carsDto = cars.Any() ? cars : Enumerable.Empty<Car>();
-                var mapper = new CarMapper();
 
                 // К каждому элементу из списка применяется маппер
-                return carsDto.Select(mapper.CarToGetCarDto).ToList();
+                return carsDto.Select(_mapper.CarToGetCarDto).ToList();
             }
             catch (Exception ex)
             {
@@ -211,7 +214,9 @@ namespace CarStockBLL.Services
                 var carModel = await _carModelService.GetCarModelByIdAsync(car.CarModelId);
                 var color = await _colorService.GetColorByIdAsync(car.ColorId);
 
-                if (await _carRepository.CarExistAsync(brand.Id, carModel.Id, color.Id))
+                var carExist = await _carRepository.CarExistAsync(brand.Id, carModel.Id, color.Id);
+
+                if (carExist)
                 {
                     _logger.LogWarning("This car already exist");
                     throw new EntityAlreadyExistsException("The car already exist");
@@ -226,14 +231,12 @@ namespace CarStockBLL.Services
                     IsAvailable = car.IsAvailable,
                 };
 
-                var mapper = new CarMapper();
-
                 await _carRepository.CreateCarAsync(newCar);
 
                 _logger.LogInformation($"Car with ID {newCar.Id} successfully created.");
 
                 // Из Model в DTO
-                var result = mapper.CarToCarDto(newCar);
+                var result = _mapper.CarToCarDto(newCar);
 
                 return result;
               
@@ -272,9 +275,7 @@ namespace CarStockBLL.Services
 
                 await _carRepository.UpdateCarAsync(existingCar);
 
-                var mapper = new CarMapper();
-
-                var result = mapper.CarAvailabilityUpdateDTO(existingCar);
+                var result = _mapper.CarAvailabilityUpdateDTO(existingCar);
 
                 return result;
             }
@@ -315,12 +316,9 @@ namespace CarStockBLL.Services
 
                 existingCar.Amount = amount;
 
-
                 await _carRepository.UpdateCarAsync(existingCar);
-                
-                var mapper = new CarMapper();
 
-                return mapper.CarAmountToDto(existingCar);
+                return _mapper.CarAmountToDto(existingCar);
             }
             catch (ApiException)
             {

@@ -46,13 +46,13 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="userDto"></param>
         /// <returns>DTO представления созданного пользователя</returns>
-        Task<GetUserDTO> RegisterUser(UserDTO userDto);
+        Task<GetUserDTO> RegisterUser(User user);
 
         /// <summary>
         /// Обновляет только некоторые данные пользователя
         /// </summary>
         /// <param name="userDto">Пользователь</param>
         /// <returns>DTO представления обновленного пользователя</returns>
-        Task<GetUserDTO> UpdateUserAccount(UserDTO userDto);
+        Task<GetUserDTO> UpdateUserAccount(User user);
     }
 }

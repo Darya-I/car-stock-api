@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CarStockBLL.DTO.User
+namespace CarStockBLL.DTO.Account
 {
     /// <summary>
-    /// DTO для создания пользователя
+    /// Модель запроса пользователя на регистрацию
     /// </summary>
-    public class CreateUserDTO
+    public class RegisterRequest
     {
         /// <summary>
         /// Почта пользователя
@@ -13,17 +13,18 @@ namespace CarStockBLL.DTO.User
         public string Email { get; set; }
 
         /// <summary>
+        /// Юзернейм пользователя
+        /// </summary>
+        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Username can only contain English letters.")]
+        public string UserName { get; set; }
+
+        /// <summary>
         /// Пароль пользователя
         /// </summary>
+        [Required]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
         [RegularExpression(@"^(?=.*\d)(?=.*[A-Z])(?=.*[\W_]).{6,}$",
         ErrorMessage = "Password must contain at least one digit, one uppercase letter, and one special character.")]
         public string Password { get; set; }
-
-        /// <summary>
-        /// Роль пользователя
-        /// </summary>
-        public int RoleId { get; set; }
     }
-
 }

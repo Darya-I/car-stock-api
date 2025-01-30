@@ -25,15 +25,23 @@ namespace CarStockAPI.Controllers
         private readonly ILogger<CarController> _logger;
 
         /// <summary>
+        /// Экземпляр маппера
+        /// </summary>
+        private readonly CarMapper _mapper;
+
+        /// <summary>
         /// Инициализирует новый экземпляр контроллера автомобилей
         /// </summary>
         /// <param name="carService">Сервис операций над автомобилями</param>
         /// <param name="logger">Логгер</param>
+        /// <param name="mapper">Маппер</param>
         public CarController(ICarService carService,
-                            ILogger<CarController> logger)
+                            ILogger<CarController> logger,
+                            CarMapper mapper)
         {
             _carService = carService;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -45,11 +53,8 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> GetAllCarsAsync()
         {
             _logger.LogInformation("Attempting to get cars");
-
             var cars = await _carService.GetAllCarsAsync();
-
             _logger.LogInformation("Geting cars successful");
-            
             return Ok(cars);
         }
 
@@ -63,13 +68,8 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> CreateCarAsync(CarDTO carDto)
         {
             _logger.LogInformation("Attempting to create car");
-
-            var mapper = new CarMapper();
-            
-            var car = mapper.CarDtoToCar(carDto);
-
+            var car = _mapper.CarDtoToCar(carDto);
             var newCar = await _carService.CreateCarAsync(car);
-
             _logger.LogInformation("Creating car successful");
             return Ok(newCar);
         }
@@ -84,11 +84,8 @@ namespace CarStockAPI.Controllers
         public async Task<ActionResult> GetCarByIdAsync(int id)
         {
             _logger.LogInformation($"Attempting to get car with ID {id}");
-
             var carDto = await _carService.GetCarByIdAsync(id);
-
             _logger.LogInformation("Geting car successful");
-           
             return Ok(carDto);
         }
 
@@ -102,16 +99,8 @@ namespace CarStockAPI.Controllers
         public async Task<IActionResult> UpdateCar([FromBody] CarDTO carDTO)
         {
             _logger.LogInformation($"Attempting to update car with ID {carDTO.Id}");
-
-            if (carDTO == null)
-            {
-                return BadRequest("Invalid data.");
-            }
-
-            var mapper = new CarMapper();
-            var car = mapper.CarDtoToCar(carDTO);
+            var car = _mapper.CarDtoToCar(carDTO);
             var updatedCar = await _carService.UpdateCarAsync(car);
-
             _logger.LogInformation("Updating car successful");
             return Ok(updatedCar);
         }
@@ -128,7 +117,7 @@ namespace CarStockAPI.Controllers
             _logger.LogInformation($"Attempting to delete car with ID {id}");
             await _carService.DeleteCarAsync(id);
             _logger.LogInformation("Deleting car successful");
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -140,15 +129,9 @@ namespace CarStockAPI.Controllers
         [HttpPatch("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityDTO carDto)
         {
-            _logger.LogInformation($"Attempting to update availability for car with ID {carDto.Id}");
-            if (carDto == null)
-            {
-                return BadRequest("Invalid data.");
-            }
-
-            _logger.LogInformation("Updating availability of car successful");
-            
+            _logger.LogInformation($"Attempting to update availability for car with ID {carDto.Id}");                   
             var updatedCar = await _carService.UpdateCarAvailabilityAsync(carDto.Id, carDto.IsAvailable);
+            _logger.LogInformation("Updating availability of car successful");
             return Ok(updatedCar);
         }
 
@@ -161,14 +144,9 @@ namespace CarStockAPI.Controllers
         [HttpPatch("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountDTO carDto)
         {
-            _logger.LogInformation($"Attempting to update amount for car with ID {carDto.Id}");
-            if (carDto == null)
-            {
-                return BadRequest("Invalid data.");
-            }
-
-            _logger.LogInformation("Updating amount of car successful");
+            _logger.LogInformation($"Attempting to update amount for car with ID {carDto.Id}");           
             var updatedCar = await _carService.UpdateCarAmountAsync(carDto.Id, carDto.Amount);
+            _logger.LogInformation("Updating amount of car successful");
             return Ok(updatedCar);
         }
     }

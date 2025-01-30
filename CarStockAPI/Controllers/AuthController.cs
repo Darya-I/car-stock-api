@@ -1,5 +1,6 @@
 ﻿using CarStockBLL.DTO.Auth;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Map;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -27,15 +28,23 @@ namespace CarStockAPI.Controllers
         private readonly ILogger<AuthController> _logger;
 
         /// <summary>
+        /// Экземпляр маппера
+        /// </summary>
+        private readonly UserMapper _mapper;
+
+        /// <summary>
         /// Инициализирует новый экземпляр контроллера аутентификации
         /// </summary>
         /// <param name="authorizeUserService">Сервис авторизации пользователей</param>
         /// <param name="logger">Логгер</param>
+        /// <param name="mapper">Маппер</param>
         public AuthController(IAuthorizeUserService authorizeUserService,
-                              ILogger<AuthController> logger)
+                              ILogger<AuthController> logger,
+                              UserMapper mapper)
         {
             _authorizationService = authorizeUserService;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -43,13 +52,14 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <returns>Перенаправление на страницу аутентификации Google</returns>
         [HttpGet("signin-google")]
+        [ProducesResponseType(StatusCodes.Status302Found)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult SignInWithGoogle() 
         {
             _logger.LogInformation("Initiating Google sign-in process.");
             var redirectUrl = Url.Action("GoogleResponse", "Auth");
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-
         }
 
         /// <summary>
@@ -72,15 +82,17 @@ namespace CarStockAPI.Controllers
             var claims = googleAuthResult.Principal.Claims;
 
             //вот тут раскидали гугловского пользака
-            GoogleLoginRequestDTO googleUser = new GoogleLoginRequestDTO
+            GoogleLoginRequest googleUser = new GoogleLoginRequest
             {
                 Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value.ToString(),
                 Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value.ToString(),
             };
 
+            var user = _mapper.GoogleRequestToUser(googleUser);
+
             _logger.LogInformation($"Processing login via google for user {googleUser.Email}");
 
-            var accessToken = await _authorizationService.ProcessGoogle(googleUser);
+            var accessToken = await _authorizationService.ProcessGoogle(user);
 
             _logger.LogInformation("Google login successful. Access token generated");
             return Ok(accessToken);
@@ -89,14 +101,15 @@ namespace CarStockAPI.Controllers
         /// <summary>
         /// Вход пользователя
         /// </summary>
-        /// <param name="loginDto">Данные пользователя для входа</param>
+        /// <param name="request">Данные пользователя для входа</param>
         /// <returns>Access токен</returns>
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         { 
-            _logger.LogInformation($"Attempting to login user {loginDto.Email}");
-            var result = await _authorizationService.Authenticate(loginDto);
-            _logger.LogInformation($"Authentication successful for user: {loginDto.Email}. Setting refresh token cookie.");
+            _logger.LogInformation($"Attempting to login user {request.Email}");
+            var user = _mapper.LoginRequestToUser(request);
+            var result = await _authorizationService.Authenticate(user);
+            _logger.LogInformation($"Authentication successful for user: {request.Email}. Setting refresh token cookie.");
             SetTokenCookie(result.RefreshToken);
             return Ok(result.AccessToken);
         }
