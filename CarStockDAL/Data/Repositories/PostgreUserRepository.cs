@@ -55,7 +55,11 @@ namespace CarStockDAL.Data.Repositories
         /// <returns>Пользователь</returns>
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _dbContext.Users
+                .Include(r => r.Role) // Получить связную роль
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            return user;
         }
 
         /// <summary>
@@ -85,13 +89,11 @@ namespace CarStockDAL.Data.Repositories
         /// <summary>
         /// Получает роль пользователя
         /// </summary>
-        /// <param name="id">Идентификатор пользователя</param>
+        /// <param name="id">Идентификатор роли</param>
         /// <returns>Роль</returns>
-        public async Task<Role> GetUserRolesAsync(int? id)
+        public async Task<Role> GetUserRoleAsync(int id)
         {
-            var role = await _dbContext.Roles
-                .FirstOrDefaultAsync(r => r.Id == id);
-
+            var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Id == id);
             return role;
         }
     }

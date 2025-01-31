@@ -1,9 +1,9 @@
-﻿namespace CarStockMAP.DTO.Car
+﻿namespace CarStockBLL.DTO.Car
 {
     /// <summary>
     /// DTO обновления наличия автомобиля
     /// </summary>
-    public class CarAvailabilityUpdateDTO
+    public class CarAvailabilityDTO
     {
         /// <summary>
         /// Идентификатор автомобиля

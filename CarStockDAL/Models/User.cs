@@ -5,8 +5,19 @@ namespace CarStockDAL.Models
 {
     public class User : IdentityUser
     {
+        /// <summary>
+        /// Токен обновления
+        /// </summary>
         public string? RefreshToken { get; set; }
+        
+        /// <summary>
+        /// Дата истечения токена обновления
+        /// </summary>
         public DateTime RefreshTokenExpireTime { get; set; }
+        
+        /// <summary>
+        /// Идентификатор роли пользователя
+        /// </summary>
         public int RoleId { get; set; }
         
         /// <summary>

@@ -1,9 +1,9 @@
-﻿namespace CarStockMAP.DTO.User
+﻿namespace CarStockBLL.DTO.User
 {
     /// <summary>
-    /// DTO для представления пользователя и его ролей
+    /// DTO для представления пользователя и его роли
     /// </summary>
-    public class GetUsersDTO
+    public class GetUserDTO
     {
         /// <summary>
         /// Почта пользователя
@@ -18,6 +18,6 @@
         /// <summary>
         /// Список ролей пользователя
         /// </summary>
-        public List<string> Roles { get; set; }
+        public string RoleName { get; set; }
     }
 }

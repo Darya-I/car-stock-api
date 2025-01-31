@@ -53,5 +53,25 @@ namespace CarStockBLL.Services
 
             return (new Brand { Name = brand.Name, Id = brand.Id });
         }
+
+        /// <summary>
+        /// Получает марку автомобиля по идентификатору из базы данных
+        /// </summary>
+        /// <param name="id">Идентификатор марки</param>
+        /// <returns>Объект марки автомобиля</returns>
+        public async Task<Brand> GetBrandByIdAsync(int id)
+        {
+            _logger.LogInformation($"Fetching brand with Id {id}.");
+
+            var brand = await _brandRepository.GetBrandByIdAsync(id);
+
+            if (brand == null)
+            {
+                _logger.LogWarning($"Brand with Id {id} not found.");
+                throw new EntityNotFoundException($"Brand with Id '{id}' not found.");
+            }
+
+            return brand;
+        }
     }
 }

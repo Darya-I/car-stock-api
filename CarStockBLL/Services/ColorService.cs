@@ -56,5 +56,25 @@ namespace CarStockBLL.Services
 
             return (new Color { Name = color.Name, Id = color.Id });
         }
+
+        /// <summary>
+        /// Получает цвет автомобиля по идентификатору из базы данных
+        /// </summary>
+        /// <param name="id">Идентификатор цвета</param>
+        /// <returns>Объект цвета автомобиля</returns>
+        public async Task<Color> GetColorByIdAsync(int id)
+        {
+            _logger.LogInformation($"Fetching color with Id {id}.");
+
+            var color = await _colorRepository.GetColorByIdAsync(id);
+
+            if (color == null)
+            {
+                _logger.LogWarning($"Color with Id {id} not found.");
+                throw new EntityNotFoundException($"Color with Id '{id}' not found.");
+            }
+
+            return color;
+        }
     }
 }

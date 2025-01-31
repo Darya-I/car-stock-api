@@ -1,4 +1,5 @@
-﻿using CarStockDAL.Models;
+﻿using CarStockBLL.DTO.User;
+using CarStockDAL.Models;
 
 namespace CarStockBLL.Interfaces
 {
@@ -11,47 +12,47 @@ namespace CarStockBLL.Interfaces
         /// Получает пользователя с списком ролей из базы данных
         /// </summary>
         /// <param name="email">Почта</param>
-        /// <returns>Пользователь и список его ролей</returns>
-        Task<(User user, List<string> roles)?> GetUserAsync(string email);
-        
-        /// <summary>
-        /// Получает список ролей пользователя
-        /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Список ролей пользователя</returns>
-        Task<List<string>> GetUserRolesAsync(User user);
-        
+        /// <returns>DTO представления созданного пользователя</returns>
+        Task<GetUserDTO> GetUserAsync(string email);
+
         /// <summary>
         /// Создает нового пользователя в базе данных
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Созданный пользователь</returns>
-        Task<User> CreateUserAsync(User user);
-        
+        /// <param name="userDto">Пользователь</param>
+        /// <returns>DTO представления созданного пользователя</returns>
+        Task<GetUserDTO> CreateUserAsync(CreateUserDTO userDto);
+
         /// <summary>
         /// Удаляет пользователя из базы данных
         /// </summary>
         /// <param name="email">Почта</param>
         Task DeleteUserAsync(string email);
-        
+
         /// <summary>
         /// Обновляет данные пользователя
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Обновленный пользователь</returns>
-        Task<User> UpdateUserAsync(User user);
-        
+        /// <param name="userDto">Пользователь</param>
+        /// <returns>DTO представления обновленного пользователя</returns>
+        Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO userDto);
+
         /// <summary>
-        /// Обновляет роль пользователя
+        /// Получает список пользователей из базы данных
         /// </summary>
-        /// <param name="userEmail">Почта</param>
-        /// <param name="newRole">Роль</param>
-        Task UpdateUserRoleAsync(string userEmail, string newRole);
-        
+        /// <returns>Список DTO представления пользователей</returns>
+        Task<List<GetUserDTO>> GetAllUsersAsync();
+
         /// <summary>
-        /// Получает список пользователей и список их ролей из базы данных
+        /// Создает нового пользователя и назначает ему роль User
         /// </summary>
-        /// <returns>Список пользователей с их ролями</returns>
-        Task<List<(User user, List<string> roles)>> GetAllUsersAsync();
+        /// <param name="userDto"></param>
+        /// <returns>DTO представления созданного пользователя</returns>
+        Task<GetUserDTO> RegisterUser(User user);
+
+        /// <summary>
+        /// Обновляет только некоторые данные пользователя
+        /// </summary>
+        /// <param name="userDto">Пользователь</param>
+        /// <returns>DTO представления обновленного пользователя</returns>
+        Task<GetUserDTO> UpdateUserAccount(User user);
     }
 }

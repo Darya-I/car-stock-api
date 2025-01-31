@@ -1,4 +1,5 @@
-﻿using CarStockDAL.Models;
+﻿using CarStockBLL.DTO.Car;
+using CarStockDAL.Models;
 
 
 namespace CarStockBLL.Interfaces
@@ -12,28 +13,28 @@ namespace CarStockBLL.Interfaces
         /// Получает автомобиль из базы данных
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
-        /// <returns>Автомобиль</returns>
-        Task<Car> GetCarByIdAsync(int id);
+        /// <returns>DTO автомобиля</returns>
+        Task<GetCarDTO> GetCarByIdAsync(int id);
 
         /// <summary>
         /// Получает список автомобилей из базы данных
         /// </summary>
-        /// <returns>Коллекция автомобилей</returns>
-        Task<IEnumerable<Car>> GetAllCarsAsync();
+        /// <returns>Коллекция DTO автомобилей</returns>
+        Task<List<GetCarDTO>> GetAllCarsAsync();
 
         /// <summary>
         /// Создает новый автомобиль в базе данных
         /// </summary>
         /// <param name="car">Автомобиль</param>
-        /// <returns>Информация о новом автомобиле</returns>
-        Task<Car> CreateCarAsync(Car car);
+        /// <returns>DTO информация о новом автомобиле</returns>
+        Task<CarDTO> CreateCarAsync(Car car);
 
         /// <summary>
         /// Обновляет информацию об автомобиле в базе данных
         /// </summary>
         /// <param name="car">Автомобиль</param>
-        /// <returns>Значение <c>true</c>, если обновление выполнено успешно; иначе <c>false</c>.</returns>
-        Task<Car> UpdateCarAsync(Car car);
+        /// <returns>DTO обновленного автомобиля</returns>
+        Task<CarDTO> UpdateCarAsync(Car car);
 
         /// <summary>
         /// Удаляет автомобиль из базы данных
@@ -46,13 +47,16 @@ namespace CarStockBLL.Interfaces
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="isAvaible">Доступность</param>
-        Task<Car> UpdateCarAvailabilityAsync(int id, bool isAvaible);
+        /// <returns>DTO доступности автомобиля</returns>
+        Task<CarAvailabilityDTO> UpdateCarAvailabilityAsync(int id, bool isAvaible);
 
         /// <summary>
         /// Обновляет количество автомобилей
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="amount">Количество</param>
-        Task<Car> UpdateCarAmountAsync(int id, int amount);
+        /// <returns>DTO количества автомобиля</returns>
+        Task<CarAmountDTO> UpdateCarAmountAsync(int id, int amount);
+
     }
 }

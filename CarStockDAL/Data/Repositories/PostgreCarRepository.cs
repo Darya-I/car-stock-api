@@ -89,5 +89,20 @@ namespace CarStockDAL.Data.Repositories
 
             return await query.ToListAsync();
         }
+
+        /// <summary>
+        /// Вспомогательный метод для проверки наличия автомобиля
+        /// </summary>
+        /// <param name="brandId">Идентификатор марки</param>
+        /// <param name="carModelId">Идентификатор модели</param>
+        /// <param name="colorId">Идентификатор цвета</param>
+        /// <returns><c>true</c> если машина создана, иначе <c>false</c></returns>
+        public async Task<bool> CarExistAsync(int brandId, int carModelId, int colorId)
+        {
+            return await _cars.AnyAsync(c =>
+            c.BrandId == brandId &&
+            c.CarModelId == carModelId &&
+            c.ColorId == colorId);
+        }
     }
 }

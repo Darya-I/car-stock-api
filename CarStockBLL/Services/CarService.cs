@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using CarStockBLL.CustomException;
+﻿using CarStockBLL.CustomException;
+using CarStockBLL.DTO.Car;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Map;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 
@@ -37,6 +38,11 @@ namespace CarStockBLL.Services
         private readonly ILogger<CarService> _logger;
 
         /// <summary>
+        /// Экземпляр маппера
+        /// </summary>
+        private readonly CarMapper _mapper;
+
+        /// <summary>
         /// Инициализирует новый экземпляр сервиса операций над автомобилями
         /// </summary>
         /// <param name="carRepository">Репозиторий доступа к автомобилям</param>
@@ -44,26 +50,30 @@ namespace CarStockBLL.Services
         /// <param name="carModelService">Сервис операций над моделями автомобиля</param>
         /// <param name="colorService">Сервис операций над цветом автомобиля</param>
         /// <param name="logger">Логгер</param>
+        /// <param name="mapper">Маппер</param>
         public CarService(
             ICarRepository<Car> carRepository, 
             IBrandService brandService, 
             ICarModelService carModelService, 
             IColorService colorService,
-            ILogger<CarService> logger)
+            ILogger<CarService> logger,
+            CarMapper mapper)
         {
             _carRepository = carRepository;
             _brandService = brandService;
             _carModelService = carModelService;
             _colorService = colorService;
             _logger = logger;
+            _mapper = mapper;
         }
+
 
         /// <summary>
         /// Получает автомобиль из базы данных
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
-        /// <returns>Автомобиль</returns>
-        public async Task<Car> GetCarByIdAsync(int id)
+        /// <returns>DTO автомобиля</returns>
+        public async Task<GetCarDTO> GetCarByIdAsync(int id)
         {
             _logger.LogInformation($"Fetching car with ID {id}.");
 
@@ -78,16 +88,11 @@ namespace CarStockBLL.Services
                 }
 
                 _logger.LogInformation($"Car with ID {id} successfully retrieved.");
-                
-                return new Car
-                {
-                    Id = car.Id,
-                    Brand = car.Brand,
-                    CarModel = car.CarModel,
-                    Color = car.Color,
-                    Amount = car.Amount,
-                    IsAvailable = car.IsAvailable,
-                };
+
+                var result = _mapper.CarToGetCarDto(car);
+
+                return result;
+
             }
             catch (ApiException)
             {
@@ -104,8 +109,8 @@ namespace CarStockBLL.Services
         /// Обновляет информацию об автомобиле в базе данных
         /// </summary>
         /// <param name="car">Автомобиль</param>
-        /// <returns>Значение <c>true</c>, если обновление выполнено успешно; иначе <c>false</c>.</returns>
-        public async Task<Car> UpdateCarAsync(Car car)
+        /// <returns>DTO обновленного автомобиля</returns>
+        public async Task<CarDTO> UpdateCarAsync(Car car)
         {
             _logger.LogInformation($"Fetching car with ID {car.Id}.");
 
@@ -129,7 +134,7 @@ namespace CarStockBLL.Services
                 
                 _logger.LogInformation($"Car with ID {car.Id} successfully updated.");
 
-                return car;
+                return (_mapper.CarToCarDto(car));
             }
             catch (ApiException)
             {
@@ -176,15 +181,18 @@ namespace CarStockBLL.Services
         /// <summary>
         /// Получает список автомобилей из базы данных
         /// </summary>
-        /// <returns>Коллекция автомобилей</returns>
-        public async Task<IEnumerable<Car>> GetAllCarsAsync() 
+        /// <returns>Коллекция DTO автомобилей</returns>
+        public async Task<List<GetCarDTO>> GetAllCarsAsync() 
         {
             try
             {
                 var cars = await _carRepository.GetAllCarsAsync();
-                return cars.Any() ? cars : Enumerable.Empty<Car>();
+                var carsDto = cars.Any() ? cars : Enumerable.Empty<Car>();
+
+                // К каждому элементу из списка применяется маппер
+                return carsDto.Select(_mapper.CarToGetCarDto).ToList();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.LogError($"An error occurred while retrieving cars. Details: {ex.Message}");
                 throw;
@@ -195,20 +203,26 @@ namespace CarStockBLL.Services
         /// Создает новый автомобиль в базе данных
         /// </summary>
         /// <param name="car">Автомобиль</param>
-        /// <returns>Информация о новом автомобиле</returns>
-        public async Task<Car> CreateCarAsync(Car car)
+        /// <returns>DTO информация о новом автомобиле</returns>
+        public async Task<CarDTO> CreateCarAsync(Car car)
         {
             try
             {
                 _logger.LogInformation("Creating car");
 
-                var brand = await _brandService.GetBrandByNameAsync(car.Brand.Name);
-                var carModel = await _carModelService.GetCarModelByNameAsync(car.CarModel.Name);
-                var color = await _colorService.GetColorByNameAsync(car.Color.Name);
+                var brand = await _brandService.GetBrandByIdAsync(car.BrandId);
+                var carModel = await _carModelService.GetCarModelByIdAsync(car.CarModelId);
+                var color = await _colorService.GetColorByIdAsync(car.ColorId);
 
-                //      NEED TO REFACTOR нет проверки на дубликат, добавлю позже
+                var carExist = await _carRepository.CarExistAsync(brand.Id, carModel.Id, color.Id);
 
-                var newCar = new Car
+                if (carExist)
+                {
+                    _logger.LogWarning("This car already exist");
+                    throw new EntityAlreadyExistsException("The car already exist");
+                }
+
+                var newCar = new Car()
                 {
                     BrandId = brand.Id,
                     CarModelId = carModel.Id,
@@ -221,7 +235,11 @@ namespace CarStockBLL.Services
 
                 _logger.LogInformation($"Car with ID {newCar.Id} successfully created.");
 
-                return newCar;        
+                // Из Model в DTO
+                var result = _mapper.CarToCarDto(newCar);
+
+                return result;
+              
             }
             catch (ApiException)
             {
@@ -238,8 +256,9 @@ namespace CarStockBLL.Services
         /// Обновляет доступность автомобиля
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
-        /// <param name="isAvaible">Доступность</param>
-        public async Task<Car> UpdateCarAvailabilityAsync(int id, bool IsAvailable)
+        /// <param name="isAvailable">Доступность</param>
+        /// <returns>DTO доступности автомобиля</returns>
+        public async Task<CarAvailabilityDTO> UpdateCarAvailabilityAsync(int id, bool isAvailable)
         {
             try
             {
@@ -252,10 +271,13 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException($"Car with ID {id} not found.");
                 }
 
-                existingCar.IsAvailable = IsAvailable;
+                existingCar.IsAvailable = isAvailable;
 
                 await _carRepository.UpdateCarAsync(existingCar);
-                return existingCar;
+
+                var result = _mapper.CarAvailabilityUpdateDTO(existingCar);
+
+                return result;
             }
             catch (ApiException)
             {
@@ -273,7 +295,8 @@ namespace CarStockBLL.Services
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <param name="amount">Количество</param>
-        public async Task<Car> UpdateCarAmountAsync(int id, int amount)
+        /// <returns>DTO количества автомобиля</returns>
+        public async Task<CarAmountDTO> UpdateCarAmountAsync(int id, int amount)
         {
             var existingCar = await _carRepository.GetCarByIdAsync(id);
 
@@ -294,7 +317,8 @@ namespace CarStockBLL.Services
                 existingCar.Amount = amount;
 
                 await _carRepository.UpdateCarAsync(existingCar);
-                return existingCar;
+
+                return _mapper.CarAmountToDto(existingCar);
             }
             catch (ApiException)
             {

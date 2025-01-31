@@ -53,5 +53,23 @@ namespace CarStockBLL.Services
 
             return (new CarModel { Name = carModel.Name, Id = carModel.Id });
         }
+
+        /// <summary>
+        /// Получает модель автомобиля по идентификатору из базы данных
+        /// </summary>
+        /// <param name="id">Идентификатор модели</param>
+        /// <returns>Объект модели автомобиля</returns>
+        public async Task<CarModel> GetCarModelByIdAsync(int id)
+        {
+            _logger.LogInformation($"Fetching model with Id {id}.");
+
+            var carModel = await _carModelRepository.GetCarModelByIdAsync(id);
+            if (carModel == null)
+            {
+                _logger.LogWarning($"Car model with Id {id} not found.");
+                throw new EntityNotFoundException($"Car model with Id '{id}' not found.");
+            }
+            return carModel;
+        }
     }
 }

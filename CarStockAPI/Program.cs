@@ -4,7 +4,6 @@ using CarStockBLL.Interfaces;
 using CarStockBLL.Services;
 using CarStockDAL.Data;
 using CarStockDAL.Models;
-using CarStockMAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +15,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Data.Repositories;
 using CarStockAPI.Configs;
+using Microsoft.OpenApi.Models;
+using CarStockBLL.Map;
+using CarStockAPI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//                                                  настройки serilog
+//                                              Настройки serilog
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true);
@@ -45,8 +47,42 @@ builder.Host.UseSerilog((context, services, configuration) =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+
+//                                              Настройка в сваггере для авторизации
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(name: JwtBearerDefaults.AuthenticationScheme,
+        securityScheme: new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Description = "Enter the Bearer authorization : `Bearer Generated-JWT-Token`",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = JwtBearerDefaults.AuthenticationScheme
+            }
+        },
+
+        new string[] {}
+        }
+    });
+}
+);
+//                                              Настройка глобального фильтра
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<RequireAcceptHeaderFilter>();
+});
+
 
 builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
@@ -69,11 +105,11 @@ builder.Services.AddScoped<ICarModelService, CarModelService>();
 builder.Services.AddScoped<IColorService, ColorService>();
 
 
-builder.Services.AddScoped<UserMapService>();
-builder.Services.AddScoped<CarMapService>();
-
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();
+
+builder.Services.AddScoped<UserMapper>();
+builder.Services.AddScoped<CarMapper>();
 
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
@@ -83,10 +119,10 @@ builder.Services.AddScoped<ITokenService, TokenService>(sp =>
     return new TokenService(jwtConfig.Secret, jwtConfig.Issuer, jwtConfig.Audience, logger);
 });
 
-// Google
+//                                              Google
 builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Authentication:Google"));
 
-// Аутентификация с JWT
+//                                              Аутентификация с JWT
 builder.Services.AddAuthentication((options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -119,7 +155,7 @@ builder.Services.AddAuthentication((options => {
             options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Использование Cookie для Google
         });
 
-// Настройки политик
+//                                              Настройки политик
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
@@ -149,23 +185,31 @@ builder.Services.AddAuthorization(options =>
     
     options.AddPolicy("ViewUserPolicy", policy =>
             policy.RequireClaim("Permission", "CanViewUser"));
+    
+    options.AddPolicy("AccountPolicy", policy =>
+            policy.RequireClaim("Permission", "CanEditAccount"));
 });
 
-// для откладки пока не используется чтоб потрогать гугл
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-
+var allowedHeaders = builder.Configuration.GetSection("Cors:AllowedHeaders").Get<string[]>();
+var allowedMethods = builder.Configuration.GetSection("Cors:AllowedMethods").Get<string[]>();
 builder.Services.AddCors(options =>
-options.AddPolicy("CorsPolicy", policy =>
 {
-    policy.AllowAnyMethod()
-    .AllowAnyHeader()
-    .AllowAnyOrigin();
-    //WithOrigins(allowedOrigins);
-})
-    );
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithMethods(allowedMethods)
+        .WithHeaders(allowedHeaders)
+        .WithOrigins(allowedOrigins)
+        .AllowCredentials();
+
+    });
+});
 
 var app = builder.Build();
 
+app.UseCors("CorsPolicy");
+
+//                                              Установка middleware исключений
 app.UseMiddleware<BussinessExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -176,7 +220,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 

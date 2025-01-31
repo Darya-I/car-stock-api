@@ -1,19 +1,18 @@
-﻿namespace CarStockMAP.DTO.User
+﻿namespace CarStockBLL.DTO.Auth
 {
     /// <summary>
-    /// DTO для создания нового пользователя
+    /// Модель запроса для входа пользователя
     /// </summary>
-    public class CreateUserDTO
+    public class LoginRequest
     {
         /// <summary>
         /// Почта пользователя
         /// </summary>
         public string Email { get; set; }
-
+        
         /// <summary>
         /// Пароль пользователя
         /// </summary>
         public string Password { get; set; }
     }
-
 }

@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Data;
+﻿using System.Data;
 using CarStockBLL.CustomException;
+using CarStockBLL.DTO.User;
 using CarStockBLL.Interfaces;
+using CarStockBLL.Map;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarStockBLL.Services
 {
@@ -20,11 +21,6 @@ namespace CarStockBLL.Services
         private readonly UserManager<User> _userManager;
 
         /// <summary>
-        /// Экземпляр менеджера для работы с ролями пользователей
-        /// </summary>
-        private readonly RoleManager<IdentityRole> _roleManager;
-
-        /// <summary>
         /// Экземпляр репозитория для работы с пользователями
         /// </summary>
         private readonly IUserRepository _userRepository;
@@ -35,30 +31,35 @@ namespace CarStockBLL.Services
         private readonly ILogger<IUserService> _logger;
 
         /// <summary>
+        /// Экземпляр маппера
+        /// </summary>
+        private readonly UserMapper _mapper;
+
+        /// <summary>
         /// Инициализирует новый экземпляр сервиса операций над пользователями
         /// </summary>
         /// <param name="userManager">Менеджер управления пользователями</param>
-        /// <param name="roleManager">Менеджер управления ролями пользователей</param>
         /// <param name="userRepository">Репозиторий доступа к пользователям</param>
         /// <param name="logger">Логгер</param>
+        /// <param name="mapper">Маппер для модели пользователя</param>
         public UserService(
-            UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManager, 
+            UserManager<User> userManager,
             IUserRepository userRepository,
-            ILogger<IUserService> logger) 
+            ILogger<IUserService> logger,
+            UserMapper mapper) 
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _userManager = userManager;   
             _userRepository = userRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
         /// Получает пользователя с списком ролей из базы данных
         /// </summary>
         /// <param name="email">Почта</param>
-        /// <returns>Пользователь и список его ролей</returns>
-        public async Task<(User user, List<string> roles)?> GetUserAsync(string email)
+        /// <returns>DTO представления созданного пользователя</returns>
+        public async Task<GetUserDTO> GetUserAsync(string email)
         {
             try
             {
@@ -68,9 +69,7 @@ namespace CarStockBLL.Services
                     throw new EntityNotFoundException($"User with email '{email}' was not found.");
                 }
 
-                // Получить роли для пользователя
-                var roles = await _userManager.GetRolesAsync(user);
-                return (user, roles.ToList());
+                return _mapper.UserToGetUserDto(user);
             }
             catch (Exception ex)
             {
@@ -80,48 +79,44 @@ namespace CarStockBLL.Services
         }
 
         /// <summary>
-        /// Получает список ролей пользователя
-        /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Список ролей пользователя</returns>
-        public async Task<List<string>> GetUserRolesAsync(User user)
-        {
-            try 
-            {
-                return (await _userManager.GetRolesAsync(user)).ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"An error occurred while retrieving user`s roles. Details: {ex.Message}");
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Создает нового пользователя в базе данных
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Созданный пользователь</returns>
-        public async Task<User> CreateUserAsync(User user)
+        /// <param name="userDto">Пользователь</param>
+        /// <returns>DTO представления созданного пользователя</returns>
+        public async Task<GetUserDTO> CreateUserAsync(CreateUserDTO userDto)
         {
             try
             {
-                var existingUser = await _userManager.FindByEmailAsync(user.Email);
+                var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
+
                 if (existingUser != null)
                 {
                     throw new EntityAlreadyExistsException("A user with this email already exists.");
                 }
 
+                var role = await _userRepository.GetUserRoleAsync(userDto.RoleId);
+
+                if (role== null)
+                {
+                    _logger.LogWarning($"Role with Id {userDto.RoleId} not found");
+                    throw new EntityNotFoundException($"Role with Id {userDto.RoleId} not found");
+                }
+
+                // С DTO на объект пользователя
+                var user = _mapper.UserDtoToUser(userDto);
+
                 var result = await _userManager.CreateAsync(user, user.PasswordHash);
+                
                 if (!result.Succeeded)
                 {
                     _logger.LogError(string.Join($"Failed to create the user. Errors:", result.Errors.Select(e => e.Description)));
-                    throw new ValidationErrorException("Failed to create the user. Errors:");
+                    throw new ApiException("Failed to create the user. Errors:");
                 }
 
-                // NEED TO REFACTOR на ишью маппинга
-                await _userManager.AddToRoleAsync(user, "User");
-                return user;
+                // С объекта нового пользователя на DTO
+                var newUser = _mapper.UserToGetUserDto(user);
+
+                return newUser;
             }
             catch (ApiException)
             {
@@ -130,6 +125,49 @@ namespace CarStockBLL.Services
             catch (Exception ex)
             {
                 _logger.LogError($"An error occurred while creating user. Details: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Создает нового пользователя и назначает ему роль User
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>DTO представления созданного пользователя</returns>
+        public async Task<GetUserDTO> RegisterUser(User user) 
+        {
+            try
+            {
+                var existingUser = await _userManager.FindByEmailAsync(user.Email);
+
+                if (existingUser != null)
+                {
+                    throw new EntityAlreadyExistsException("A user with this email already exists.");
+                }
+
+                // Присваиваем роль "User" (объектом, чтобы потом сделать обратный маппинг)
+                user.Role = await _userRepository.GetUserRoleAsync(2);
+
+                var result = await _userManager.CreateAsync(user, user.PasswordHash);
+
+                if (!result.Succeeded)
+                {
+                    _logger.LogError(string.Join($"Failed to register the user. Errors:", result.Errors.Select(e => e.Description)));
+                    throw new ApiException("Failed to register the user. Errors:");
+                }
+
+                // С объекта нового пользователя на DTO
+                var newUser = _mapper.UserToGetUserDto(user);
+
+                return newUser;
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while register user. Details: {ex.Message}");
                 throw;
             }
         }
@@ -165,124 +203,102 @@ namespace CarStockBLL.Services
         /// <summary>
         /// Обновляет данные пользователя
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <returns>Обновленный пользователь</returns>
-        public async Task<User> UpdateUserAsync(User user)
+        /// <param name="userDto">Пользователь</param>
+        /// <returns>DTO представления обновленного пользователя</returns>
+        public async Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO userDto)
         {
             try
             {
-                var existingUser = await _userManager.FindByEmailAsync(user.Email);
+                var existingUser = await _userRepository.GetUserByEmailAsync(userDto.Email);
+                
                 if (existingUser == null)
                 {
-                    throw new EntityNotFoundException("A user with this email does not exists.");
+                    throw new EntityNotFoundException("A user with this email does not exist.");
                 }
 
+                var user = _mapper.UpadateDtoToUser(userDto);
+
+                // Проверка и обновление роли
+                if (user.RoleId > 0 && existingUser.RoleId != user.RoleId)
+                {
+                    var role = await _userRepository.GetUserRoleAsync(user.RoleId);
+                    if (role == null)
+                    {
+                        _logger.LogWarning($"Role with Id {user.RoleId} not found");
+                        throw new EntityNotFoundException($"Role with Id {user.RoleId} not found");
+                    }
+                    existingUser.RoleId = user.RoleId;
+                }
+
+                // Проверка и обновление имени пользователя
                 if (!string.IsNullOrEmpty(user.UserName) && user.UserName != existingUser.UserName)
                 {
                     existingUser.UserName = user.UserName;
                 }
 
+                // Проверка и обновление email
                 if (!string.IsNullOrEmpty(user.Email) && user.Email != existingUser.Email)
                 {
-                    user.Email = existingUser.Email;
+                    existingUser.Email = user.Email;
                 }
 
-                // если указан новый пароль, обновляем его
-                if (!string.IsNullOrEmpty(user.PasswordHash))
+                // Обновление пароля (если передан новый пароль)
+                if (!string.IsNullOrEmpty(userDto.Password))
                 {
                     var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
-                    var passwordResult = await _userManager.ResetPasswordAsync(existingUser, token, user.PasswordHash);
+                    
+                    var passwordResult = await _userManager.ResetPasswordAsync(existingUser, token, userDto.Password);
+
                     if (!passwordResult.Succeeded)
                     {
-                        _logger.LogError(string.Join($"Failed to updating user`s password: ", passwordResult.Errors.Select(e => e.Description)));
-                        throw new ApiException("Failed to updating user`s password");
+                        _logger.LogError($"Failed to update user's password: {string.Join(", ", passwordResult.Errors.Select(e => e.Description))}");
+                        throw new ApiException("Failed to update user's password.");
                     }
                 }
 
+                // Обновление пользователя
                 var result = await _userManager.UpdateAsync(existingUser);
+
                 if (!result.Succeeded)
                 {
-                    _logger.LogError(string.Join($"Failed to updating user: ", result.Errors.Select(e => e.Description)));
-                    throw new ApiException("Failed to updating user");
+                    _logger.LogError($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    throw new ApiException("Failed to update user.");
                 }
 
-                return existingUser;
+                return _mapper.UserToGetUserDto(existingUser);
             }
-            catch (Exception ex) 
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception ex)
             {
                 _logger.LogError($"An error occurred while updating user. Details: {ex.Message}");
                 throw;
             }
         }
 
-        /// <summary>
-        /// Обновляет роль пользователя
-        /// </summary>
-        /// <param name="userEmail">Почта</param>
-        /// <param name="newRole">Роль</param>
-        public async Task UpdateUserRoleAsync(string userEmail, string newRole)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(userEmail);
-                if (user == null)
-                {
-                    _logger.LogWarning($"User with email {userEmail} does not exist.");
-                    throw new EntityNotFoundException("User not found.");
-                }
-
-                var currentRoles = await _userManager.GetRolesAsync(user);
-
-                // Удалить текущие роли
-                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
-                if (!removeResult.Succeeded)
-                {
-                    _logger.LogError(string.Join($"Failed to removing roles: ", removeResult.Errors.Select(e => e.Description)));
-                    throw new ApiException($"Failed to removing roles");
-                }
-
-                if (!await _roleManager.RoleExistsAsync(newRole))
-                {
-                    _logger.LogWarning($"Role {newRole} does not exist.");
-                    throw new EntityNotFoundException($"Role {newRole} does not exist.");
-                }
-
-                var addRoleResult = await _userManager.AddToRoleAsync(user, newRole);
-                if (!addRoleResult.Succeeded)
-                {
-                    _logger.LogError(string.Join($"Failed to adding role: ", addRoleResult.Errors.Select(e => e.Description)));
-                    throw new ApiException($"Failed to adding role");
-                }
-            }
-            catch (Exception ex) 
-            {
-                _logger.LogError($"An error occurred while updating user`s roles. Details: {ex.Message}");
-            }
-        }
 
         /// <summary>
-        /// Получает список пользователей и список их ролей из базы данных
+        /// Получает список пользователей из базы данных
         /// </summary>
-        /// <returns>Список пользователей с их ролями</returns>
-        public async Task<List<(User user, List<string> roles)>> GetAllUsersAsync()
+        /// <returns>Список DTO представления пользователей</returns>
+        public async Task<List<GetUserDTO>> GetAllUsersAsync()
         {
-            //С вложенным списком для ролей
+            
             try
             {
-                var users = _userManager.Users.ToList();
+                var users = await _userManager.Users
+                    .Include(u => u.Role) // Связные роли
+                    .ToListAsync();
+                
+                // К каждому элементу из списка применяется маппер
+                var result = users.Select(_mapper.UserToGetUserDto).ToList();
 
-                var result = new List<(User user, List<string> roles)>();
-
-                foreach (var user in users)
-                {
-                    // Получить роли для каждого пользователя
-                    var roles = await _userManager.GetRolesAsync(user);
-                    result.Add((user, roles.ToList())); // Добавить пользователя и его роли в результат
-                }
                 if (result == null)
                 {
-                    _logger.LogError("Failed to retrieve user roles");
-                    throw new ApiException("Failed to retrieve user roles");
+                    _logger.LogError("Failed to retrieve users");
+                    throw new ApiException("Failed to retrieve users");
                 }
 
                 return result;
@@ -290,6 +306,65 @@ namespace CarStockBLL.Services
             catch (Exception ex) 
             {
                 _logger.LogError($"An error occurred while retrieving all users. Details: {ex.Message}");
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Обновляет только некоторые данные пользователя
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <returns>DTO представления обновленного пользователя</returns>
+        public async Task<GetUserDTO> UpdateUserAccount(User user)
+        {
+            try
+            {
+                var existingUser = await _userRepository.GetUserByEmailAsync(user.Email);
+
+                if (existingUser == null)
+                {
+                    throw new EntityNotFoundException("A user with this email does not exist.");
+                }
+
+                // Проверка и обновление имени пользователя
+                if (!string.IsNullOrEmpty(user.UserName) && user.UserName != existingUser.UserName)
+                {
+                    existingUser.UserName = user.UserName;
+                }
+
+                // Обновление пароля (если передан новый пароль)
+                if (!string.IsNullOrEmpty(user.PasswordHash))
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
+
+                    var passwordResult = await _userManager.ResetPasswordAsync(existingUser, token, user.PasswordHash);
+                    
+                    if (!passwordResult.Succeeded)
+                    {
+                        _logger.LogError($"Failed to update user's password: {string.Join(", ", passwordResult.Errors.Select(e => e.Description))}");
+                        throw new ApiException("Failed to update user's password.");
+                    }
+                }
+
+                // Обновление пользователя
+                var result = await _userManager.UpdateAsync(existingUser);
+
+                if (!result.Succeeded)
+                {
+                    _logger.LogError($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    throw new ApiException("Failed to update user.");
+                }
+
+                return _mapper.UserToGetUserDto(existingUser);
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while updating user. Details: {ex.Message}");
                 throw;
             }
         }
