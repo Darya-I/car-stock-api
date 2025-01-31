@@ -13,13 +13,13 @@ namespace CarStockBLL.DTO.Account
         public string Email { get; set; }
 
         /// <summary>
-        /// Юзернейм пользователя
+        /// Юзернейм пользователя для смены
         /// </summary>
         [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Username can only contain English letters.")]
         public string? UserName { get; set; }
 
         /// <summary>
-        /// Пароль пользователя
+        /// Пароль пользователя для смены
         /// </summary>
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
         [RegularExpression(@"^(?=.*\d)(?=.*[A-Z])(?=.*[\W_]).{6,}$",
