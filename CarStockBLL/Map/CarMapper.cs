@@ -12,12 +12,12 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="car">Объект автомобиля</param>
         /// <returns>DTO автомобиля</returns>
-        [MapProperty(nameof(car.Id), nameof(CarDTO.Id))]
-        [MapProperty(nameof(car.BrandId), nameof(CarDTO.BrandId))]
-        [MapProperty(nameof(car.CarModelId), nameof(CarDTO.CarModelId))]
-        [MapProperty(nameof(car.ColorId), nameof(CarDTO.ColorId))]
-        [MapProperty(nameof(car.Amount), nameof(CarDTO.Amount))]
-        [MapProperty(nameof(car.IsAvailable), nameof(CarDTO.IsAvailable))]
+        [MapProperty(nameof(Car.Id), nameof(CarDTO.Id))]
+        [MapProperty(nameof(Car.BrandId), nameof(CarDTO.BrandId))]
+        [MapProperty(nameof(Car.CarModelId), nameof(CarDTO.CarModelId))]
+        [MapProperty(nameof(Car.ColorId), nameof(CarDTO.ColorId))]
+        [MapProperty(nameof(Car.Amount), nameof(CarDTO.Amount))]
+        [MapProperty(nameof(Car.IsAvailable), nameof(CarDTO.IsAvailable))]
         public partial CarDTO CarToCarDto(Car car);
 
         /// <summary>
@@ -25,12 +25,12 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="car">Объект автомобиля</param>
         /// <returns>DTO автомобиля</returns>
-        [MapProperty(nameof(car.Id), nameof(GetCarDTO.Id))]
-        [MapProperty(nameof(car.Brand.Name), nameof(GetCarDTO.Brand))]
-        [MapProperty(nameof(car.CarModel.Name), nameof(GetCarDTO.CarModel))]
-        [MapProperty(nameof(car.Color.Name), nameof(GetCarDTO.Color))]
-        [MapProperty(nameof(car.Amount), nameof(CarDTO.Amount))]
-        [MapProperty(nameof(car.IsAvailable), nameof(CarDTO.IsAvailable))]
+        [MapProperty(nameof(Car.Id), nameof(GetCarDTO.Id))]
+        [MapProperty(nameof(Car.Brand.Name), nameof(GetCarDTO.Brand))]
+        [MapProperty(nameof(Car.CarModel.Name), nameof(GetCarDTO.CarModel))]
+        [MapProperty(nameof(Car.Color.Name), nameof(GetCarDTO.Color))]
+        [MapProperty(nameof(Car.Amount), nameof(CarDTO.Amount))]
+        [MapProperty(nameof(Car.IsAvailable), nameof(CarDTO.IsAvailable))]
         public partial GetCarDTO CarToGetCarDto(Car car);
 
         /// <summary>
@@ -38,12 +38,12 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="carDto">DTO автомобиля</param>
         /// <returns>Объект автомобиля</returns>
-        [MapProperty(nameof(carDto.Id), nameof(Car.Id))]
-        [MapProperty(nameof(carDto.BrandId), nameof(Car.BrandId))]
-        [MapProperty(nameof(carDto.CarModelId), nameof(Car.CarModelId))]
-        [MapProperty(nameof(carDto.ColorId), nameof(Car.ColorId))]
-        [MapProperty(nameof(carDto.Amount), nameof(Car.Amount))]
-        [MapProperty(nameof(carDto.IsAvailable), nameof(Car.IsAvailable))]
+        [MapProperty(nameof(CarDTO.Id), nameof(Car.Id))]
+        [MapProperty(nameof(CarDTO.BrandId), nameof(Car.BrandId))]
+        [MapProperty(nameof(CarDTO.CarModelId), nameof(Car.CarModelId))]
+        [MapProperty(nameof(CarDTO.ColorId), nameof(Car.ColorId))]
+        [MapProperty(nameof(CarDTO.Amount), nameof(Car.Amount))]
+        [MapProperty(nameof(CarDTO.IsAvailable), nameof(Car.IsAvailable))]
         public partial Car CarDtoToCar(CarDTO carDto);
 
 
@@ -52,8 +52,8 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="car">Объект автомобиля</param>
         /// <returns>DTO доступности</returns>
-        [MapProperty(nameof(car.Id), nameof(CarAvailabilityDTO.Id))]
-        [MapProperty(nameof(car.IsAvailable), nameof(CarAvailabilityDTO.IsAvailable))]
+        [MapProperty(nameof(Car.Id), nameof(CarAvailabilityDTO.Id))]
+        [MapProperty(nameof(Car.IsAvailable), nameof(CarAvailabilityDTO.IsAvailable))]
         public partial CarAvailabilityDTO CarAvailabilityUpdateDTO(Car car);
 
 
@@ -62,8 +62,8 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="car">Объект автомобиля</param>
         /// <returns>DTO количества</returns>
-        [MapProperty(nameof(car.Id), nameof(CarAmountDTO.Id))]
-        [MapProperty(nameof(car.Amount), nameof(CarAmountDTO.Amount))]
+        [MapProperty(nameof(Car.Id), nameof(CarAmountDTO.Id))]
+        [MapProperty(nameof(Car.Amount), nameof(CarAmountDTO.Amount))]
         public partial CarAmountDTO CarAmountToDto(Car car);
     }
 }

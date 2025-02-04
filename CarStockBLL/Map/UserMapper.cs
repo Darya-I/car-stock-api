@@ -14,9 +14,9 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="user">Объект пользователя</param>
         /// <returns>DTO представления пользователя</returns>
-        [MapProperty(nameof(user.Email), nameof(GetUserDTO.Email))]
-        [MapProperty(nameof(user.UserName), nameof(GetUserDTO.UserName))]
-        [MapProperty(nameof(user.Role.Name), nameof(GetUserDTO.RoleName))]
+        [MapProperty(nameof(User.Email), nameof(GetUserDTO.Email))]
+        [MapProperty(nameof(User.UserName), nameof(GetUserDTO.UserName))]
+        [MapProperty(nameof(User.Role.Name), nameof(GetUserDTO.RoleName))]
         public partial GetUserDTO UserToGetUserDto(User user);
 
         /// <summary>
@@ -24,10 +24,10 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="userDto">DTO пользователя</param>
         /// <returns>Объект пользователя</returns>
-        [MapProperty(nameof(userDto.Email), nameof(User.Email))]
-        [MapProperty(nameof(userDto.Email), nameof(User.UserName))]
-        [MapProperty(nameof(userDto.Password), nameof(User.PasswordHash))]
-        [MapProperty(nameof(userDto.RoleId), nameof(User.RoleId))]
+        [MapProperty(nameof(CreateUserDTO.Email), nameof(User.Email))]
+        [MapProperty(nameof(CreateUserDTO.Email), nameof(User.UserName))]
+        [MapProperty(nameof(CreateUserDTO.Password), nameof(User.PasswordHash))]
+        [MapProperty(nameof(CreateUserDTO.RoleId), nameof(User.RoleId))]
         public partial User UserDtoToUser(CreateUserDTO userDto);
 
         /// <summary>
@@ -35,10 +35,10 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="userDto">DTO пользователя</param>
         /// <returns>Объект пользователя</returns>
-        [MapProperty(nameof(userDto.Email), nameof(User.Email))]
-        [MapProperty(nameof(userDto.UserName), nameof(User.UserName))]
-        [MapProperty(nameof(userDto.Password), nameof(User.PasswordHash))]
-        [MapProperty(nameof(userDto.RoleId), nameof(User.RoleId))]
+        [MapProperty(nameof(UpdateUserDTO.Email), nameof(User.Email))]
+        [MapProperty(nameof(UpdateUserDTO.UserName), nameof(User.UserName))]
+        [MapProperty(nameof(UpdateUserDTO.Password), nameof(User.PasswordHash))]
+        [MapProperty(nameof(UpdateUserDTO.RoleId), nameof(User.RoleId))]
         public partial User UpadateDtoToUser(UpdateUserDTO userDto);
 
         /// <summary>
@@ -46,9 +46,9 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="userRequest">Модель запроса пользователя</param>
         /// <returns>Объект пользователя</returns>
-        [MapProperty(nameof(userRequest.UserName), nameof(User.UserName))]
-        [MapProperty(nameof(userRequest.Email), nameof(User.Email))]
-        [MapProperty(nameof(userRequest.Password), nameof(User.PasswordHash))]
+        [MapProperty(nameof(RegisterRequest.UserName), nameof(User.UserName))]
+        [MapProperty(nameof(RegisterRequest.Email), nameof(User.Email))]
+        [MapProperty(nameof(RegisterRequest.Password), nameof(User.PasswordHash))]
         public partial User RegisterRequestToUser(RegisterRequest userRequest);
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="userRequest">Модель запроса пользователя</param>
         /// <returns>Объект пользователя</returns>
-        [MapProperty(nameof(userRequest.UserName), nameof(User.UserName))]
-        [MapProperty(nameof(userRequest.Email), nameof(User.Email))]
-        [MapProperty(nameof(userRequest.Password), nameof(User.PasswordHash))]
+        [MapProperty(nameof(EditRequest.UserName), nameof(User.UserName))]
+        [MapProperty(nameof(EditRequest.Email), nameof(User.Email))]
+        [MapProperty(nameof(EditRequest.Password), nameof(User.PasswordHash))]
         public partial User EditRequestToUser(EditRequest userRequest);
 
         /// <summary>
@@ -66,8 +66,8 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="userRequest">Модель запроса аутентификации</param>
         /// <returns>Объект пользователя</returns>
-        [MapProperty(nameof(userRequest.Email), nameof(User.Email))]
-        [MapProperty(nameof(userRequest.Email), nameof(User.UserName))]
+        [MapProperty(nameof(GoogleLoginRequest.Email), nameof(User.Email))]
+        [MapProperty(nameof(GoogleLoginRequest.Email), nameof(User.UserName))]
         public partial User GoogleRequestToUser(GoogleLoginRequest userRequest);
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace CarStockBLL.Map
         /// </summary>
         /// <param name="userRequest">Модель запроса на логин</param>
         /// <returns>Объект пользователя</returns>
-        [MapProperty(nameof(userRequest.Email), nameof(User.Email))]
-        [MapProperty(nameof(userRequest.Password), nameof(User.PasswordHash))]
+        [MapProperty(nameof(LoginRequest.Email), nameof(User.Email))]
+        [MapProperty(nameof(LoginRequest.Password), nameof(User.PasswordHash))]
         public partial User LoginRequestToUser(LoginRequest userRequest);
     }
 }
