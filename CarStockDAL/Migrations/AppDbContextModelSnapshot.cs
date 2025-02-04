@@ -137,6 +137,9 @@ namespace CarStockDAL.Migrations
                     b.Property<bool>("CanDeleteUser")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanEditAccount")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanEditCar")
                         .HasColumnType("boolean");
 
@@ -165,6 +168,7 @@ namespace CarStockDAL.Migrations
                             CanCreateUser = true,
                             CanDeleteCar = true,
                             CanDeleteUser = true,
+                            CanEditAccount = true,
                             CanEditCar = true,
                             CanEditUser = true,
                             CanViewCar = true,
@@ -178,6 +182,7 @@ namespace CarStockDAL.Migrations
                             CanCreateUser = false,
                             CanDeleteCar = false,
                             CanDeleteUser = false,
+                            CanEditAccount = true,
                             CanEditCar = false,
                             CanEditUser = false,
                             CanViewCar = true,
@@ -191,6 +196,7 @@ namespace CarStockDAL.Migrations
                             CanCreateUser = false,
                             CanDeleteCar = true,
                             CanDeleteUser = false,
+                            CanEditAccount = true,
                             CanEditCar = true,
                             CanEditUser = false,
                             CanViewCar = true,

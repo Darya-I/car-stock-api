@@ -5,6 +5,7 @@
 
 # Confidential file
 CarStockAPI/appsettings.json
+CarStockAPI/Certificates/
 
 # Database-specific directories
 CarStockDAL/Migrations/

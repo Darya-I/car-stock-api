@@ -18,6 +18,7 @@ using CarStockAPI.Configs;
 using Microsoft.OpenApi.Models;
 using CarStockBLL.Map;
 using CarStockAPI.Filters;
+using CarStockAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -216,6 +217,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();

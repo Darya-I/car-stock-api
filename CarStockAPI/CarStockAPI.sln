@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockAPI", "CarStockAPI.csproj", "{5DE5BD34-4F4C-43F9-8DB7-1E58F8A64CBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockBLL", "..\CarStockBLL\CarStockBLL.csproj", "{37E9EE48-B598-4BC4-ABA9-A790FA5BF5BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockDAL", "..\CarStockDAL\CarStockDAL.csproj", "{27797A62-D1FC-4BE3-ABBF-FDC18AC186CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{AE6A8EC2-0CE6-4ADB-93D6-E281EB1467FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,14 @@ Global
 		{5DE5BD34-4F4C-43F9-8DB7-1E58F8A64CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DE5BD34-4F4C-43F9-8DB7-1E58F8A64CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DE5BD34-4F4C-43F9-8DB7-1E58F8A64CBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37E9EE48-B598-4BC4-ABA9-A790FA5BF5BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37E9EE48-B598-4BC4-ABA9-A790FA5BF5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37E9EE48-B598-4BC4-ABA9-A790FA5BF5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37E9EE48-B598-4BC4-ABA9-A790FA5BF5BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27797A62-D1FC-4BE3-ABBF-FDC18AC186CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27797A62-D1FC-4BE3-ABBF-FDC18AC186CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27797A62-D1FC-4BE3-ABBF-FDC18AC186CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27797A62-D1FC-4BE3-ABBF-FDC18AC186CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

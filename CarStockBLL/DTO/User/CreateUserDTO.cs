@@ -24,6 +24,7 @@ namespace CarStockBLL.DTO.User
         /// Роль пользователя
         /// </summary>
         public int RoleId { get; set; }
+
     }
 
 }

@@ -1,0 +1,15 @@
+services:
+  carstockapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+;http://+ 
+      - ASPNETCORE_HTTPS_PORTS=8001 
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=superpassword228 
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/Certificates/aspnetapp.pfx
+    ports:
+      - "8000:80"
+      - "8001:443"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/https:ro
+    networks:
+      - carstock-network

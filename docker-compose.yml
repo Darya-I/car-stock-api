@@ -1,0 +1,47 @@
+networks:
+  carstock-network:
+    driver: bridge
+services:
+  carstockapi:
+    image: ${DOCKER_REGISTRY-}carstockapi
+    build:
+      context: ..
+      dockerfile: CarStockAPI/CarStockAPI/Dockerfile
+    ports:
+      - "8000:80"  
+      - "8001:443"  
+    depends_on:
+      - carstock-db
+    networks:
+      - carstock-network
+  carstock-db:
+    image: postgres:latest
+    container_name: carstockdb
+    restart: always
+    environment:
+      POSTGRES_DB: carstock
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - carstock-network
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports: 
+     - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: superAdmin228@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: superPassword228
+    volumes:
+    - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - carstock-network
+
+volumes:
+  pgdata:
+  pgadmin-data:
