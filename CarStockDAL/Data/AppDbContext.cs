@@ -1,6 +1,7 @@
 ﻿using CarStockDAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using CarStockDAL.Models.WS;
 
 namespace CarStockDAL.Data
 {
@@ -41,6 +42,11 @@ namespace CarStockDAL.Data
         /// Набор данных моделей автомобилей
         /// </summary>
         public DbSet<CarModel> Models { get; set; }
+
+        /// <summary>
+        /// Набор данных тех. работ
+        /// </summary>
+        public DbSet<Maintenance> Maintenances { get; set; }
 
         /// <summary>
         /// Настройка моделей базы данных с определением связей и первичных ключей, добавление дефолтных записей

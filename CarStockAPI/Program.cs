@@ -19,6 +19,9 @@ using Microsoft.OpenApi.Models;
 using CarStockBLL.Map;
 using CarStockAPI.Filters;
 using CarStockAPI.Extensions;
+using CarStockDAL.Data.Interfaces.WS;
+using CarStockDAL.Data.Repositories.WS;
+using CarStockBLL.Services.WS_Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,10 +82,12 @@ builder.Services.AddSwaggerGen(options =>
 }
 );
 //                                              Настройка глобального фильтра
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<RequireAcceptHeaderFilter>();
-});
+builder.Services.AddControllers(
+//    options =>
+//{
+//    options.Filters.Add<RequireAcceptHeaderFilter>();
+//}
+);
 
 
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -99,6 +104,7 @@ builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
 builder.Services.AddScoped<IColorRepository<Color>, PostgreColorRepository<Color>>();
 builder.Services.AddScoped<IUserRepository, PostgreUserRepository>();
+builder.Services.AddScoped<IMaintenanceRepository, PostgreMaintenanceRepository>();
 
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
@@ -108,9 +114,14 @@ builder.Services.AddScoped<IColorService, ColorService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();
+builder.Services.AddScoped<IMaitenanceService, MaintenanceService>();
 
 builder.Services.AddScoped<UserMapper>();
 builder.Services.AddScoped<CarMapper>();
+
+
+builder.Services.AddSingleton<WebSocketHandler>();
+builder.Services.AddSingleton<IHostedService, MaintenanceStatusChecker>(); // Фоновая задача 
 
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
@@ -210,8 +221,18 @@ var app = builder.Build();
 
 app.UseCors("CorsPolicy");
 
+// Включаем поддержку WebSocket
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2) // Поддержка соединения
+};
+app.UseWebSockets(webSocketOptions);
+
 //                                              Установка middleware исключений
 app.UseMiddleware<BussinessExceptionMiddleware>();
+//                                              Установка middleware проверки тех. работ
+app.UseMiddleware<MaintenanceMiddleware>();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -224,6 +245,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapControllers();
 
