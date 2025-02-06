@@ -1,5 +1,7 @@
 ﻿using System.Text;
+using CarStockAPI.Configs;
 using CarStockDAL.Data.Interfaces.MaintenanceRepo;
+using Microsoft.Extensions.Options;
 
 namespace CarStockAPI.Middlewares
 {
@@ -14,16 +16,9 @@ namespace CarStockAPI.Middlewares
         private readonly RequestDelegate _next;
 
         /// <summary>
-        /// Список допустимых путей, которые допускает middleware
+        /// Список допустимых путей, которые пропускает middleware
         /// </summary>
-        private readonly List<string> _excludedPaths = new List<string>
-        {
-            "/sr_notifier.html",
-            "/ws_notifier.html",
-            "/api/notifier/ws",
-            "/notifier",
-            "/notifier/negotiate"
-        };
+        private readonly List<string> _excludedPaths;
 
         /// <summary>
         /// Экземпляр логгера
@@ -31,10 +26,12 @@ namespace CarStockAPI.Middlewares
         private readonly ILogger<MaintenanceMiddleware> _logger;
 
         public MaintenanceMiddleware(RequestDelegate next, 
-            ILogger<MaintenanceMiddleware> logger)
+            ILogger<MaintenanceMiddleware> logger,
+            IOptions<AllowedPathsOptions> options)
         {
             _next = next;
             _logger = logger;
+            _excludedPaths = options.Value.Paths ?? new List<string>();
         }
 
         /// <summary>

@@ -217,6 +217,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<AllowedPathsOptions>(builder.Configuration.GetSection("AllowedPaths")); // Для использования в middleware проверки
+
 var app = builder.Build();
 
 app.UseCors("CorsPolicy");
