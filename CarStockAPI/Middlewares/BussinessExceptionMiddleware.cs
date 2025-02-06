@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using CarStockBLL.CustomException;
-using Newtonsoft.Json;
+
 
 namespace CarStockAPI.Middlewares
 {

@@ -1,4 +1,4 @@
-﻿using CarStockDAL.Data.Interfaces.WS;
+﻿using CarStockDAL.Data.Interfaces.MaintenanceRepo;
 using CarStockDAL.Models.WS;
 using Microsoft.EntityFrameworkCore;
 

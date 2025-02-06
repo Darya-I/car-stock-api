@@ -10,7 +10,6 @@ namespace CarStockBLL.Interfaces
         /// <summary>
         /// Создает новую запись о тех. работах в базе данных
         /// </summary>
-        /// <param name="maintenance">DTO добавления тех. работ</param>
         Task CreateMaintenanceAsync();
 
         /// <summary>

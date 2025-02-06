@@ -1,4 +1,4 @@
-﻿using CarStockBLL.DTO.Admin;
+﻿using CarStockAPI.Filters;
 using CarStockBLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,7 +35,7 @@ namespace CarStockAPI.Controllers
         /// <summary>
         /// Создание новой записи о тех. работах
         /// </summary>
-
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [HttpPost("CreateMaintenance")]
         public async Task<IActionResult> CreateMaintenance()
         {
@@ -49,6 +49,7 @@ namespace CarStockAPI.Controllers
         /// Удаление записи о тех. работах по идентификатору
         /// </summary>
         /// <param name="id">Идентификатор записи тех. работ</param>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [HttpDelete("DeleteMaintenance/{id}")]
         public async Task<IActionResult> DeleteMaintenance([FromRoute] int id)
         {

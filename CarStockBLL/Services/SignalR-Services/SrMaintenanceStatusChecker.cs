@@ -1,16 +1,18 @@
-﻿using CarStockDAL.Data.Interfaces.WS;
+﻿using CarStockBLL.Hubs;
+using CarStockDAL.Data.Interfaces.MaintenanceRepo;
+using Microsoft.AspNetCore.SignalR;
 
-namespace CarStockBLL.Services.WS_Services
+namespace CarStockBLL.Services.SignalR_Services
 {
     /// <summary>
-    /// Класс фоновой задачи, которая проверяет состояние тех. работ в БД и оповещения по WS
+    /// Класс фоновой задачи, которая проверяет состояние тех. работ в БД и оповещения по SignalR
     /// </summary>
-    public class MaintenanceStatusChecker : IHostedService, IDisposable
+    public class SrMaintenanceStatusChecker : IHostedService, IDisposable
     {
         /// <summary>
-        /// Экземляр логгера
+        /// Экземпляр логгера
         /// </summary>
-        private readonly ILogger<MaintenanceStatusChecker> _logger;
+        private readonly ILogger<SrMaintenanceStatusChecker> _logger;
 
         /// <summary>
         /// Провайдер сервисов для получения зависимостей
@@ -18,23 +20,22 @@ namespace CarStockBLL.Services.WS_Services
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Обработчик WS-соединений
+        /// Объект хаба для взаимодействия с подключенными клиентами
         /// </summary>
-        private readonly WebSocketHandler _wsHandler; 
+        private readonly IHubContext<NotifierHub> _hubContext;
         
         /// <summary>
-        /// Экземпляр таймера
+        /// Таймер
         /// </summary>
-        private Timer _timer;
+        private Timer? _timer;
 
-        public MaintenanceStatusChecker(ILogger<MaintenanceStatusChecker> logger,
-                                        WebSocketHandler webSocketHandler,
-                                        IServiceProvider serviceProvider)
+        public SrMaintenanceStatusChecker(ILogger<SrMaintenanceStatusChecker> logger,
+                                          IServiceProvider serviceProvider,
+                                          IHubContext<NotifierHub> hubContext)
         {
-            _serviceProvider = serviceProvider;
             _logger = logger;
-            _wsHandler = webSocketHandler;
-            
+            _serviceProvider = serviceProvider;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -42,40 +43,38 @@ namespace CarStockBLL.Services.WS_Services
         /// Устанавливает таймер на каждые 5 минут. Метод <c>CheckMaintenance</c> вызывается сразу
         /// </summary>
         /// <param name="cancellationToken">Токен завершеия</param>
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer
-                (async state => await CheckMaintenance(),
+            _timer = new Timer(
+                async state => await CheckMaintenance(),
                 null,
                 TimeSpan.Zero,
-                TimeSpan.FromSeconds(30));
+                TimeSpan.FromMinutes(5));
 
             return Task.CompletedTask;
         }
 
         /// <summary>
         ///  Проверяет состояние тех. работ на сервере и отправляет соответствующее сообщение
-        ///  активным клиентам WS
+        ///  активным клиентам через <c>_hubContext</c>
         /// </summary>
-        private async Task CheckMaintenance()
+        public async Task CheckMaintenance()
         {
             try
             {
                 _logger.LogInformation("Checking server status");
 
                 // Создаем новый scope для разрешения scoped репозитория
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var maintenanceRepository = scope.ServiceProvider.GetRequiredService<IMaintenanceRepository>();
-                    bool hasMaintenance = await maintenanceRepository.IsMaintenanceActiveAsync();
+                using var scope = _serviceProvider.CreateScope();
+                var maintenanceRepository = scope.ServiceProvider.GetRequiredService<IMaintenanceRepository>();
 
-                    string message = hasMaintenance
-                        ? "Сервер недоступен, идут технические работы"
-                        : "Сервер доступен";
+                bool hasMaintenance = await maintenanceRepository.IsMaintenanceActiveAsync();
 
-                    await _wsHandler.BroadcastMessage(message);
+                string message = hasMaintenance
+                    ? "Сервер недоступен, идут технические работы"
+                    : "Сервер доступен";
 
-                }
+                await _hubContext.Clients.All.SendAsync("RecieveNotification", message);
             }
             catch (Exception ex)
             {
@@ -89,11 +88,11 @@ namespace CarStockBLL.Services.WS_Services
         /// Останавливает таймер
         /// </summary>
         /// <param name="cancellationToken">Токен завершеия</param>
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             _timer?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
-        } 
+        }
 
         /// <summary>
         /// Освобождает ресурсы таймера

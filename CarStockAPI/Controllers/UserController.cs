@@ -1,4 +1,5 @@
-﻿using CarStockBLL.DTO.User;
+﻿using CarStockAPI.Filters;
+using CarStockBLL.DTO.User;
 using CarStockBLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="user">DTO для создания пользователя</param>
         /// <returns>Созданный пользователь</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "CreateUserPolicy")]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser(CreateUserDTO user)
@@ -54,6 +56,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="email">Почта пользователя</param>
         /// <returns>Результат удаления</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "DeleteUserPolicy")]
         [HttpDelete("DeleteUser/{email}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string email)
@@ -69,6 +72,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="updateUserDTO">DTO пользователя для обновления</param>
         /// <returns>Результат обновления</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "EditUserPolicy")]
         [HttpPatch("UpdateUser")]
         public async Task<IActionResult> UpdateUser(UpdateUserDTO updateUserDTO)
@@ -83,6 +87,7 @@ namespace CarStockAPI.Controllers
         /// Получение списка пользователей
         /// </summary>
         /// <returns>Список пользователй</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "ViewUserPolicy")]
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
@@ -98,6 +103,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="email">Почта пользователя</param>
         /// <returns>Пользователь</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "ViewUserPolicy")]
         [HttpGet("GetUser/{email}")]
         public async Task<IActionResult> GetUser([FromRoute] string email)

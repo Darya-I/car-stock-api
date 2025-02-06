@@ -1,5 +1,5 @@
 ﻿using CarStockBLL.Interfaces;
-using CarStockDAL.Data.Interfaces.WS;
+using CarStockDAL.Data.Interfaces.MaintenanceRepo;
 using CarStockDAL.Models.WS;
 
 namespace CarStockBLL.Services

@@ -1,4 +1,5 @@
-﻿using CarStockBLL.DTO.Auth;
+﻿using CarStockAPI.Filters;
+using CarStockBLL.DTO.Auth;
 using CarStockBLL.Interfaces;
 using CarStockBLL.Map;
 using Microsoft.AspNetCore.Authentication;
@@ -103,6 +104,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="request">Данные пользователя для входа</param>
         /// <returns>Access токен</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         { 
@@ -119,6 +121,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="refreshTokenRequest">Refresh токен</param>
         /// <returns>Новый access токен</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [HttpPost("Refresh")] 
         public async Task<IActionResult> Refresh([FromBody] string refreshTokenRequest)
         {

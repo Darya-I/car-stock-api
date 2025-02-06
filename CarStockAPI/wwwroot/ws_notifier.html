@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>Уведомления о технических работах</title>
+    <title>WebSocket уведомления</title>
     <style>
         #messages {
             width: 400px;
@@ -34,7 +34,7 @@
             };
 
             socket.onmessage = function (event) {
-                addMessage("📢 " + event.data); // Сообщение с иконкой
+                addMessage("📢 " + event.data);
             };
 
             socket.onclose = function () {

@@ -1,6 +1,5 @@
-﻿using System.Linq;
-using System.Text;
-using CarStockDAL.Data.Interfaces.WS;
+﻿using System.Text;
+using CarStockDAL.Data.Interfaces.MaintenanceRepo;
 
 namespace CarStockAPI.Middlewares
 {
@@ -15,13 +14,15 @@ namespace CarStockAPI.Middlewares
         private readonly RequestDelegate _next;
 
         /// <summary>
-        /// Список допустимых путей, которые не проверяет middleware
+        /// Список допустимых путей, которые допускает middleware
         /// </summary>
         private readonly List<string> _excludedPaths = new List<string>
         {
-            "/notifier.html",
-            "/api/notifier/status",
-            "/api/notifier/ws"
+            "/sr_notifier.html",
+            "/ws_notifier.html",
+            "/api/notifier/ws",
+            "/notifier",
+            "/notifier/negotiate"
         };
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace CarStockAPI.Middlewares
                 await _next(context);
                 return;
             }
+
             if (await repo.IsMaintenanceActiveAsync())
             {
                 _logger.LogInformation("MaintenanceMiddleware: Server is in maintenance mode.");

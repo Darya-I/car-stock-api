@@ -19,9 +19,10 @@ using Microsoft.OpenApi.Models;
 using CarStockBLL.Map;
 using CarStockAPI.Filters;
 using CarStockAPI.Extensions;
-using CarStockDAL.Data.Interfaces.WS;
 using CarStockDAL.Data.Repositories.WS;
-using CarStockBLL.Services.WS_Services;
+using CarStockBLL.Hubs;
+using CarStockBLL.Services.SignalR_Services;
+using CarStockDAL.Data.Interfaces.MaintenanceRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,14 +82,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 }
 );
-//                                              Настройка глобального фильтра
-builder.Services.AddControllers(
-//    options =>
-//{
-//    options.Filters.Add<RequireAcceptHeaderFilter>();
-//}
-);
 
+builder.Services.AddControllers();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
@@ -120,8 +117,11 @@ builder.Services.AddScoped<UserMapper>();
 builder.Services.AddScoped<CarMapper>();
 
 
-builder.Services.AddSingleton<WebSocketHandler>();
-builder.Services.AddSingleton<IHostedService, MaintenanceStatusChecker>(); // Фоновая задача 
+//builder.Services.AddSingleton<WebSocketHandler>();
+//builder.Services.AddSingleton<IHostedService, WsMaintenanceStatusChecker>(); // Фоновая задача 
+builder.Services.AddSingleton<IHostedService, SrMaintenanceStatusChecker>(); // для signalR
+
+builder.Services.AddScoped<RequireAcceptHeaderFilter>();
 
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
@@ -249,5 +249,7 @@ app.UseAuthorization();
 app.UseStaticFiles();
 
 app.MapControllers();
+
+app.MapHub<NotifierHub>("/notifier"); // NotifierHub обработает запросы по этому пути
 
 app.Run();

@@ -1,4 +1,4 @@
-﻿namespace CarStockDAL.Data.Interfaces.WS
+﻿namespace CarStockDAL.Data.Interfaces.MaintenanceRepo
 {
     /// <summary>
     /// Интерфейс для операций над тех. работами в БД

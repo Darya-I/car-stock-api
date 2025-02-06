@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using CarStockBLL.Map;
 using CarStockBLL.DTO.Car;
+using CarStockAPI.Filters;
 
 namespace CarStockAPI.Controllers
 {
@@ -48,6 +49,7 @@ namespace CarStockAPI.Controllers
         /// Получение списка автомобилей
         /// </summary>
         /// <returns>Список автомобилей</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "ViewCarPolicy")]
         [HttpGet("GetCars")]
         public async Task<IActionResult> GetAllCarsAsync()
@@ -63,6 +65,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carDto">DTO автомобиля</param>
         /// <returns>DTO созданного автомобиля</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "CreateCarPolicy")]
         [HttpPost("CreateCar")]
         public async Task<IActionResult> CreateCarAsync(CarDTO carDto)
@@ -79,6 +82,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <returns>DTO найденного автомобиля</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "ViewCarPolicy")]
         [HttpGet("GetCar/{id}")]
         public async Task<ActionResult> GetCarByIdAsync(int id)
@@ -94,6 +98,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carDTO">DTO автомобиля</param>
         /// <returns>Результат обновления</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "EditCarPolicy")]
         [HttpPut("UpdateCar/{id}")]
         public async Task<IActionResult> UpdateCar([FromBody] CarDTO carDTO)
@@ -110,6 +115,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор автомобиля</param>
         /// <returns>Результат удаления</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "DeleteCarPolicy")]
         [HttpDelete("DeleteCar/{id}")]
         public async Task<IActionResult> DeleteCar(int id)
@@ -125,6 +131,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carDto">DTO доступности автомобиля</param>
         /// <returns>Результат изменения доступности</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "EditCarPolicy")]
         [HttpPatch("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityDTO carDto)
@@ -140,6 +147,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="carDto">DTO количества автомобиля</param>
         /// <returns>Результат изменения количества</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "EditCarPolicy")]
         [HttpPatch("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountDTO carDto)
