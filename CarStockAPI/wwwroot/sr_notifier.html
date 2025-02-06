@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>SignalR уведомления</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <style>
+        #messages {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .message {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Уведомления о технических работах</h1>
+    <div id="messages"></div>
+
+    <script>
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/notifier") // Убедитесь, что путь совпадает с сервером
+            .withAutomaticReconnect()
+            .build();
+
+        hubConnection.on("RecieveNotification", (message) => {
+            addMessage("📢 " + message);
+        });
+
+        async function startConnection() {
+            try {
+                await hubConnection.start();
+                addMessage("✅ Соединение установлено");
+            } catch (err) {
+                addMessage("🔴 Ошибка соединения, повторная попытка...");
+                setTimeout(startConnection, 5000); // Повторное подключение через 5 сек
+            }
+        }
+
+        function addMessage(text) {
+            const messagesDiv = document.getElementById("messages");
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+            messageElement.textContent = text;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        hubConnection.onclose(() => {
+            addMessage("🔴 Соединение потеряно, переподключение...");
+            setTimeout(startConnection, 5000);
+        });
+
+        startConnection();
+    </script>
+</body>
+</html>

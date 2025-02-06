@@ -19,6 +19,10 @@ using Microsoft.OpenApi.Models;
 using CarStockBLL.Map;
 using CarStockAPI.Filters;
 using CarStockAPI.Extensions;
+using CarStockDAL.Data.Repositories.WS;
+using CarStockBLL.Hubs;
+using CarStockBLL.Services.SignalR_Services;
+using CarStockDAL.Data.Interfaces.MaintenanceRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,12 +82,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 }
 );
-//                                              Настройка глобального фильтра
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<RequireAcceptHeaderFilter>();
-});
 
+builder.Services.AddControllers();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
@@ -99,6 +101,7 @@ builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand
 builder.Services.AddScoped<ICarModelRepository<CarModel>, PostgreCarModelRepository<CarModel>>();
 builder.Services.AddScoped<IColorRepository<Color>, PostgreColorRepository<Color>>();
 builder.Services.AddScoped<IUserRepository, PostgreUserRepository>();
+builder.Services.AddScoped<IMaintenanceRepository, PostgreMaintenanceRepository>();
 
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
@@ -108,9 +111,17 @@ builder.Services.AddScoped<IColorService, ColorService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizeUserService, AuthorizeUserService>();
+builder.Services.AddScoped<IMaitenanceService, MaintenanceService>();
 
 builder.Services.AddScoped<UserMapper>();
 builder.Services.AddScoped<CarMapper>();
+
+
+//builder.Services.AddSingleton<WebSocketHandler>();
+//builder.Services.AddSingleton<IHostedService, WsMaintenanceStatusChecker>(); // Фоновая задача 
+builder.Services.AddSingleton<IHostedService, SrMaintenanceStatusChecker>(); // для signalR
+
+builder.Services.AddScoped<RequireAcceptHeaderFilter>();
 
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
@@ -206,12 +217,24 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<AllowedPathsOptions>(builder.Configuration.GetSection("AllowedPaths")); // Для использования в middleware проверки
+
 var app = builder.Build();
 
 app.UseCors("CorsPolicy");
 
+// Включаем поддержку WebSocket
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2) // Поддержка соединения
+};
+app.UseWebSockets(webSocketOptions);
+
 //                                              Установка middleware исключений
 app.UseMiddleware<BussinessExceptionMiddleware>();
+//                                              Установка middleware проверки тех. работ
+app.UseMiddleware<MaintenanceMiddleware>();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -225,6 +248,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseStaticFiles();
+
 app.MapControllers();
+
+app.MapHub<NotifierHub>("/notifier"); // NotifierHub обработает запросы по этому пути
 
 app.Run();

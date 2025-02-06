@@ -46,6 +46,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="request">Запрос обновления пользователя</param>
         /// <returns>Обновленный пользователь</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "AccountPolicy")]
         [HttpPatch("Edit")]
         public async Task<IActionResult> AccountEdit(EditRequest request)
@@ -62,6 +63,7 @@ namespace CarStockAPI.Controllers
         /// </summary>
         /// <param name="request">Запрос для создания пользователя</param>
         /// <returns>Созданный пользователь</returns>
+        [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
