@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using CarStockBLL.CustomException;
+using FluentValidation;
 
 
 namespace CarStockAPI.Middlewares
@@ -32,7 +33,7 @@ namespace CarStockAPI.Middlewares
                 case InvalidUserDataException:
                     code = HttpStatusCode.Unauthorized;
                     break;
-                case ValidationErrorException:
+                case ValidationErrorException or ValidationException:
                     code = HttpStatusCode.BadRequest;
                     break;
                 case EntityAlreadyExistsException:
