@@ -133,7 +133,7 @@ namespace CarStockAPI.Controllers
         /// <returns>Результат изменения доступности</returns>
         [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "EditCarPolicy")]
-        [HttpPatch("UpdateCarAvailability/{id}")]
+        [HttpPut("UpdateCarAvailability/{id}")]
         public async Task<IActionResult> UpdateCarAvailability([FromBody] CarAvailabilityDTO carDto)
         {
             _logger.LogInformation($"Attempting to update availability for car with ID {carDto.Id}");                   
@@ -149,7 +149,7 @@ namespace CarStockAPI.Controllers
         /// <returns>Результат изменения количества</returns>
         [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [Authorize(Policy = "EditCarPolicy")]
-        [HttpPatch("UpdateCarAmount/{id}")]
+        [HttpPut("UpdateCarAmount/{id}")]
         public async Task<IActionResult> UpdateCarAmount([FromBody] CarAmountDTO carDto)
         {
             _logger.LogInformation($"Attempting to update amount for car with ID {carDto.Id}");           

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockAPI", "CarStockAPI\CarStockAPI.csproj", "{847D80FA-1B1E-442D-A314-B8D3FD05DD74}"
+	ProjectSection(ProjectDependencies) = postProject
+		{05D2D65D-8757-40CA-AB27-467B8759BDB6} = {05D2D65D-8757-40CA-AB27-467B8759BDB6}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarStockBLL", "CarStockBLL\CarStockBLL.csproj", "{090F485A-2B13-4357-A922-22BECEC178D2}"
 EndProject
@@ -16,6 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CQRS", "CQRS", "{41355388-7224-4720-80A4-4005BA824259}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatrBL", "..\MediatrBL\MediatrBL.csproj", "{05D2D65D-8757-40CA-AB27-467B8759BDB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{65660E1E-3A7B-4CD3-A784-40DE06DD113F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,8 +48,19 @@ Global
 		{C6E1F09F-CAC4-4220-848C-33BD37D1CA09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6E1F09F-CAC4-4220-848C-33BD37D1CA09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6E1F09F-CAC4-4220-848C-33BD37D1CA09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05D2D65D-8757-40CA-AB27-467B8759BDB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05D2D65D-8757-40CA-AB27-467B8759BDB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05D2D65D-8757-40CA-AB27-467B8759BDB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05D2D65D-8757-40CA-AB27-467B8759BDB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65660E1E-3A7B-4CD3-A784-40DE06DD113F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65660E1E-3A7B-4CD3-A784-40DE06DD113F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65660E1E-3A7B-4CD3-A784-40DE06DD113F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65660E1E-3A7B-4CD3-A784-40DE06DD113F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{05D2D65D-8757-40CA-AB27-467B8759BDB6} = {41355388-7224-4720-80A4-4005BA824259}
 	EndGlobalSection
 EndGlobal
