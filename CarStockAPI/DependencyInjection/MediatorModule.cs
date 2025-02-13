@@ -29,6 +29,7 @@ namespace CarStockAPI.DependencyInjection
             // Регистрация всех обработчиков команд/запросов
             builder.RegisterAssemblyTypes(assembly)
                    .AsClosedTypesOf(typeof(IRequestHandler<,>))
+                   .InstancePerLifetimeScope()
                    .AsImplementedInterfaces();
 
             // Регистрация ValidationBehavior в MediatR pipeline

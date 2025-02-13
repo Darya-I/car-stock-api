@@ -24,14 +24,9 @@ using CarStockBLL.Hubs;
 using CarStockBLL.Services.SignalR_Services;
 using CarStockDAL.Data.Interfaces.MaintenanceRepo;
 using MediatrBL.Services;
-using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CarStockAPI.DependencyInjection;
-using MediatR;
-using MediatrBL.Application.Behaviours;
-using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +39,7 @@ builder.Configuration
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
-        .ReadFrom.Configuration(context.Configuration) 
+        .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services)
         .WriteTo.PostgreSQL(
             connectionString: context.Configuration.GetConnectionString("DefaultConnection"),
@@ -62,6 +57,9 @@ builder.Host.UseSerilog((context, services, configuration) =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
+
+
 
 //                                              Настройка в сваггере для авторизации
 builder.Services.AddSwaggerGen(options =>
@@ -105,6 +103,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
+
+
+
 //                                              Регистрация сервисов
 builder.Services.AddScoped<ICarRepository<Car>, PostgreCarRepository<Car>>();
 builder.Services.AddScoped<IBrandRepository<Brand>, PostgreBrandRepository<Brand>>();
@@ -132,28 +133,33 @@ builder.Services.AddScoped<CarMapper>();
 //builder.Services.AddSingleton<IHostedService, WsMaintenanceStatusChecker>(); // Фоновая задача 
 builder.Services.AddSingleton<IHostedService, SrMaintenanceStatusChecker>(); // для signalR
 
+
+
 //                                               Настройка фильтра
 builder.Services.AddScoped<RequireAcceptHeaderFilter>();
-
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
-
 builder.Services.AddScoped<ITokenService, TokenService>(sp =>
 {
     var logger = sp.GetRequiredService<ILogger<ITokenService>>();
     return new TokenService(jwtConfig.Secret, jwtConfig.Issuer, jwtConfig.Audience, logger);
 });
 
+
+
 //                                               Используем Autofac для MediatR вместо стандартного DI
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterModule(new MediatorModule());
 });
 
 
+
 //                                              Google
 builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Authentication:Google"));
+
+
+
 
 //                                              Аутентификация с JWT
 builder.Services.AddAuthentication((options => {
@@ -223,6 +229,9 @@ builder.Services.AddAuthorization(options =>
             policy.RequireClaim("Permission", "CanEditAccount"));
 });
 
+
+
+//                                              Настройки CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 var allowedHeaders = builder.Configuration.GetSection("Cors:AllowedHeaders").Get<string[]>();
 var allowedMethods = builder.Configuration.GetSection("Cors:AllowedMethods").Get<string[]>();
@@ -238,13 +247,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
+
 builder.Services.Configure<AllowedPathsOptions>(builder.Configuration.GetSection("AllowedPaths")); // Для использования в middleware проверки
-
 var app = builder.Build();
-
 app.UseCors("CorsPolicy");
 
-// Включаем поддержку WebSocket
+
+
+
+//                                               Включаем поддержку WebSocket
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2) // Поддержка соединения
@@ -253,8 +266,12 @@ app.UseWebSockets(webSocketOptions);
 
 //                                              Установка middleware исключений
 app.UseMiddleware<BussinessExceptionMiddleware>();
+
+
+
 //                                              Установка middleware проверки тех. работ
 app.UseMiddleware<MaintenanceMiddleware>();
+
 
 
 if (app.Environment.IsDevelopment())
@@ -265,14 +282,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseStaticFiles();
-
 app.MapControllers();
-
 app.MapHub<NotifierHub>("/notifier"); // NotifierHub обработает запросы по этому пути
 
 app.Run();
