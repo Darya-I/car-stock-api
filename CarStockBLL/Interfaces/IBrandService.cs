@@ -20,5 +20,7 @@ namespace CarStockBLL.Interfaces
         /// <param name="id">Идентификатор марки</param>
         /// <returns>Объект марки автомобиля</returns>
         Task<Brand> GetBrandByIdAsync(int id);
+
+        Task<List<Brand>> GetAllBrandsAsync();
     }
 }

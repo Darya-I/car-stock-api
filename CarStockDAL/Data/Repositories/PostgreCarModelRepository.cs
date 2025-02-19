@@ -95,5 +95,17 @@ namespace CarStockDAL.Data.Repositories
         {
             return await _carModels.FirstOrDefaultAsync(b => b.Name == name);
         }
+
+        /// <summary>
+        /// Получает модели автомобиля по идентификатору марки
+        /// </summary>
+        /// <param name="id">Идентификатор марки</param>
+        /// <returns>Объект модели</returns>
+        public async Task<List<CarModel>> GetModelByBrandIdAsync(int id)
+        {
+            return await _carModels
+                .Where(b => b.BrandId == id)
+                .ToListAsync();   
+        }
     }
 }

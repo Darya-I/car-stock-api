@@ -73,5 +73,10 @@ namespace CarStockBLL.Services
 
             return brand;
         }
+
+        public Task<List<Brand>> GetAllBrandsAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

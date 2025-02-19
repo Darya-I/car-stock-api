@@ -20,5 +20,7 @@ namespace CarStockBLL.Interfaces
         /// <param name="id">Идентификатор модели</param>
         /// <returns>Объект модели автомобиля</returns>
         Task<CarModel> GetCarModelByIdAsync(int id);
+
+        Task<List<CarModel>> GetCarModelByBrandIdAsync(int id);
     }
 }

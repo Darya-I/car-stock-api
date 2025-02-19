@@ -58,9 +58,6 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-
-
-
 //                                              Настройка в сваггере для авторизации
 builder.Services.AddSwaggerGen(options =>
 {
@@ -115,9 +112,9 @@ builder.Services.AddScoped<IUserRepository, PostgreUserRepository>();
 builder.Services.AddScoped<IMaintenanceRepository, PostgreMaintenanceRepository>();
 
 builder.Services.AddScoped<ICarService, CarServiceWithMediatr>();
-builder.Services.AddScoped<IBrandService, BrandService>();
-builder.Services.AddScoped<ICarModelService, CarModelService>();
-builder.Services.AddScoped<IColorService, ColorService>();
+builder.Services.AddScoped<IBrandService, BrandServiceWithMediatr>();
+builder.Services.AddScoped<ICarModelService, CarModelServiceWithMediatr>();
+builder.Services.AddScoped<IColorService, ColorServiceWithMediatr>();
 
 
 builder.Services.AddScoped<IUserService, UserServiceWithMediatr>();
@@ -239,8 +236,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithMethods(allowedMethods)
-        .WithHeaders(allowedHeaders)
+        policy.AllowAnyHeader()
+        .AllowAnyMethod()
+        //policy.WithMethods(allowedMethods)
+        //.WithHeaders(allowedHeaders)
         .WithOrigins(allowedOrigins)
         .AllowCredentials();
 

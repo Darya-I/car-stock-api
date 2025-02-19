@@ -15,7 +15,8 @@ namespace CarStockBLL.DTO.Account
         /// <summary>
         /// Юзернейм пользователя
         /// </summary>
-        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Username can only contain English letters.")]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z0-9_-]{3,23}$",
+            ErrorMessage = "Username must start with a letter and contain only English letters, numbers, '_' or '-'. Length: 4-24.")]
         public string UserName { get; set; }
 
         /// <summary>
@@ -23,8 +24,9 @@ namespace CarStockBLL.DTO.Account
         /// </summary>
         [Required]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
-        [RegularExpression(@"^(?=.*\d)(?=.*[A-Z])(?=.*[\W_]).{6,}$",
-        ErrorMessage = "Password must contain at least one digit, one uppercase letter, and one special character.")]
+        [MaxLength(16, ErrorMessage = "Password must be at most 16 characters long.")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$",
+            ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&). Length: 8-16.")]
         public string Password { get; set; }
     }
 }

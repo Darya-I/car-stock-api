@@ -10,9 +10,6 @@ namespace MediatrBL.Application.Validators.Cars
     {
         public CreateCarCommandValidator() 
         {
-            RuleFor(command => command.Car.Id)
-                .NotEmpty()
-                .WithMessage("The car identifier cannot be empty");
 
             RuleFor(command => command.Car.BrandId)
                 .NotEmpty()
@@ -27,7 +24,7 @@ namespace MediatrBL.Application.Validators.Cars
                 .WithMessage("The color identifier cannot be empty");
 
             RuleFor(command => command.Car.IsAvailable)
-                .NotEmpty()
+                .NotNull()
                 .WithMessage($"The availability of car cannot be empty");
 
             RuleFor(command => command.Car.Amount)

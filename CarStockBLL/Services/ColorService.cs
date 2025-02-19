@@ -76,5 +76,10 @@ namespace CarStockBLL.Services
 
             return color;
         }
+
+        public Task<List<Color>> GetAllColorsAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

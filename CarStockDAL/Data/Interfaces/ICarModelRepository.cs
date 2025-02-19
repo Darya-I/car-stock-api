@@ -47,5 +47,12 @@ namespace CarStockDAL.Data.Interfaces
         /// <param name="name">Название модели</param>
         /// <returns>Модель автомобиля</returns>
         Task<T> GetCarModelByNameAsync(string name);
+
+        /// <summary>
+        /// Получает модель автомобиля по идентификатору марки
+        /// </summary>
+        /// <param name="id">Идентификатор марки</param>
+        /// <returns>Объект модели</returns>
+        Task<List<CarModel>> GetModelByBrandIdAsync(int id);
     }
 }

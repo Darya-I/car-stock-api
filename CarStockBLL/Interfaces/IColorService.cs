@@ -20,5 +20,7 @@ namespace CarStockBLL.Interfaces
         /// <param name="id">Идентификатор цвета</param>
         /// <returns>Объект цвета автомобиля</returns>
         Task<Color> GetColorByIdAsync(int id);
+
+        Task<List<Color>> GetAllColorsAsync();
     }
 }

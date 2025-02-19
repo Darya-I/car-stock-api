@@ -71,5 +71,10 @@ namespace CarStockBLL.Services
             }
             return carModel;
         }
+
+        public Task<List<CarModel>> GetCarModelByBrandIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
