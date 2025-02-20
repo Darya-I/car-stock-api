@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CarStockBLL.CustomException;
+﻿using CarStockBLL.CustomException;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using MediatR;
@@ -23,6 +18,13 @@ namespace MediatrBL.Application.Handlers.CarModels
             _carModelRepository = carModelRepository;
         }
 
+        /// <summary>
+        /// Обрабатывает команду на получение списка моделей для определенной марки
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
         public async Task<List<CarModel>> Handle(GetCarModelByBrandIdQuery request, CancellationToken cancellationToken)
         {
             var carModels = await _carModelRepository.GetModelByBrandIdAsync(request.id);

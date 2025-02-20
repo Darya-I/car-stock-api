@@ -11,30 +11,41 @@ import EditCarPage from './pages/Cars/EditCarPage';
 import Register from './Auth/Register';
 import Login from './Auth/Login';
 import RequireAuth from './Auth/RequireAuth';
-
-
-
+import { ToastContainer } from 'react-toastify';
+import ForbiddenPage from './pages/ForbiddenPage';
 function App() {
   return (
-    <ChakraProvider value={defaultSystem}>
-      <Router>
-        <Routes>
-          <Route path='/' Component={HomePage} />
-          <Route path="/register" Component={Register} />
-          <Route path='/login' Component={Login} />
-          <Route element={<RequireAuth />}>
-            <Route path='/cars' Component={CarsPage} />
-            <Route path='/getcars' Component={GetCarsPage} />
-            <Route path='/createcar' Component={CreateCarPage} />
-            <Route element={<RequireAuth requiredPolicy="CanEditCar" />}>
-              <Route path="/edit-car/:id" Component={EditCarPage} />
+    <>
+      <ToastContainer />
+      <ChakraProvider value={defaultSystem}>
+        <Router>
+          <Routes>
+            <Route path='/' Component={HomePage} />
+            <Route path='/register' Component={Register} />
+            <Route path='/login' Component={Login} />
+            <Route path='/forbidden' Component={ForbiddenPage} />
+            {/* Защищенные маршруты */}
+            <Route element={<RequireAuth />}>
+              <Route path='/cars' Component={CarsPage} />
+              <Route path='/getcars' Component={GetCarsPage} />
+
+              {/* Доступ только с правом "CanEditCar" */}
+              <Route element={<RequireAuth requiredPolicy="CanEditCar" />}>
+                <Route path='/edit-car/:id' Component={EditCarPage} />
+              </Route>
+
+              <Route element={<RequireAuth requiredPolicy="CanCreateCar" />}>
+                <Route path='/createcar' Component={CreateCarPage} />
+              </Route>
+
+              <Route path='/users' Component={UsersPage} />
+              <Route path='/account' Component={AccountPage} />
             </Route>
-            <Route path='/users' Component={UsersPage} />
-            <Route path='/account' Component={AccountPage} />
-          </Route>
-        </Routes>
-      </Router>
-    </ChakraProvider>
+          </Routes>
+        </Router>
+      </ChakraProvider>
+    </>
+
   )
 }
 

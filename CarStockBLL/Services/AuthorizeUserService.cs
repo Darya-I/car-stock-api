@@ -154,7 +154,7 @@ namespace CarStockBLL.Services
                 
                 return new RefreshTokenResponse 
                 { 
-                    Token = accessToken,
+                    AccessToken = accessToken,
                     Expires = expires 
                 };
 

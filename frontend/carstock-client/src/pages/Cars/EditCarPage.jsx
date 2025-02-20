@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../../axios/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { Fieldset, DataList, Input, Text, Stack, Card, Heading, Button } from "@chakra-ui/react";
 import { NativeSelectField, NativeSelectRoot } from "@chakra-ui/react";
@@ -20,8 +20,8 @@ const EditCarPage = () => {
     const [isAvailable, setAvailable] = useState(false);
 
 
-    const updateCarApi = "https://localhost:7087/api/Car/UpdateCar";
-    const getCarApi = `https://localhost:7087/api/Car/GetCar/${carId}`;
+    const updateCarApi = "/api/Car/UpdateCar";
+    const getCarApi = `/api/Car/GetCar/${carId}`;
 
     const [car, setCar] = useState([]);
 
@@ -42,7 +42,7 @@ const EditCarPage = () => {
     useEffect(() => {
         const fetchBrand = async () => {
             try {
-                const respone = await axios.get("https://localhost:7087/api/Brand/GetBrands");
+                const respone = await axios.get("/api/Brand/GetBrands");
                 setBrands(respone.data);
 
             } catch (error) {
@@ -59,7 +59,7 @@ const EditCarPage = () => {
                 return;
             }
             try {
-                const response = await axios.get(`https://localhost:7087/api/CarModel/GetModelByBrand/${selectedBrand}`);
+                const response = await axios.get(`/api/CarModel/GetModelByBrand/${selectedBrand}`);
                 setModels(response.data);
             } catch (error) {
                 console.error("Ошибка загрузки моделей:", error);
@@ -75,7 +75,7 @@ const EditCarPage = () => {
                 return;
             }
             try {
-                const response = await axios.get("https://localhost:7087/api/Color/GetColors");
+                const response = await axios.get("/api/Color/GetColors");
                 setColors(response.data);
             } catch (error) {
                 console.error("Ошибка загрузки цветов:", error);

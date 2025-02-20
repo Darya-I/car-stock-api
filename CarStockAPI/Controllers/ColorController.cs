@@ -9,7 +9,7 @@ namespace CarStockAPI.Controllers
     public class ColorController : ControllerBase
     {
         /// <summary>
-        /// Экземпляр сервиса операций над автомобилями
+        /// Экземпляр сервиса операций над цветами
         /// </summary>
         private readonly IColorService _colorService;
 
@@ -24,6 +24,10 @@ namespace CarStockAPI.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Получает список цветов автомобиля
+        /// </summary>
+        /// <returns>Список цветов</returns>
         [HttpGet("GetColors")]
         public async Task<IActionResult> GetAllColorAsync()
         {

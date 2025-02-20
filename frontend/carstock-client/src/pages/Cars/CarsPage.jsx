@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Button, Stack } from "@chakra-ui/react";
 import '../styles/CarsPage.css';
 import { useNavigate } from "react-router-dom";

@@ -1,12 +1,15 @@
 import { Button, Card, Field, Input, Stack, Text } from "@chakra-ui/react";
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import axios from "../axios/axios"
+import { useContext, useEffect, useRef, useState } from "react";
 import  useAuth  from '../hooks/useAuth'
 import { useLocation, useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthProvider";
+import useLogout from "../hooks/useLogout";
 
 const Login = () => {
-    const { setAuth } = useAuth();
+    const { setAuth } = useContext(AuthContext);
     
+    const logout = useLogout();
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
@@ -32,7 +35,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault;
         try {
-            const response = await axios.post('https://localhost:7087/api/Auth/Login',
+            const response = await axios.post('/api/Auth/Login',
                 JSON.stringify(
                     {
                         email: email,
@@ -110,7 +113,10 @@ const Login = () => {
                         </Card.Body>
                         <Card.Footer justifyContent="space-between" flexDirection="column" alignItems="baseline">
                             <Stack direction="row" spacing={4} w="full" justifyContent="space-between">
-                                <Button variant="outline">Отмена</Button>
+                                <Button variant="outline"
+                                onClick={logout}>
+                                    Отмена
+                                </Button>
                                 <Button
                                     disabled={!email || !pswrd}
                                     variant="ghost" color="blue.700"

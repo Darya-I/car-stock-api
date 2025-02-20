@@ -15,11 +15,6 @@ const RequireAuth = ({ requiredPolicy }) => {
 
     return <Outlet />
     
-    return (
-        auth?.email
-            ? <Outlet />
-            : <Navigate to='/login' state={ {from: location}} replace /> 
-    );
 }
 
 export default RequireAuth;

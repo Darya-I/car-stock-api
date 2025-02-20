@@ -65,7 +65,8 @@ namespace MediatrBL.Application.Handlers.Users
 
             return new RefreshTokenResponse
             {
-                Token = accessToken,
+                AccessToken = accessToken,
+                RefreshToken = newRefreshToken,
                 Expires = expires
             };
         }

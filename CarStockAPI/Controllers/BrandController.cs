@@ -9,7 +9,7 @@ namespace CarStockAPI.Controllers
     public class BrandController : ControllerBase
     {
         /// <summary>
-        /// Экземпляр сервиса операций над автомобилями
+        /// Экземпляр сервиса операций над марками
         /// </summary>
         public readonly IBrandService _brandService;
 
@@ -25,6 +25,10 @@ namespace CarStockAPI.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Получает список всех марок
+        /// </summary>
+        /// <returns>Список марок</returns>
         [HttpGet("GetBrands")]
         public async Task<IActionResult> GetAllBrandsAsync()
         {

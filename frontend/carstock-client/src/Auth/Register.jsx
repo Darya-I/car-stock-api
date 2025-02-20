@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react"
 import { faCheck, faInfoCircle, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Field, Fieldset, DataList, Input, Text, Stack, Card, Heading, Button } from "@chakra-ui/react";
-import axios from "axios";
+import axios from "../axios/axios";
 
 
 const USER_REGEX = /^[a-zA-Z0-9_-]{3,23}$/;
@@ -115,7 +115,7 @@ const Register = () => {
                 <section>
                     <h3 style={{ marginBottom: "10px" }}>Вы успешно зарегистрировались</h3>
                     <p style={{ marginTop: "10px" }}>
-                        <a href="#">Войти</a>
+                        <a href="/login">Войти</a>
                     </p>
                 </section>
 

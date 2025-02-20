@@ -8,7 +8,7 @@ namespace CarStockAPI.Controllers
     public class CarModelController : ControllerBase
     {
         /// <summary>
-        /// Экземпляр сервиса операций над автомобилями
+        /// Экземпляр сервиса операций над моделями
         /// </summary>
         private readonly ICarModelService _carModelService;
 
@@ -23,6 +23,11 @@ namespace CarStockAPI.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Получает список моделей для определенной марки
+        /// </summary>
+        /// <param name="id">Идентификатор марки</param>
+        /// <returns>Список моделей</returns>
         [HttpGet("GetModelByBrand/{id}")]
         public async Task<IActionResult> GetCarModelByBrandIdAsync([FromRoute] int id)
         {

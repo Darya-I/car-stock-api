@@ -117,25 +117,28 @@ namespace CarStockAPI.Controllers
         }
 
         /// <summary>
-        /// Обновляет refresh токен пользователя
+        /// Обновляет refresh токен пользователя по кукам
         /// </summary>
-        /// <param name="refreshTokenRequest">Refresh токен</param>
-        /// <returns>Новый access токен</returns>
+        /// <returns>Новые токены</returns>
         [ServiceFilter(typeof(RequireAcceptHeaderFilter))]
         [HttpPost("Refresh")] 
-        public async Task<IActionResult> Refresh([FromBody] string refreshTokenRequest)
+        public async Task<IActionResult> Refresh()
         {
-            _logger.LogInformation("Attempting to refresh token for user with refresh token: {RefreshToken}", refreshTokenRequest);
-            var user = await _authorizationService.GetUserByRefreshTokenAsync(refreshTokenRequest);
+            if (!Request.Cookies.TryGetValue("refresh-token", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return BadRequest();
+            }
+            _logger.LogInformation("Attempting to refresh token for user with refresh token: {RefreshToken}", refreshToken);
+            var user = await _authorizationService.GetUserByRefreshTokenAsync(refreshToken);
             if (user == null)
             {
-                _logger.LogWarning($"No user found for refresh token: {refreshTokenRequest}");
+                _logger.LogWarning($"No user found for refresh token: {refreshToken}");
                 return Unauthorized();
             }
             _logger.LogInformation($"Access token generated successfully for user: {user.UserName}. Updating refresh token.");
             var result = await _authorizationService.UpdateRefreshTokenAsync(user);
-            SetTokenCookie(result.Token);
-            return Ok(result);
+            SetTokenCookie(result.RefreshToken);
+            return Ok(result.AccessToken);
         }
 
         /// <summary>

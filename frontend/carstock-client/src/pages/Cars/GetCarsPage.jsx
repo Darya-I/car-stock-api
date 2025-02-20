@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { DataList, Button, Stack, Toast, createToaster } from "@chakra-ui/react";
-import '../styles/CarsPage.css';
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { DataList, Button, Stack } from "@chakra-ui/react";
+import "../styles/CarsPage.css";
 import { useNavigate } from "react-router-dom";
-//import { toaster } from "@/components/ui/toaster"
+import { toast, ToastContainer } from "react-toastify";
 
 const GetCarsPage = () => {
-  const showCarsApi = "https://localhost:7087/api/Car/GetCars";
-  const deleteCarApi = "https://localhost:7087/api/Car/DeleteCar";
-
+  const showCarsApi = "/api/Car/GetCars";
+  const deleteCarApi = "/api/Car/DeleteCar";
+  const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
   const [cars, setCars] = useState([]);
-
-  const toaster = createToaster({
-    duration: 5000,
-    max: 3,
-  });
 
   useEffect(() => {
     fetchCars();
@@ -24,35 +19,55 @@ const GetCarsPage = () => {
 
   const fetchCars = async () => {
     try {
-      const response = await axios.get(showCarsApi);
+      const response = await axiosPrivate.get(showCarsApi);
       setCars(response.data);
     } catch (error) {
       console.error("Ошибка загрузки автомобилей:", error);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
     try {
-      let isConfirm = confirm("Подтвердить удаление автомобиля");
+      const isConfirm = confirm("Подтвердить удаление автомобиля");
       if (!isConfirm) return;
 
-      await axios.delete(`${deleteCarApi}/${id}`);
-      setCars(cars.filter((car) => car.id !== id));
-
-      toaster.show({
-        title: "Автомобиль удален",
-        type: "success"
-      })
-
-
+      await axiosPrivate.delete(`${deleteCarApi}/${id}`);
+      toast.success("Успешно удален", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setCars((prevCars) => prevCars.filter((car) => car.id !== id));
+      
     } catch (error) {
-      if(error.response?.status === 401) {
-        toaster.create({
-          title: "У вас нет прав на удаление",
-          type: "error"
-        })
+      if (error.response?.status === 401) {
+        toast.warn("У вас нет прав на это действие", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        return;
       }
-      console.error("Ошибка удаления автомобиля:", error);
+      toast.error("Ошибка удаления автомобиля", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
 
@@ -80,18 +95,10 @@ const GetCarsPage = () => {
             <DataList.ItemValue>{car.isAvailable ? "Доступен" : "Недоступен"}</DataList.ItemValue>
             <DataList.ItemValue>
               <Stack direction="row" spacing={2}>
-                <Button
-                  variant="outline"
-                  color="red.600"
-                  onClick={() => handleDelete(car.id)}
-                >
+                <Button variant="outline" color="red.600" onClick={() => handleDelete(car.id)}>
                   Удалить
                 </Button>
-                <Button
-                  variant="outline"
-                  color="blue.600"
-                  onClick={() => navigate(`/edit-car/${car.id}`)}
-                >
+                <Button variant="outline" color="blue.600" onClick={() => navigate(`/edit-car/${car.id}`)}>
                   Изменить
                 </Button>
               </Stack>
@@ -104,6 +111,7 @@ const GetCarsPage = () => {
           Назад
         </Button>
       </div>
+        <ToastContainer />
     </>
   );
 };

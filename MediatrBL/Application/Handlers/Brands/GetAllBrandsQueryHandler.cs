@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CarStockBLL.CustomException;
+﻿using CarStockBLL.CustomException;
 using CarStockDAL.Data.Interfaces;
 using CarStockDAL.Models;
 using MediatR;

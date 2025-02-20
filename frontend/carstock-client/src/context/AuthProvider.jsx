@@ -4,7 +4,11 @@ import { jwtDecode } from "jwt-decode";
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-    const [auth, setAuth] = useState({});
+    const [auth, setAuth] = useState(() => {
+        const storedAuth = localStorage.getItem("auth");
+        return storedAuth ? JSON.parse(storedAuth) : {};
+    });
+
     const [permission, setPermission] = useState([]);
 
     useEffect(() => {
@@ -12,26 +16,27 @@ export const AuthProvider = ({ children }) => {
             try {
                 const decoded = jwtDecode(auth.accessToken);
                 setPermission(decoded.Permission || []);
-                console.log({permission});
             } catch (err) {
                 setPermission([]);
             }
-        }
-        else {
+        } else {
             setPermission([]);
         }
-    }, [auth]) // декодируем при изменении auth
+    }, [auth]); // Декодируем токен при изменении auth
 
     useEffect(() => {
-        console.log("Updated permission:", permission);
-    }, [permission]);
-
+        if (auth?.accessToken) {
+            localStorage.setItem("auth", JSON.stringify(auth));
+        } else {
+            localStorage.removeItem("auth");
+        }
+    }, [auth]); // Сохраняем auth в localStorage при изменении
 
     return (
-        <AuthContext.Provider value={{auth, setAuth, permission}}>
+        <AuthContext.Provider value={{ auth, setAuth, permission }}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
 
 export default AuthContext;
