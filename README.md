@@ -1,7 +1,7 @@
 # Car stock API
 .NET 6.0 RESTful Справочник автомобилей. Трехуровневая архитектура, CRUD, аутентификация JWT Bearer, Google OAuth 2.0.
 
-![https://img.shields.io/badge/Status-WIP-blue](https://img.shields.io/badge/Status-WIP-blue)
+![https://badgen.net/badge/status/achieved?color=purple](https://badgen.net/badge/status/achieved?color=purple)
 
 ## DAL
 Взаимодействует с БД и передает результат слою выше.
